@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Pac;
 use App\Entity\Adherent;
+use App\Repository\PacRepository;
 use App\Repository\ExerciceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
@@ -15,12 +16,14 @@ class ExcelReader
     private $manager;
     private $validator;
     private $exerciceRepo;
+    private $pacRepo;
 
-    public function __construct(EntityManagerInterface $entityManager, ValidatorInterface $validator, ExerciceRepository $exerciceRepo)
+    public function __construct(EntityManagerInterface $entityManager, ValidatorInterface $validator, ExerciceRepository $exerciceRepo, PacRepository $pacRepo)
     {
         $this->manager = $entityManager;
         $this->validator = $validator;
         $this->exerciceRepo = $exerciceRepo;
+        $this->pacRepo = $pacRepo;
     }
 
     public function savePacFromExcel(Adherent $adherent, $file)
@@ -73,10 +76,18 @@ class ExcelReader
         // update the compte cotisation / if nouveau ++
         $currentExercice = $this->exerciceRepo->findCurrent();
         $currentCompteCotisation = $adherent->getCompteCotisation($currentExercice);
+        // Code généré (pour les nouveau importer)
+        $g = $this->pacRepo->generateCode($adherent);
 
         foreach ($donnees as $row => $donnee) {
             $pac = new Pac();
-            $pac->setCodeMutuelle($donnee[0]);
+            if ($donnee[0]) {
+                $pac->setCodeMutuelle($donnee[0]);
+            } else {          
+                $pac->setCodeMutuelle($g);
+                $g++;
+            }
+            
             $pac->setNom($donnee[1]);
             $pac->setPrenom($donnee[2]);
             $pac->setSexe($donnee[3]);

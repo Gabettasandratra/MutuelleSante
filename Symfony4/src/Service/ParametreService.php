@@ -72,38 +72,21 @@ class ParametreService
         // Les report à nouveau
         $ran110 = new Compte();
         $ran110->setIsTresor(false) // Pas de trésorerie
-                ->setCategorie('COMPTES DE BILAN') // Categorie
-                ->setType(false) // Passif
-                ->setClasse('1-COMPTES DE CAPITAUX') // Classe
                 ->setPoste('110000')
-                ->setTitre('Report à nouveau (solde créditeur)')
-                ->setNote('Les bénéfices de l\'exercice précedent');
+                ->setTitre('Report à nouveau (solde créditeur)');
         $ran119 = new Compte();
         $ran119->setIsTresor(false) // Pas de trésorerie
-                ->setCategorie('COMPTES DE BILAN') // Categorie
-                ->setType(false) // Passif
-                ->setClasse('1-COMPTES DE CAPITAUX') // Classe
                 ->setPoste('119000')
-                ->setTitre('Report à nouveau (solde débiteur)')
-                ->setNote('Les pertes de l\'exercice précedent');
-        
+                ->setTitre('Report à nouveau (solde débiteur)');     
         // Résultat de l'exercice
         $res120 = new Compte();
         $res120->setIsTresor(false) // Pas de trésorerie
-                ->setCategorie('COMPTES DE BILAN') // Categorie
-                ->setType(false) // Passif
-                ->setClasse('1-COMPTES DE CAPITAUX') // Classe
                 ->setPoste('120000')
-                ->setTitre('Résultat de l\'exercice (bénéfice)')
-                ->setNote('Les bénéfices de l\'exercice à la clôture');
+                ->setTitre('Résultat de l\'exercice (bénéfice)');
         $res129 = new Compte();
         $res129->setIsTresor(false) // Pas de trésorerie
-                ->setCategorie('COMPTES DE BILAN') // Categorie
-                ->setType(false) // Passif
-                ->setClasse('1-COMPTES DE CAPITAUX') // Classe
                 ->setPoste('129000')
-                ->setTitre('Résultat de l\'exercice (perte)')
-                ->setNote('Les pertes de l\'exercice à la clôture');
+                ->setTitre('Résultat de l\'exercice (perte)');
         $this->manager->persist($ran110);  
         $this->manager->persist($ran119);  
         $this->manager->persist($res120);  

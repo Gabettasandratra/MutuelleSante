@@ -63,6 +63,7 @@ class Exercice
     public function __construct()
     {
         $this->isCloture = false;   
+        $this->droitAdhesion = 0;   
         $this->historiqueCotisations = new ArrayCollection();
     }
 

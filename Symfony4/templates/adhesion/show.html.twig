@@ -161,7 +161,7 @@
                     </div>
                     <hr>
                     <div class="table-responsive">
-                        <table class="table table-bordered" id="order_2_desc">
+                        <table class="table table-bordered no-padding" id="order_2_desc">
                             <thead class="thead-light">
                                 <tr>
                                     <th scope="col">N° Matricule</th>
@@ -179,9 +179,9 @@
                                     {% if not pac.isSortie %}
                                         <tr>
                                             <th scope="row">{{ adherent.numero }} / {{ pac.codeMutuelle }}</th>
-                                            <td>{{ pac.dateEntrer | date('d / m / Y') }}</td>
+                                            <td>{{ pac.dateEntrer | date('d/m/Y') }}</td>
                                             <td>{{ pac.nom }} {{ pac.prenom }}</td>
-                                            <td>{{ pac.dateNaissance | date('d / m / Y') }}</td>
+                                            <td>{{ pac.dateNaissance | date('d/m/Y') }}</td>
                                             <td>{{ pac.parente }}</td>
                                             {% if exercice.isCurrent  %}
                                             <td>

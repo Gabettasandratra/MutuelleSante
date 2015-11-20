@@ -27,7 +27,7 @@ class Pac
     private $id;
 
     /**
-     * @ORM\Column(type="integer", columnDefinition="INT(5) UNSIGNED ZEROFILL" )
+     * @ORM\Column(type="integer", unique=true)
      */
     private $codeMutuelle;
 

@@ -127,14 +127,14 @@
                                         {% endif %}        
                                         <tr>
                                             <td {% if rubrique[0] != 0 %}class="pl-4"{% endif %}>{{ rubrique[1] }}</td>
-                                            <td>{% if rubrique[2] is defined and rubrique[2] != 0 %}{{ rubrique[2]|number_format(2,',',' ') }} {% set tCa = tCa + rubrique[2] %}{% endif %}</td>
-                                            <td>{% if rubrique[3] is defined and rubrique[3] != 0 %}{{ rubrique[3]|number_format(2,',',' ') }} {% set tCs = tCs + rubrique[3] %}{% endif %}</td>
+                                            <td>{% if rubrique[2] is defined and rubrique[2] != 0 %}{{ (0 - rubrique[2])|number_format(2,',',' ') }} {% set tCa = tCa + rubrique[2] %}{% endif %}</td>
+                                            <td>{% if rubrique[3] is defined and rubrique[3] != 0 %}{{ (0 - rubrique[3])|number_format(2,',',' ') }} {% set tCs = tCs + rubrique[3] %}{% endif %}</td>
                                         </tr>
                                         {% if loop.last %}
                                         <tr>
                                             <td class="text-right font-weight-bold">TOTAL CAPITAUX PROPRES</td>
-                                            <td>{% if tCa != 0 %}{{ tCa|number_format(2,',',' ') }}{% endif %}</td>
-                                            <td>{% if tCs != 0 %}{{ tCs|number_format(2,',',' ') }}{% endif %}</td>
+                                            <td>{% if tCa != 0 %}{{ (0 - tCa)|number_format(2,',',' ') }}{% endif %}</td>
+                                            <td>{% if tCs != 0 %}{{ (0 - tCs)|number_format(2,',',' ') }}{% endif %}</td>
                                         </tr>
                                         {% endif %}           
                                     {% endfor %}
@@ -149,14 +149,14 @@
                                         {% endif %}        
                                         <tr>
                                             <td {% if rubrique[0] != 0 %}class="pl-4"{% endif %}>{{ rubrique[1] }}</td>
-                                            <td>{% if rubrique[2] is defined and rubrique[2] != 0 %}{{ rubrique[2]|number_format(2,',',' ') }} {% set tPNCa = tPNCa + rubrique[2] %}{% endif %}</td>
-                                            <td>{% if rubrique[3] is defined and rubrique[3] != 0 %}{{ rubrique[3]|number_format(2,',',' ') }} {% set tPNCs = tPNCs + rubrique[3] %}{% endif %}</td>
+                                            <td>{% if rubrique[2] is defined and rubrique[2] != 0 %}{{ (0 - rubrique[2])|number_format(2,',',' ') }} {% set tPNCa = tPNCa + rubrique[2] %}{% endif %}</td>
+                                            <td>{% if rubrique[3] is defined and rubrique[3] != 0 %}{{ (0 - rubrique[3])|number_format(2,',',' ') }} {% set tPNCs = tPNCs + rubrique[3] %}{% endif %}</td>
                                         </tr>
                                         {% if loop.last %}
                                         <tr>
                                             <td class="text-right font-weight-bold">TOTAL PASSIFS NON-COURANTS</td>
-                                            <td>{% if tPNCa != 0 %}{{ tPNCa|number_format(2,',',' ') }}{% endif %}</td>
-                                            <td>{% if tPNCs != 0 %}{{ tPNCs|number_format(2,',',' ') }}{% endif %}</td>
+                                            <td>{% if tPNCa != 0 %}{{ (0 - tPNCa)|number_format(2,',',' ') }}{% endif %}</td>
+                                            <td>{% if tPNCs != 0 %}{{ (0 - tPNCs)|number_format(2,',',' ') }}{% endif %}</td>
                                         </tr>
                                         {% endif %}           
                                     {% endfor %}
@@ -171,14 +171,14 @@
                                         {% endif %}        
                                         <tr>
                                             <td {% if rubrique[0] != 0 %}class="pl-4"{% endif %}>{{ rubrique[1] }}</td>
-                                            <td>{% if rubrique[2] is defined and rubrique[2] != 0 %}{{ rubrique[2]|number_format(2,',',' ') }} {% set tPCa = tPCa + rubrique[2] %}{% endif %}</td>
-                                            <td>{% if rubrique[3] is defined and rubrique[3] != 0 %}{{ rubrique[3]|number_format(2,',',' ') }} {% set tPCs = tPCs + rubrique[3] %}{% endif %}</td>
+                                            <td>{% if rubrique[2] is defined and rubrique[2] != 0 %}{{ (0 - rubrique[2])|number_format(2,',',' ') }} {% set tPCa = tPCa + rubrique[2] %}{% endif %}</td>
+                                            <td>{% if rubrique[3] is defined and rubrique[3] != 0 %}{{ (0 - rubrique[3])|number_format(2,',',' ') }} {% set tPCs = tPCs + rubrique[3] %}{% endif %}</td>
                                         </tr>
                                         {% if loop.last %}
                                         <tr>
                                             <td class="text-right font-weight-bold">TOTAL PASSIFS COURANTS</td>
-                                            <td>{% if tPCa != 0 %}{{ tPCa|number_format(2,',',' ') }}{% endif %}</td>
-                                            <td>{% if tPCs != 0 %}{{ tPCs|number_format(2,',',' ') }}{% endif %}</td>
+                                            <td>{% if tPCa != 0 %}{{ (0 - tPCa)|number_format(2,',',' ') }}{% endif %}</td>
+                                            <td>{% if tPCs != 0 %}{{ (0 - tPCs)|number_format(2,',',' ') }}{% endif %}</td>
                                         </tr>
                                         {% endif %}           
                                     {% endfor %}

@@ -22,6 +22,7 @@ class ParametersType extends AbstractType
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('c')
                             ->andWhere('c.classe = \'7-COMPTES DE PRODUITS\'')
+                            ->andWhere('length(c.poste) = 6')
                             ->orderBy('c.poste', 'ASC');
                 },
                 'choice_label' => function ($c) {
@@ -34,6 +35,7 @@ class ParametersType extends AbstractType
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('c')
                             ->andWhere('c.classe = \'6-COMPTES DE CHARGES\'')
+                            ->andWhere('length(c.poste) = 6')
                             ->orderBy('c.poste', 'ASC');
                 },
                 'choice_label' => function ($c) {
@@ -48,9 +50,8 @@ class ParametersType extends AbstractType
                 'class' => Compte::class,
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('c')
-                            ->andWhere('c.classe != \'6-COMPTES DE CHARGES\'')
-                            ->andWhere('c.classe != \'7-COMPTES DE PRODUITS\'')
-                            ->andWhere('c.type = false')
+                            ->andWhere('c.classe = \'4-COMPTES DE TIERS\'')
+                            ->andWhere('length(c.poste) = 6')
                             ->orderBy('c.poste', 'ASC');
                 },
                 'choice_label' => function ($c) {

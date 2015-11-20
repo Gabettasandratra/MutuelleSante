@@ -27,7 +27,6 @@ class ExerciceType extends AbstractType
             ])
             ->add('cotNouveau', NumberType::class)
             ->add('cotAncien', NumberType::class)
-            ->add('droitAdhesion', NumberType::class)
             ->add('dateDebut', DateType::class)
             ->add('dateFin', DateType::class)
         ;

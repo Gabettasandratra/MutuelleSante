@@ -99,6 +99,9 @@ class PrestationRepository extends ServiceEntityRepository
                                 ->getOneOrNullResult();
         # A chaque soins
         $retour = [];
+        if (!$total) {
+            return $retour;
+        }
         foreach ($listDesSoins['list'] as $code => $description) {
             $nb = $this->_em->createQuery('select count(p) from App\Entity\Prestation p where year(p.date) = :year and p.designation = :code')
                                 ->setParameter('year', $annee)

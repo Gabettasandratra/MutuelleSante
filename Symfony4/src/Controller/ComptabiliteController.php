@@ -82,7 +82,7 @@ class ComptabiliteController extends AbstractController
                     ->setCategorie($journal);
         }    
         $plan_analytiques = $repositoryParametre->findOneBy(['nom' => 'plan_analytique'])->getList();
-        $choices = [];
+        $choices['NULL'] = null;
         foreach ($plan_analytiques as $key => $value) {
             $choices[$key.' | '.$value] = $key;
         } // reverse key value
@@ -203,20 +203,7 @@ class ComptabiliteController extends AbstractController
     public function plan(CompteRepository $repositoryCompte, Request $request, EntityManagerInterface $manager)
     {
         $compte = new Compte();     
-        $form = $this->createFormBuilder($compte) 
-                    ->add('rubrique', EntityType::class, [
-                        'class' => Compte::class,
-                        'mapped' => false,
-                        'query_builder' => function (EntityRepository $er) {
-                            return $er->createQueryBuilder('c')
-                                    ->andWhere('length(c.poste) < 6')
-                                    ->orderBy('c.poste', 'ASC');
-                        },
-                        'choice_label' => function ($c) {
-                            return $c->getPoste().' | '.$c->getTitre();
-                        },
-
-                    ])    
+        $form = $this->createFormBuilder($compte)   
                      ->add('poste', TextType::class, [
                         'constraints' => [
                             new Length([
@@ -230,7 +217,7 @@ class ComptabiliteController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             // verifier si le rubrique existe
-            $rub = substr($compte->getPoste(), 0, 3);
+            $rub = substr($compte->getPoste(), 0, 2);
             if ($repositoryCompte->findByPoste($rub)) {
                 $manager->persist($compte);
                 $manager->flush();

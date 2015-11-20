@@ -173,7 +173,7 @@ class ConfigEtatFi {
     {
         return array(
             [0,"Produits exceptionnels sur opérations de gestion",[771]],
-            [0,"Produits exceptionnels sur opérations en capital",[775,778,777]],
+            [0,"Produits exceptionnels sur opérations en capital",[775,778,777,779]],
             [0,"Reprises sur dépreciations et transferts de charges",[787,797]]
         );
     }

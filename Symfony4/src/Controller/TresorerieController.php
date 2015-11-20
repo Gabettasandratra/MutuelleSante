@@ -40,9 +40,6 @@ class TresorerieController extends AbstractController
         if ($compteTresorerie === null) {
             $compteTresorerie = new Compte();
             $compteTresorerie->setIsTresor(true);
-            $compteTresorerie->setClasse('5-COMPTE FINANCIERS');
-            $compteTresorerie->setCategorie('COMPTES DE BILAN');
-            $compteTresorerie->setType(true); // Actif
         }
         $form = $this->createFormBuilder($compteTresorerie)
                      ->add('poste')
