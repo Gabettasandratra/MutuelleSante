@@ -147,7 +147,15 @@
                         </li>
 
                         {% block sidebarMenu %}
-                            <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link" href="index.html" aria-expanded="false"><i class="mdi mdi-view-dashboard"></i><span class="hide-menu">Dashboard</span></a></li>
+                            <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ path('dashboard') }}" aria-expanded="false"><i class="mdi mdi-view-dashboard"></i><span class="hide-menu">Dashboard</span></a></li>
+                            <li class="nav-small-cap"><span class="hide-menu">Gestion mutuelle</span></li>
+                            <li class="sidebar-item"> 
+                                <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-account-multiple"></i><span class="hide-menu"> Adhesion </span></a>
+                                <ul aria-expanded="false" class="collapse first-level">
+                                    <li class="sidebar-item"><a href="{{ path('adhesion_new') }}" class="sidebar-link"><i class="mdi mdi-account-plus"></i><span class="hide-menu"> Inscrire adhérent </span></a></li>
+                                    <li class="sidebar-item"><a href="{{ path('adhesion') }}" class="sidebar-link"><i class="mdi  mdi-account-search"></i><span class="hide-menu"> Modifier adhérent </span></a></li>
+                                </ul>
+                            </li>
                         {% endblock %}
                     </ul>
                     
@@ -165,27 +173,25 @@
         <!-- ============================================================== -->
         <div class="page-wrapper">
             {% block header %}
-            <!-- ============================================================== -->
-            <!-- Bread crumb and right sidebar toggle -->
-            <!-- ============================================================== -->
-            <div class="page-breadcrumb">
-                <div class="row align-items-center">
-                    <div class="col-5">
-                        <h4 class="page-title">Blank Page</h4>
-                        <div class="d-flex align-items-center">
+                <!-- ============================================================== -->
+                <!-- Bread crumb and right sidebar toggle -->
+                <!-- ============================================================== -->
+                <div class="page-breadcrumb">
+                    <div class="d-flex align-items-center">
+                        <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Tableau de bord</h4>
+                        <div class="ml-auto">
                             <nav aria-label="breadcrumb">
-                                <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="#">Blank</a></li>
-                                    <li class="breadcrumb-item active" aria-current="page">Page</li>
+                                <ol class="breadcrumb m-0 p-0">
+                                    <li class="breadcrumb-item text-muted active" aria-current="page">Xtreme</li>
+                                    <li class="breadcrumb-item text-muted" aria-current="page">Introduction</li>
                                 </ol>
                             </nav>
                         </div>
                     </div>
                 </div>
-            </div>
-            <!-- ============================================================== -->
-            <!-- End Bread crumb and right sidebar toggle -->
-            <!-- ============================================================== -->
+                <!-- ============================================================== -->
+                <!-- End Bread crumb and right sidebar toggle -->
+                <!-- ============================================================== -->
             {% endblock %}
             <!-- ============================================================== -->
             <!-- Container fluid  -->
@@ -210,7 +216,7 @@
 
             {% block footer %}
             <footer class="footer text-center">
-                All Rights Reserved by Xtreme Admin. Designed and Developed by <a href="https://wrappixel.com">WrapPixel</a>.
+                <i class="fa fa-copyright" aria-hidden="true"></i> Copyright 2020 - Fidev gestion mutuelle santé.
             </footer>
             {% endblock %}
             <!-- ============================================================== -->

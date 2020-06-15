@@ -7,6 +7,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class DashboardController extends AbstractController
 {
+
     /**
      * @Route("/dashboard", name="dashboard")
      */
