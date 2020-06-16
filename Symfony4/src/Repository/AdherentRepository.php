@@ -47,4 +47,11 @@ class AdherentRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function generateCode()
+    {
+        // get the last id
+        $lastId = $this->_em->createQuery('select max(a.id) from App\Entity\Adherent a')->getSingleScalarResult();
+        return ++$lastId.'/1';
+    }
 }

@@ -13,10 +13,10 @@
     <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('assets/images/favicon.png') }}">
     <title>{% block title %}{% endblock %}</title>
-    {% block stylesheets %}
-        <!-- Custom CSS -->
-        <link href="{{ asset('dist/css/style.min.css') }}" rel="stylesheet">
-    {% endblock %}
+    
+    <link href="{{ asset('dist/css/style.min.css') }}" rel="stylesheet">
+    <!-- Custom CSS -->
+    {% block stylesheets %}{% endblock %}
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -147,13 +147,13 @@
                         </li>
 
                         {% block sidebarMenu %}
-                            <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ path('dashboard') }}" aria-expanded="false"><i class="mdi mdi-view-dashboard"></i><span class="hide-menu">Dashboard</span></a></li>
+                            <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ path('dashboard') }}" aria-expanded="false"><i class="mdi mdi-view-dashboard"></i><span class="hide-menu"> Tableau de bord</span></a></li>
                             <li class="nav-small-cap"><span class="hide-menu">Gestion mutuelle</span></li>
                             <li class="sidebar-item"> 
                                 <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-account-multiple"></i><span class="hide-menu"> Adhesion </span></a>
                                 <ul aria-expanded="false" class="collapse first-level">
                                     <li class="sidebar-item"><a href="{{ path('adhesion_new') }}" class="sidebar-link"><i class="mdi mdi-account-plus"></i><span class="hide-menu"> Inscrire adhérent </span></a></li>
-                                    <li class="sidebar-item"><a href="{{ path('adhesion') }}" class="sidebar-link"><i class="mdi  mdi-account-search"></i><span class="hide-menu"> Modifier adhérent </span></a></li>
+                                    <li class="sidebar-item"><a href="{{ path('adhesion') }}" class="sidebar-link"><i class="mdi  mdi-account-search"></i><span class="hide-menu"> Liste adhérents </span></a></li>
                                 </ul>
                             </li>
                         {% endblock %}
@@ -231,31 +231,31 @@
     <!-- End Wrapper -->
     <!-- ============================================================== -->
 
-    {% block javascripts %}
-        <!-- ============================================================== -->
-        <!-- All Required js -->
-        <!-- ============================================================== -->
-        <script src="{{ asset('assets/libs/jquery/dist/jquery.min.js') }}"></script>
-        <!-- Bootstrap tether Core JavaScript -->
-        <script src="{{ asset('assets/libs/popper.js/dist/umd/popper.min.js') }}"></script>
-        <script src="{{ asset('assets/libs/bootstrap/dist/js/bootstrap.min.js') }}"></script>
-        <!-- ============================================================== -->
-        <!-- This page plugin js -->
-        <script src="{{ asset('dist/js/app-style-switcher.js') }}"></script>
-        <!--Wave Effects -->
-        <script src="{{ asset('dist/js/waves.js') }}"></script>
-        <!--Menu sidebar -->
-        <script src="{{ asset('dist/js/sidebarmenu.js') }}"></script>
-        <!--Custom JavaScript -->
-        <script src="{{ asset('dist/js/custom.js') }}"></script>
-        <!-- ============================================================== -->
-    {% endblock %}
-    {% block script %}
+    
+    <!-- ============================================================== -->
+    <!-- All Required js -->
+    <!-- ============================================================== -->
+    <script src="{{ asset('assets/libs/jquery/dist/jquery.min.js') }}"></script>
+    <!-- Bootstrap tether Core JavaScript -->
+    <script src="{{ asset('assets/libs/popper.js/dist/umd/popper.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/bootstrap/dist/js/bootstrap.min.js') }}"></script>
+    <!-- ============================================================== -->
+    <!-- This page plugin js -->
+    <script src="{{ asset('dist/js/app-style-switcher.js') }}"></script>
+    <!--Wave Effects -->
+    <script src="{{ asset('dist/js/waves.js') }}"></script>
+    <!--Menu sidebar -->
+    <script src="{{ asset('dist/js/sidebarmenu.js') }}"></script>
+    <!--Custom JavaScript -->
+    <script src="{{ asset('dist/js/custom.js') }}"></script>
+    <!-- ============================================================== -->
+
+    {% block javascripts %}{% endblock %}
+
     <script>
         $('[data-toggle="tooltip"]').tooltip();
         $(".preloader").fadeOut();
-        </script>
-    {% endblock %}
+    </script>
 </body>
 
 </html>

@@ -1,16 +1,19 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Inscrire adhérent{% endblock %}
+{% block title %}Liste des adhérents{% endblock %}
+{% block stylesheets %}
+    <link href="{{ asset('assets/libs/datatable/dist/dataTables.bootstrap4.css') }}" rel="stylesheet">
+{% endblock %}
 
 {% block header %}
     <div class="page-breadcrumb">
         <div class="d-flex align-items-center">
-            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Inscription adhérent</h4>
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Liste des adhérents</h4>
             <div class="ml-auto">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb m-0 p-0">
                         <li class="breadcrumb-item text-muted active" aria-current="page">Adhésion</li>
-                        <li class="breadcrumb-item text-muted" aria-current="page">Inscription</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Liste</li>
                     </ol>
                 </nav>
             </div>
@@ -23,53 +26,39 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Introduction</h4>
+                    <h4 class="card-title">Liste des adhérents</h4>
                     <hr>
-                    <p>Xtreme admin is a popular open source WebApp template for admin dashboards and control panels. Xtreme is fully responsive HTML template, which is based on the CSS framework <span class="text-danger">Bootstrap 4</span>. It utilizes all of the Bootstrap components in its design and re-styles many commonly used plugins to create a consistent design that can be used as a user interface for backend applications. Xtreme is based on a modular design, which allows it to be easily customized and built upon. This documentation will guide you through installing the template and exploring the various components that are bundled with the template.</p>
-                    <p>We put a lot of love and effort to make Xtreme Admin a useful template for everyone and now It comes with 10 unique demos. We are keen to release continuous long term updates and lots of new features will be coming soon in the future releases. Once you purchased Xtreme Admin, you will be entitled to free download of all future updates for the same license.</p>
-                    <div class="p-4 border shadow-sm rounded">
-                        <h4 class="card-title">Support</h4>
-                        <hr>
-                        <div class="row">
-                            <div class="col-md-6 border-right">
-                                <ul class="list-style-none">
-                                    <li class="my-2 border-bottom pb-3">
-                                        <span class="font-weight-medium text-dark"><i class="icon-note mr-2 text-success"></i> Includes:</span>
-                                    </li>
-                                    <li class="my-3">
-                                        <span><i class="icon-pencil mr-2 text-success"></i> Answering your questions or problems regarding the template.</span>
-                                    </li>
-                                    <li class="my-3">
-                                        <span><i class="icon-pencil mr-2 text-success"></i> Giving solution to the Bugs reported.</span>
-                                    </li>	
-                                </ul>
-                            </div>
-                            <div class="col-md-6">
-                                <ul class="list-style-none">
-                                    <li class="my-2 border-bottom pb-3">
-                                        <span class="font-weight-medium text-dark"><i class="icon-note mr-2 text-danger"></i> Does Not Includes:</span>
-                                    </li>
-                                    <li class="my-3">
-                                        <span><i class="icon-pencil mr-2 text-danger"></i> Custmaization Work</span>
-                                    </li>
-                                    <li class="my-3">
-                                        <span><i class="icon-pencil mr-2 text-danger"></i> Any Installation Work</span>
-                                    </li>	
-                                    <li class="my-3">
-                                        <span><i class="icon-pencil mr-2 text-danger"></i> Support for any Third Party Plugins / Software</span>
-                                    </li>
-                                    <li class="my-3">
-                                        <span><i class="icon-pencil mr-2 text-danger"></i> Support or Guide for How to integrate with any technologies (like, PHP, .net, Java etc)</span>
-                                    </li>
-                                    <li class="my-3">
-                                        <span><i class="icon-pencil mr-2 text-danger"></i> Solve bug in your implemented template</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
+                    <div class="table-responsive">
+                        <table id="zero_config" class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">N°code</th>
+                                    <th scope="col">Nom et prénom</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for adherent in adherents %}
+                                    <tr>
+                                        <th scope="row">{{ adherent.id }}</th>
+                                        <td>{{ adherent.codeMutuelle }}</td>
+                                        <td>{{ adherent.nom }} {{ adherent.prenom }}</td>
+                                        <td>
+                                            <a href="{{ path('adhesion_show', {'id': adherent.id}) }}"class="label btn-success label-success">Voir</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="{{ asset('assets/libs/datatable/dist/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('dist/js/pages/datatable/datatable-basic.init.js') }}"></script>
 {% endblock %}

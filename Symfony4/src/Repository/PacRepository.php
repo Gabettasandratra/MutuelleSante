@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Pac;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\Adherent;
 
 /**
  * @method Pac|null find($id, $lockMode = null, $lockVersion = null)
@@ -19,32 +20,16 @@ class PacRepository extends ServiceEntityRepository
         parent::__construct($registry, Pac::class);
     }
 
-    // /**
-    //  * @return Pac[] Returns an array of Pac objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function generateCode(Adherent $adherent)
     {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        // get the last id
+        $lastCode = $this->_em->createQuery('select max(p.codeMutuelle) from App\Entity\Pac p where p.adherent = :a')
+                            ->setParameter('a', $adherent) 
+                            ->getSingleScalarResult();
+        $id = (int)str_replace($adherent->getId().'/', '', $lastCode);
+        if ($id == 0) {
+            $id = 1;
+        }
+        return $adherent->getId().'/'.++$id;
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Pac
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

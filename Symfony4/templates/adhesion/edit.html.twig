@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Inscrire adhérent{% endblock %}
+{% block title %}Modifier l'adhérent N°{{ adherent.id }}{% endblock %}
 
 {% block header %}
     <div class="page-breadcrumb">
         <div class="d-flex align-items-center">
-            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Inscription adhérent</h4>
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Modifier l'adhérent N°{{ adherent.id }}</h4>
             <div class="ml-auto">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb m-0 p-0">
                         <li class="breadcrumb-item text-muted active" aria-current="page">Adhésion</li>
-                        <li class="breadcrumb-item text-muted" aria-current="page">Inscription</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Modification</li>
                     </ol>
                 </nav>
             </div>
@@ -25,13 +25,13 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Formulaire d'inscription</h4>
+                    <h4 class="card-title">Adhérent N°{{ adherent.id }}</h4>
                     <hr>
                     <div class="row">
                         <div class="col-6">
                             {{ form_start(form) }}
                                 {{ form_widget(form) }}                           
-                                <button type="submit" class="btn btn-success">Enregistrer</button>
+                                <button type="submit" class="btn btn-success">Enregistrer les modifications</button>
                             {{ form_end(form) }}
                         </div>
                     </div>
