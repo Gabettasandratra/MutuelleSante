@@ -64,9 +64,9 @@
                             <!-- Logo text -->
                             <span class="logo-text">
                                 <!-- dark Logo text -->
-                                <img src="{{ asset('assets/images/logo-text.png') }}" alt="homepage" class="dark-logo" />
+                                <img src="{{ asset('uploads/img/mutuelle-3.png') }}" alt="homepage" class="dark-logo" />
                                 <!-- Light Logo text -->    
-                                <img src="{{ asset('assets/images/logo-light-text.png') }}" class="light-logo" alt="homepage" />
+                                <img src="{{ asset('uploads/img/mutuelle-light-3.png') }}" class="light-logo" alt="homepage" />
                             </span>
                         </a>
                         <!-- ============================================================== -->
@@ -153,7 +153,16 @@
                                 <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-account-multiple"></i><span class="hide-menu"> Adhesion </span></a>
                                 <ul aria-expanded="false" class="collapse first-level">
                                     <li class="sidebar-item"><a href="{{ path('adhesion_new') }}" class="sidebar-link"><i class="mdi mdi-account-plus"></i><span class="hide-menu"> Inscrire adhérent </span></a></li>
-                                    <li class="sidebar-item"><a href="{{ path('adhesion') }}" class="sidebar-link"><i class="mdi  mdi-account-search"></i><span class="hide-menu"> Liste adhérents </span></a></li>
+                                    <li class="sidebar-item"><a href="{{ path('adhesion') }}" class="sidebar-link"><i class="mdi mdi-account-search"></i><span class="hide-menu"> Liste adhérents </span></a></li>
+                                    <li class="sidebar-item"><a href="{{ path('adhesion_beneficiaires') }}" class="sidebar-link"><i class="mdi mdi-format-list-bulleted"></i><span class="hide-menu"> Liste béneficiaires </span></a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-small-cap"><span class="hide-menu">Paramètres</span></li>
+                            <li class="sidebar-item"> 
+                                <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-human-male-female"></i><span class="hide-menu"> Garantie santé </span></a>
+                                <ul aria-expanded="false" class="collapse first-level">
+                                    <li class="sidebar-item"><a href="{{ path('garantie_new') }}" class="sidebar-link"><i class="mdi mdi-medical-bag"></i><span class="hide-menu"> Ajouter garantie </span></a></li>
+                                    <li class="sidebar-item"><a href="{{ path('garantie') }}" class="sidebar-link"><i class="mdi mdi-format-list-bulleted"></i><span class="hide-menu"> Liste garanties </span></a></li>
                                 </ul>
                             </li>
                         {% endblock %}
@@ -182,8 +191,7 @@
                         <div class="ml-auto">
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb m-0 p-0">
-                                    <li class="breadcrumb-item text-muted active" aria-current="page">Xtreme</li>
-                                    <li class="breadcrumb-item text-muted" aria-current="page">Introduction</li>
+                                    <li class="breadcrumb-item text-muted active" aria-current="page">Tableau de bord</li>
                                 </ol>
                             </nav>
                         </div>
@@ -216,7 +224,7 @@
 
             {% block footer %}
             <footer class="footer text-center">
-                <i class="fa fa-copyright" aria-hidden="true"></i> Copyright 2020 - Fidev gestion mutuelle santé.
+                <i class="fa fa-copyright" aria-hidden="true"></i> Copyright 2020 - Mutuelle santé developpé par l'ONG Fidev.
             </footer>
             {% endblock %}
             <!-- ============================================================== -->

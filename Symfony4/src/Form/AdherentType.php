@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\BirthdayType;
 
 class AdherentType extends AbstractType
 {
@@ -25,7 +26,7 @@ class AdherentType extends AbstractType
                     'Feminin' => 'Feminin',
                 ]
             ])
-            ->add('dateNaissance', DateType::class)
+            ->add('dateNaissance', BirthdayType::class)
             ->add('profession')
             ->add('salaire')
             ->add('adresse')

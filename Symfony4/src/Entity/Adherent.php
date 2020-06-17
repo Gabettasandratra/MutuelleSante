@@ -106,6 +106,17 @@ class Adherent
      */
     private $email;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Garantie::class, inversedBy="adherents")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $garantie;
+
+    /**
+     * @ORM\OneToOne(targetEntity=TailleFamille::class, mappedBy="adherent", cascade={"persist", "remove"})
+     */
+    private $tailleFamille;
+
     public function __construct()
     {
         $this->etatAdherents = new ArrayCollection();
@@ -343,6 +354,35 @@ class Adherent
     public function setEmail(?string $email): self
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    public function getGarantie(): ?Garantie
+    {
+        return $this->garantie;
+    }
+
+    public function setGarantie(?Garantie $garantie): self
+    {
+        $this->garantie = $garantie;
+
+        return $this;
+    }
+
+    public function getTailleFamille(): ?TailleFamille
+    {
+        return $this->tailleFamille;
+    }
+
+    public function setTailleFamille(TailleFamille $tailleFamille): self
+    {
+        $this->tailleFamille = $tailleFamille;
+
+        // set the owning side of the relation if necessary
+        if ($tailleFamille->getAdherent() !== $this) {
+            $tailleFamille->setAdherent($this);
+        }
 
         return $this;
     }

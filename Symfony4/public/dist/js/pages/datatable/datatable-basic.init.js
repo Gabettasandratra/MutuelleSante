@@ -19,10 +19,13 @@ $('#zero_config').DataTable({
 /****************************************
  *       Default Order Table           *
  ****************************************/
-$('#default_order').DataTable({
+$('#order').DataTable({
     "order": [
-        [3, "desc"]
-    ]
+        [1, "asc"]
+    ],
+    "language": {
+        "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/French.json"
+    }
 });
 
 /****************************************

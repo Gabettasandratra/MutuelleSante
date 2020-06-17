@@ -6,6 +6,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 use App\Entity\Adherent;
 use App\Form\AdherentType;
@@ -19,11 +21,24 @@ class AdhesionController extends AbstractController
      */
     public function index()
     {
-        $adhrents = $this->getDoctrine()
+        $adherents = $this->getDoctrine()
                          ->getRepository(Adherent::class)
                          ->findAll();
         return $this->render('adhesion/index.html.twig', [
-            'adherents' => $adhrents
+            'adherents' => $adherents
+        ]);
+    }
+
+    /**
+     * @Route("/adhesion/beneficiaires", name="adhesion_beneficiaires")
+     */
+    public function beneficiaires()
+    {
+        $adherents = $this->getDoctrine()
+                         ->getRepository(Adherent::class)
+                         ->findAll();
+        return $this->render('adhesion/beneficiaires.html.twig', [
+            'adherents' => $adherents
         ]);
     }
 
@@ -133,6 +148,19 @@ class AdhesionController extends AbstractController
         if ($formPac->isSubmitted() && $formPac->isValid()) {
             $pac->setCreatedAt(new \DateTime());
             $pac->setAdherent($adherent);
+            $photoFile = $formPac->get('photo')->getData();           
+            if ($photoFile) {
+                $fileName = uniqid().'.'.$photoFile->guessExtension();
+                try {
+                    $photoFile->move(
+                        $this->getParameter('users_img_root_directory'),
+                        $fileName
+                    );
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
+                $pac->setPhoto($this->getParameter('users_img_directory').'/'.$fileName);
+            }
             $manager->persist($pac);
             $manager->flush();
 
@@ -157,6 +185,19 @@ class AdhesionController extends AbstractController
         $formPac = $this->createForm(PacType::class, $pac);
         $formPac->handleRequest($request);
         if ($formPac->isSubmitted() && $formPac->isValid()) {
+            $photoFile = $formPac->get('photo')->getData();           
+            if ($photoFile) {
+                $fileName = uniqid().'.'.$photoFile->guessExtension();
+                try {
+                    $photoFile->move(
+                        $this->getParameter('users_img_root_directory'),
+                        $fileName
+                    );
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
+                $pac->setPhoto($this->getParameter('users_img_directory').'/'.$fileName);
+            }
             $manager->persist($pac);
             $manager->flush();
 
@@ -169,4 +210,33 @@ class AdhesionController extends AbstractController
             'editMode' => true,
         ]);
     } 
+
+    /**
+     * @Route("/adhesion/{id}/pac/{idPac}/remove", name="adhesion_remove_pac")
+     */
+    public function removePac(Adherent $adherent, $idPac, Request $request)
+    { 
+        $manager = $this->getDoctrine()->getManager();
+        $pac = $this->getDoctrine()
+                    ->getRepository(Pac::class)
+                    ->find($idPac);
+
+        $formPac = $this->createFormBuilder($pac)
+                        ->add('dateSortie', DateType::class)
+                        ->add('remarque', TextareaType::class)
+                        ->getForm();
+        $formPac->handleRequest($request);
+        if ($formPac->isSubmitted() && $formPac->isValid()) {
+            $pac->setIsSortie(true);
+            $manager->persist($pac);
+            $manager->flush();
+
+            return $this->redirectToRoute('adhesion_show', ['id' => $adherent->getId()]);
+        }
+        return $this->render('adhesion/removePac.html.twig', [
+            'form' => $formPac->createView(),
+            'adherent' => $adherent,
+            'pac' => $pac
+        ]);
+    }
 }

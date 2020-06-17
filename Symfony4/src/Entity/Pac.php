@@ -82,6 +82,21 @@ class Pac
      */
     private $etatPacs;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isSortie;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $dateSortie;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $remarque;
+
     public function __construct()
     {
         $this->etatPacs = new ArrayCollection();
@@ -239,6 +254,42 @@ class Pac
                 $etatPac->setPac(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getIsSortie(): ?bool
+    {
+        return $this->isSortie;
+    }
+
+    public function setIsSortie(bool $isSortie): self
+    {
+        $this->isSortie = $isSortie;
+
+        return $this;
+    }
+
+    public function getDateSortie(): ?\DateTimeInterface
+    {
+        return $this->dateSortie;
+    }
+
+    public function setDateSortie(?\DateTimeInterface $dateSortie): self
+    {
+        $this->dateSortie = $dateSortie;
+
+        return $this;
+    }
+
+    public function getRemarque(): ?string
+    {
+        return $this->remarque;
+    }
+
+    public function setRemarque(?string $remarque): self
+    {
+        $this->remarque = $remarque;
 
         return $this;
     }

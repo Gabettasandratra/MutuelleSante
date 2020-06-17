@@ -8,6 +8,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\BirthdayType;
 
 class PacType extends AbstractType
 {
@@ -23,7 +25,7 @@ class PacType extends AbstractType
                     'Feminin' => 'Feminin',
                 ]
             ])
-            ->add('dateNaissance', DateType::class)
+            ->add('dateNaissance', BirthdayType::class)
             ->add('parente', ChoiceType::class, [
                 'choices'  => [
                     'Conjoint' => 'Conjoint',
@@ -33,7 +35,10 @@ class PacType extends AbstractType
                 ]
             ])
             ->add('dateEntrer', DateType::class)
-            ->add('photo')
+            ->add('photo', FileType::class, [
+                'mapped' => false,
+                'required' => false
+            ])
         ;
     }
 

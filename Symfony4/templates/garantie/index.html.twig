@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste garanties santés{% endblock %}
+
+{% block header %}
+    <div class="page-breadcrumb">
+        <div class="d-flex align-items-center">
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Liste garanties santés</h4>
+            <div class="ml-auto">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0 p-0">
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Garantie</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Liste</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Liste garanties santés</h4>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Nom</th>
+                                    <th scope="col">Active</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for garantie in garanties %}
+                                    <tr>
+                                        <th scope="row">{{ garantie.id }}</th>
+                                        <td>{{ garantie.nom }}</td>
+                                        <td>{% if garantie.isActive %}Active{% else %}Non active{% endif %}</td>
+                                        <td>
+                                            <a href="{{ path('garantie_edit', {'id': garantie.id }) }}"class="label btn-primary label-primary">Modifier</a>
+                                            <a href="#"class="label btn-success label-success">{% if garantie.isActive %}Desactiver{% else %}Activer{% endif %}</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

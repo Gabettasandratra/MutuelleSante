@@ -91,7 +91,43 @@
                             
                         </div>
                         <div class="col-md-6">
-                            <ul class="list-style-none">     
+                            <h4 class="card-title">Garantie santé</h4>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <ul class="list-style-none">
+                                        <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark"> Nom de la garantie:</span>
+                                        </li>
+                                        <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark"> Droit d'ahésion:</span>
+                                        </li>
+                                        <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark"> Type de cotisation:</span>
+                                        </li>
+                                        <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark"> Cotisation mensuelle:</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-8">
+                                    <ul class="list-style-none">
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ adherent.garantie.nom }}</span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ adherent.garantie.droitAdhesion }}</span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ adherent.garantie.typeCotisation.nom }}</span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ adherent.garantie.montant1 }}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <ul class="list-style-none">
+
                                 <div class="btn-list">
                                     <a href="{{ path('adhesion_edit', {'id': adherent.id}) }}"class="btn btn-sm btn-success"><i class="mdi mdi-border-color"></i> Modifier</a>
                             </ul>
@@ -122,19 +158,23 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for key, pac in adherent.pacs %}
-                                    <tr>
-                                        <th scope="row">{{ key + 1 }}</th>
-                                        <td>{{ pac.dateEntrer | date('d / m / Y') }}</td>
-                                        <td>{{ pac.codeMutuelle }}</td>
-                                        <td>{{ pac.nom }} {{ pac.prenom }}</td>
-                                        <td>{{ pac.dateNaissance | date('d / m / Y') }}</td>
-                                        <td>{{ pac.parente }}</td>
-                                        <td>
-                                            <a href="{{ path('adhesion_edit_pac', { 'id': adherent.id, 'idPac': pac.id }) }}"class="label btn-warning label-warning">Modifier</a>
-                                            <a href="#"class="label btn-danger label-danger">Supprimer</a>
-                                        </td>
-                                    </tr>                                    
+                                {% set key = 1 %}
+                                {% for pac in adherent.pacs %}
+                                    {% if not pac.isSortie %}
+                                        <tr>
+                                            <th scope="row">{{ key }}</th>
+                                            <td>{{ pac.dateEntrer | date('d / m / Y') }}</td>
+                                            <td>{{ pac.codeMutuelle }}</td>
+                                            <td>{{ pac.nom }} {{ pac.prenom }}</td>
+                                            <td>{{ pac.dateNaissance | date('d / m / Y') }}</td>
+                                            <td>{{ pac.parente }}</td>
+                                            <td>
+                                                <a href="{{ path('adhesion_edit_pac', { 'id': adherent.id, 'idPac': pac.id }) }}" class="label btn-warning label-warning">Modifier</a>
+                                                <a href="{{ path('adhesion_remove_pac', { 'id': adherent.id, 'idPac': pac.id }) }}" class="label btn-danger label-danger">Retirer</button>
+                                            </td>
+                                        </tr>
+                                        {% set key = key + 1 %}  
+                                    {% endif %}                                
                                 {% endfor %}                                
                             </tbody>
                         </table>

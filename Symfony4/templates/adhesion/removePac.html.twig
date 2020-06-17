@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} Supprimer personne à charge{% endblock %}
+
+{% block header %}
+    <div class="page-breadcrumb">
+        <div class="d-flex align-items-center">
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Supprimer personne à charge de la fiche d'adhésion N°{{ adherent.id }}</h4>
+            <div class="ml-auto">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0 p-0">
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Adhésion</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Suppression personne à charge</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Personne à charge N°{{ pac.codeMutuelle }}</h4>
+                    <hr>
+                    {{ form_start(form) }}
+                        {{ form_widget(form) }}                           
+                        <button type="submit" class="btn btn-success">Supprimer</button>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
