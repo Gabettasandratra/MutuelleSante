@@ -74,6 +74,8 @@ class AdhesionController extends AbstractController
             } else {
                 $adherent->setPhoto('http://placehold.it/100x100');
             }
+            $m = date('m', $adherent->getDateInscription()->getTimestamp());
+            $adherent->setTailleFamille(array_fill($m-1, 13-$m, 1));
             $adherent->setCreatedAt(new \DateTime());
             $manager->persist($adherent);
             $manager->flush();
@@ -147,6 +149,7 @@ class AdhesionController extends AbstractController
         $formPac->handleRequest($request);
         if ($formPac->isSubmitted() && $formPac->isValid()) {
             $pac->setCreatedAt(new \DateTime());
+            $pac->setIsSortie(false);
             $pac->setAdherent($adherent);
             $photoFile = $formPac->get('photo')->getData();           
             if ($photoFile) {
@@ -161,6 +164,16 @@ class AdhesionController extends AbstractController
                 }
                 $pac->setPhoto($this->getParameter('users_img_directory').'/'.$fileName);
             }
+            // Update taille famille from the current month
+            $m = date('m', $pac->getDateEntrer()->getTimestamp());
+            $tF = $adherent->getTailleFamille();
+            foreach ($tF as $key => $value) {
+                if ($key >= $m-1) {
+                    $tF[$key] = $value + 1; 
+                }
+            }
+            $adherent->setTailleFamille($tF);
+            $manager->persist($adherent);
             $manager->persist($pac);
             $manager->flush();
 
@@ -228,6 +241,15 @@ class AdhesionController extends AbstractController
         $formPac->handleRequest($request);
         if ($formPac->isSubmitted() && $formPac->isValid()) {
             $pac->setIsSortie(true);
+            // Update taille famille from the current month
+            $m = date('m', $pac->getDateSorite()->getTimestamp());
+            $tF = $adherent->getTailleFamille();
+            foreach ($tF as $key => $value) {
+                if ($key >= $m-1) {
+                    $tF[$key] = $value - 1; 
+                }
+            }
+            $adherent->setTailleFamille($tF);
             $manager->persist($pac);
             $manager->flush();
 

@@ -47,6 +47,7 @@ class Adherent
 
     /**
      * @ORM\Column(type="datetime")
+     * @Assert\LessThan("-18 years")
      */
     private $dateNaissance;
 
@@ -77,6 +78,7 @@ class Adherent
 
     /**
      * @ORM\Column(type="datetime")
+     * @Assert\LessThan("today")
      */
     private $dateInscription;
 
@@ -113,9 +115,9 @@ class Adherent
     private $garantie;
 
     /**
-     * @ORM\OneToOne(targetEntity=TailleFamille::class, mappedBy="adherent", cascade={"persist", "remove"})
+     * @ORM\Column(type="array")
      */
-    private $tailleFamille;
+    private $tailleFamille = [];
 
     public function __construct()
     {
@@ -370,20 +372,23 @@ class Adherent
         return $this;
     }
 
-    public function getTailleFamille(): ?TailleFamille
+    public function getTailleFamille(): ?array
     {
         return $this->tailleFamille;
     }
 
-    public function setTailleFamille(TailleFamille $tailleFamille): self
+    public function setTailleFamille(array $tailleFamille): self
     {
         $this->tailleFamille = $tailleFamille;
 
-        // set the owning side of the relation if necessary
-        if ($tailleFamille->getAdherent() !== $this) {
-            $tailleFamille->setAdherent($this);
-        }
-
         return $this;
+    }
+
+    public function getValueTailleFamille($m = null)
+    {
+        if ($m == null) {
+            $m = date('m');
+        }
+        return $this->tailleFamille[$m-1];
     }
 }

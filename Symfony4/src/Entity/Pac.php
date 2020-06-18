@@ -47,6 +47,7 @@ class Pac
 
     /**
      * @ORM\Column(type="datetime")
+     * @Assert\LessThan("today")
      */
     private $dateNaissance;
 
@@ -58,6 +59,7 @@ class Pac
 
     /**
      * @ORM\Column(type="datetime")
+     * @Assert\LessThan("today")
      */
     private $dateEntrer;
 

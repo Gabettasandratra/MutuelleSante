@@ -11,6 +11,9 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\BirthdayType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+
+use App\Entity\Garantie;
 
 class AdherentType extends AbstractType
 {
@@ -37,6 +40,11 @@ class AdherentType extends AbstractType
             ->add('photo', FileType::class, [
                 'mapped' => false,
                 'required' => false
+            ])
+            ->add('garantie', EntityType::class, [
+                'required' => true,
+                'class' => Garantie::class,
+                'choice_label' => 'nom'
             ])
         ;
     }
