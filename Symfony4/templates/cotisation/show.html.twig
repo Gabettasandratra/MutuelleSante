@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Fiche d'adhésion N°{{ adherent.id }}{% endblock %}
+{% block title %}Fiche de cotisation N°{{ adherent.id }}{% endblock %}
 
 {% block header %}
     <div class="page-breadcrumb">
         <div class="d-flex align-items-center">
-            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Fiche d'adhésion N°{{ adherent.id }}</h4>
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Fiche de cotisation N°{{ adherent.id }}</h4>
             <div class="ml-auto">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb m-0 p-0">
@@ -42,23 +42,17 @@
                                         <li class="my-3 ">
                                             <span class="font-weight-medium text-dark"> Nom et prénom:</span>
                                         </li>
-                                        <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Date de naissance:</span>
-                                        </li>
-                                        <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Adresse:</span>
-                                        </li>
-                                        <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Profession:</span>
-                                        </li>
-                                        <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Numéro téléphone:</span>
-                                        </li>
                                         <li class="my-3">
                                             <span class="font-weight-medium text-dark"> Numéro de code:</span>
                                         </li>
                                         <li class="my-3">
                                             <span class="font-weight-medium text-dark"> Date d'entrée:</span>
+                                        </li>
+                                        <li class="my-3">
+                                            <span class="font-weight-medium text-dark"> Nombre famille:</span>
+                                        </li>
+                                        <li class="my-3">
+                                            <span class="font-weight-medium text-dark"> Cotisation année:</span>
                                         </li>
                                     </ul>
                                 </div>
@@ -68,22 +62,16 @@
                                             <span> {{ adherent.nom }} {{ adherent.prenom }}</span>
                                         </li>
                                         <li class="my-3 border-bottom">
-                                            <span> {{ adherent.dateNaissance | date('d / m / Y') }}</span>
-                                        </li>
-                                        <li class="my-3 border-bottom">
-                                            <span> {{ adherent.adresse }}</span>
-                                        </li>
-                                        <li class="my-3 border-bottom">
-                                            <span> {{ adherent.profession }}</span>
-                                        </li>
-                                        <li class="my-3 border-bottom">
-                                            <span> {{ adherent.telephone1 }} {% if adherent.telephone2 %}/ {{ adherent.telephone2 }}{% endif %}</span>
-                                        </li>
-                                        <li class="my-3 border-bottom">
                                             <span> {{ adherent.codeMutuelle }} </span>
                                         </li>
                                         <li class="my-3 border-bottom">
                                             <span> {{ adherent.dateInscription | date('d / m / Y') }}</span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ adherent.getValueTailleFamille }}</span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ "now" | date('Y') }}</span>
                                         </li>
                                     </ul>
                                 </div>
@@ -140,20 +128,13 @@
                             </div>
                             <ul class="list-style-none">
                                 <div class="btn-list">
-                                    <a href="{{ path('adhesion_edit', {'id': adherent.id}) }}"class="btn btn-sm btn-success"><i class="mdi mdi-border-color"></i> Modifier</a>
-                                    <a href="{{ path('cotisation_show', {'id': adherent.id}) }}"class="btn btn-sm btn-primary"><i class="mdi mdi-calendar-check"></i> Voir fiche de cotisation</a>
-                                </div>
+                                    <a href="{{ path('adhesion_show', {'id': adherent.id}) }}"class="btn btn-sm btn-success"><i class="mdi mdi-contact-mail"></i>  Voir fiche d'adhésion</a>
                             </ul>
                         </div>
                     </div>
                     <div class="row mt-4">
                         <div class="col-5">
-                            <h4 class="card-title">Personnes à charge</h4>
-                        </div>
-                        <div class="col-7">
-                            <div class="text-right">
-                                <a href="{{ path('adhesion_add_pac', {'id': adherent.id}) }}" class="btn btn-sm btn-info"><i class="mdi mdi-account-plus"></i> Ajouter</a>
-                            </div>
+                            <h4 class="card-title">Versement de cotisation</h4>
                         </div>
                     </div>
                     <hr>
@@ -162,33 +143,28 @@
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
-                                    <th scope="col">Date d'entrée</th>
-                                    <th scope="col">N° code</th>
-                                    <th scope="col">Nom et prénom</th>
-                                    <th scope="col">Date naissance</th>
-                                    <th scope="col">Lien parenté</th>
+                                    <th scope="col">Mois</th>
+                                    <th scope="col">Cotisation due</th>
+                                    <th scope="col">Cotisation percue</th>
+                                    <th scope="col">Arriéré</th>
+                                    <th scope="col">Avance</th>
                                     <th scope="col">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% set key = 1 %}
-                                {% for pac in adherent.pacs %}
-                                    {% if not pac.isSortie %}
-                                        <tr>
-                                            <th scope="row">{{ key }}</th>
-                                            <td>{{ pac.dateEntrer | date('d / m / Y') }}</td>
-                                            <td>{{ pac.codeMutuelle }}</td>
-                                            <td>{{ pac.nom }} {{ pac.prenom }}</td>
-                                            <td>{{ pac.dateNaissance | date('d / m / Y') }}</td>
-                                            <td>{{ pac.parente }}</td>
-                                            <td>
-                                                <a href="{{ path('adhesion_edit_pac', { 'id': adherent.id, 'idPac': pac.id }) }}" class="label btn-warning label-warning">Modifier</a>
-                                                <a href="{{ path('adhesion_remove_pac', { 'id': adherent.id, 'idPac': pac.id }) }}" class="label btn-danger label-danger">Retirer</button>
-                                            </td>
-                                        </tr>
-                                        {% set key = key + 1 %}  
-                                    {% endif %}                                
-                                {% endfor %}                                
+                                {% for m, tailleFamille in adherent.tailleFamille %}
+                                    <tr>
+                                        <th scope="row">{{ m + 1 }}</th>
+                                        <td>{{ m |date('2020-' ~ (m + 1) ~ '-01') |date('M') }}</td>
+                                        <td>{{ adherent.currentCotisationEmise.cotisations[m] }}</td>
+                                        <td>{{ adherent.currentCotisationPercue.cotisations[m] }}</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>
+                                            <a href="#" class="label btn-primary label-primary">Payer</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}                        
                             </tbody>
                         </table>
                     </div>

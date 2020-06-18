@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste des adhérents{% endblock %}
+{% block title %}Fiches de cotisation{% endblock %}
 {% block stylesheets %}
     <link href="{{ asset('assets/libs/datatable/dist/dataTables.bootstrap4.css') }}" rel="stylesheet">
 {% endblock %}
@@ -12,7 +12,7 @@
             <div class="ml-auto">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb m-0 p-0">
-                        <li class="breadcrumb-item text-muted active" aria-current="page">Adhésion</li>
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Cotisation</li>
                         <li class="breadcrumb-item text-muted" aria-current="page">Liste</li>
                     </ol>
                 </nav>
@@ -26,7 +26,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Liste des adhérents</h4>
+                    <h4 class="card-title">Choisissez l'adherent parmi la liste</h4>
                     <hr>
                     <div class="table-responsive">
                         <table id="zero_config" class="table">
@@ -35,7 +35,7 @@
                                     <th scope="col">#</th>
                                     <th scope="col">N°code</th>
                                     <th scope="col">Nom et prénom</th>
-                                    <th scope="col">Status</th>
+                                    <th scope="col">Situation de compte</th>
                                     <th scope="col">Actions</th>
                                 </tr>
                             </thead>
@@ -45,9 +45,9 @@
                                         <th scope="row">{{ adherent.id }}</th>
                                         <td>{{ adherent.codeMutuelle }}</td>
                                         <td>{{ adherent.nom }} {{ adherent.prenom }}</td>
-                                        <td><span class="label label-rounded label-warning">{{ adherent.status }}</span></td>
+                                        <td><span class="label label-rounded label-warning">Arriéré</span></td>
                                         <td>
-                                            <a href="{{ path('adhesion_show', {'id': adherent.id}) }}"class="label btn-primary label-primary">Voir</a>
+                                            <a href="{{ path('cotisation_show', {'id': adherent.id}) }}"class="label btn-primary label-primary">Voir fiche</a>
                                         </td>
                                     </tr>
                                 {% endfor %}

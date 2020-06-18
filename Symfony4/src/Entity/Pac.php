@@ -59,7 +59,7 @@ class Pac
 
     /**
      * @ORM\Column(type="datetime")
-     * @Assert\LessThan("today")
+     * @Assert\LessThan("+1 day")
      */
     private $dateEntrer;
 

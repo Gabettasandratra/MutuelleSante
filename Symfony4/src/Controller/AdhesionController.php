@@ -13,6 +13,9 @@ use App\Entity\Adherent;
 use App\Form\AdherentType;
 use App\Entity\Pac;
 use App\Form\PacType;
+use App\Entity\Exercice;
+use App\Entity\CotisationEmise;
+use App\Entity\CotisationPercue;
 
 class AdhesionController extends AbstractController
 {
@@ -77,7 +80,16 @@ class AdhesionController extends AbstractController
             $m = date('m', $adherent->getDateInscription()->getTimestamp());
             $adherent->setTailleFamille(array_fill($m-1, 13-$m, 1));
             $adherent->setCreatedAt(new \DateTime());
+
+            // create the cotisation emise and cotisation percue object
+            $currentExercice = $this->getDoctrine()
+                                    ->getRepository(Exercice::class)
+                                    ->findCurrent();
+            $cotisationEmise = new CotisationEmise($currentExercice, $adherent);
+            $cotisationPercue = new CotisationPercue($currentExercice, $adherent);
             $manager->persist($adherent);
+            $manager->persist($cotisationEmise);
+            $manager->persist($cotisationPercue);
             $manager->flush();
 
             return $this->redirectToRoute('adhesion_show', ['id' => $adherent->getId()]);
@@ -173,6 +185,8 @@ class AdhesionController extends AbstractController
                 }
             }
             $adherent->setTailleFamille($tF);
+            $adherent->updateCurrentCotisationEmise();
+            $manager->persist($adherent->getCurrentCotisationEmise());
             $manager->persist($adherent);
             $manager->persist($pac);
             $manager->flush();
@@ -250,6 +264,9 @@ class AdhesionController extends AbstractController
                 }
             }
             $adherent->setTailleFamille($tF);
+            $adherent->updateCurrentCotisationEmise();
+            $manager->persist($adherent);
+            $manager->persist($adherent->getCurrentCotisationEmise());
             $manager->persist($pac);
             $manager->flush();
 

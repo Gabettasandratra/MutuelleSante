@@ -78,7 +78,7 @@ class Adherent
 
     /**
      * @ORM\Column(type="datetime")
-     * @Assert\LessThan("today")
+     * @Assert\LessThan("+1 day")
      */
     private $dateInscription;
 
@@ -119,10 +119,22 @@ class Adherent
      */
     private $tailleFamille = [];
 
+    /**
+     * @ORM\OneToMany(targetEntity=CotisationEmise::class, mappedBy="adherent", orphanRemoval=true)
+     */
+    private $cotisationEmises;
+
+    /**
+     * @ORM\OneToMany(targetEntity=CotisationPercue::class, mappedBy="adherent", orphanRemoval=true)
+     */
+    private $cotisationPercues;
+
     public function __construct()
     {
         $this->etatAdherents = new ArrayCollection();
         $this->pacs = new ArrayCollection();
+        $this->cotisationEmises = new ArrayCollection();
+        $this->cotisationPercues = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -390,5 +402,118 @@ class Adherent
             $m = date('m');
         }
         return $this->tailleFamille[$m-1];
+    }
+
+    public function getStatus()
+    {
+        $debObs =   new \DateTime(date("Y-m-d H:i:s", $this->dateInscription->getTimestamp()));
+        $obs = $this->garantie->getPeriodeObservation();
+        $finObs = $this->dateInscription;
+        date_add($finObs, date_interval_create_from_date_string("$obs months"));
+        $today = new \DateTime();
+
+        if($today->getTimestamp() > $debObs->getTimestamp() && $today->getTimestamp() < $finObs->getTimestamp()) {
+            return "En période d'observation";
+        } else {
+            return "En cours de droit";
+        }   
+        
+    }
+
+    /**
+     * @return Collection|CotisationEmise[]
+     */
+    public function getCotisationEmises(): Collection
+    {
+        return $this->cotisationEmises;
+    }
+
+    public function getCurrentCotisationEmise(): CotisationEmise
+    {
+        $currentYear = date('Y');
+        foreach ($this->cotisationEmises as $cotisationEmise) {
+            if ($cotisationEmise->getExercice()->getAnnee() == $currentYear) {
+                return $cotisationEmise;
+            }
+        }
+        return null;
+    }
+
+    // After updating the taille famille 
+    public function updateCurrentCotisationEmise()
+    {
+        $currentCotisationEmise = $this->getCurrentCotisationEmise();
+        $montant1 = $this->getGarantie()->getMontant1();
+        $cotisations = $currentCotisationEmise->getCotisations();
+        // Option 2 : Montant unique par béneficiaires
+        foreach ($this->tailleFamille as $m => $n) {
+            $cotisations[$m] = $n * $montant1;
+        } 
+        $currentCotisationEmise->setCotisations($cotisations);
+    }
+
+    public function addCotisationEmise(CotisationEmise $cotisationEmise): self
+    {
+        if (!$this->cotisationEmises->contains($cotisationEmise)) {
+            $this->cotisationEmises[] = $cotisationEmise;
+            $cotisationEmise->setAdherent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCotisationEmise(CotisationEmise $cotisationEmise): self
+    {
+        if ($this->cotisationEmises->contains($cotisationEmise)) {
+            $this->cotisationEmises->removeElement($cotisationEmise);
+            // set the owning side to null (unless already changed)
+            if ($cotisationEmise->getAdherent() === $this) {
+                $cotisationEmise->setAdherent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|CotisationPercue[]
+     */
+    public function getCotisationPercues(): Collection
+    {
+        return $this->cotisationPercues;
+    }
+
+    public function getCurrentCotisationPercue(): CotisationPercue
+    {
+        $currentYear = date('Y');
+        foreach ($this->cotisationPercues as $cotisationPercue) {
+            if ($cotisationPercue->getExercice()->getAnnee() == $currentYear) {
+                return $cotisationPercue;
+            }
+        }
+        return null;
+    }
+
+    public function addCotisationPercue(CotisationPercue $cotisationPercue): self
+    {
+        if (!$this->cotisationPercues->contains($cotisationPercue)) {
+            $this->cotisationPercues[] = $cotisationPercue;
+            $cotisationPercue->setAdherent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCotisationPercue(CotisationPercue $cotisationPercue): self
+    {
+        if ($this->cotisationPercues->contains($cotisationPercue)) {
+            $this->cotisationPercues->removeElement($cotisationPercue);
+            // set the owning side to null (unless already changed)
+            if ($cotisationPercue->getAdherent() === $this) {
+                $cotisationPercue->setAdherent(null);
+            }
+        }
+
+        return $this;
     }
 }

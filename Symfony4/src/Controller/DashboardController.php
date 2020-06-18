@@ -7,6 +7,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class DashboardController extends AbstractController
 {
+    /**
+     * @Route("/")
+     */
+    public function home()
+    {
+        return $this->redirectToRoute('dashboard');
+    }
 
     /**
      * @Route("/dashboard", name="dashboard")
