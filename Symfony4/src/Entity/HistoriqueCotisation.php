@@ -19,12 +19,6 @@ class HistoriqueCotisation
     private $id;
 
     /**
-     * @ORM\Column(type="integer")
-     * @Assert\Range(min=0, max=11)
-     */
-    private $month;
-
-    /**
      * @ORM\Column(type="float")
      * @Assert\Positive()
      */
@@ -52,6 +46,11 @@ class HistoriqueCotisation
      */
     private $createdAt;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $annee;
+
     public function __construct()
     {
         $this->datePaiement = new \DateTime();
@@ -60,18 +59,6 @@ class HistoriqueCotisation
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getMonth(): ?int
-    {
-        return $this->month;
-    }
-
-    public function setMonth(int $month): self
-    {
-        $this->month = $month;
-
-        return $this;
     }
 
     public function getMontant(): ?float
@@ -130,6 +117,18 @@ class HistoriqueCotisation
     public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getAnnee(): ?string
+    {
+        return $this->annee;
+    }
+
+    public function setAnnee(string $annee): self
+    {
+        $this->annee = $annee;
 
         return $this;
     }

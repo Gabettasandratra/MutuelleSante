@@ -14,9 +14,6 @@ use App\Form\AdherentType;
 use App\Entity\Pac;
 use App\Form\PacType;
 use App\Entity\Exercice;
-use App\Entity\CotisationEmise;
-use App\Entity\CotisationPercue;
-use App\Entity\ArriereAvance;
 
 class AdhesionController extends AbstractController
 {
@@ -54,11 +51,6 @@ class AdhesionController extends AbstractController
         $manager = $this->getDoctrine()->getManager();
         $adherent = new Adherent();
 
-        $generatedCode = $this->getDoctrine()
-                         ->getRepository(Adherent::class)
-                         ->generateCode();
-        $adherent->setCodeMutuelle($generatedCode);
-
         $formAdherent = $this->createForm(AdherentType::class, $adherent);
         $formAdherent->handleRequest($request);
         if ($formAdherent->isSubmitted() && $formAdherent->isValid()) {
@@ -79,24 +71,10 @@ class AdhesionController extends AbstractController
                 $adherent->setPhoto('http://placehold.it/100x100');
             }
             $m = date('m', $adherent->getDateInscription()->getTimestamp());
-            $adherent->setTailleFamille(array_fill($m-1, 13-$m, 1));
+            $adherent->setTailleFamille(array_fill($m-1, 13-$m, 0));
             $adherent->setCreatedAt(new \DateTime());
-
-            // create the cotisation emise and cotisation percue and arriere avance object
-            $currentExercice = $this->getDoctrine()
-                                    ->getRepository(Exercice::class)
-                                    ->findCurrent();
-            $cotisationEmise = new CotisationEmise($currentExercice, $adherent);
-            $adherent->addCotisationEmise($cotisationEmise);
-            $cotisationPercue = new CotisationPercue($currentExercice, $adherent);
-            $adherent->addCotisationPercue($cotisationPercue);
-            $arriereAvance = new ArriereAvance($currentExercice, $adherent);
-            $adherent->addArriereAvance($arriereAvance);
+            
             $manager->persist($adherent);
-            $manager->persist($cotisationEmise);
-            $manager->persist($cotisationPercue);
-            $manager->persist($arriereAvance);
-
             $manager->flush();
 
             return $this->redirectToRoute('adhesion_show', ['id' => $adherent->getId()]);

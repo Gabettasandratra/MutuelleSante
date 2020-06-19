@@ -53,7 +53,7 @@ class Pac
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\Choice({"Conjoint", "Fils", "Fille", "Autre"})
+     * @Assert\NotBlank()
      */
     private $parente;
 
@@ -101,6 +101,7 @@ class Pac
 
     public function __construct()
     {
+        $this->dateEntrer = new \DateTime();
         $this->etatPacs = new ArrayCollection();
     }
 

@@ -7,6 +7,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 use App\Entity\TypeCotisation;
 
@@ -25,7 +26,9 @@ class GarantieType extends AbstractType
                 'class' => TypeCotisation::class,
                 'choice_label' => 'nom'
             ])
-            ->add('montant1')
+            ->add('montant1', TextType::class, [
+                'label' => 'Montant cotisation annuelle / béneficiaire'
+            ])
         ;
     }
 

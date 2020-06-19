@@ -1,0 +1,128 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Saisir prestation consommé{% endblock %}
+
+{% block header %}
+    <div class="page-breadcrumb">
+        <div class="d-flex align-items-center">
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Saisir prestation consommé par {{ pac.nom ~ ' ' ~ pac.prenom }} </h4>
+            <div class="ml-auto">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0 p-0">
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Prestation</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Saisie</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">    
+                    <h4 class="card-title">Bénéficiaires</h4>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6 border-right">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <ul class="list-style-none">     
+                                        <li class="my-3">
+                                            <img src="{{ asset(pac.photo) }}" alt="profile" class="img-thumbnail mx-auto d-block" height="150" width="150">
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <ul class="list-style-none border-bottom-white">
+                                        <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark"> Congrégation:</span>
+                                        </li>
+                                        <li class="my-3">
+                                            <span class="font-weight-medium text-dark"> Nom et prénom:</span>
+                                        </li>
+                                        <li class="my-3">
+                                            <span class="font-weight-medium text-dark"> Code mutuelle:</span>
+                                        </li>
+                                        <li class="my-3">
+                                            <span class="font-weight-medium text-dark"> Date d'entrée:</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-8">
+                                    <ul class="list-style-none">
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ pac.adherent.nom }} </span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ pac.nom ~ ' ' ~ pac.prenom }} </span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ pac.codeMutuelle }}</span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ pac.dateEntrer | date('d / m / Y') }}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>                           
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-5">
+                            <h4 class="card-title">Historique des prestations consommées</h4>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Date de remboursement</th>
+                                    <th scope="col">Prestataire</th>
+                                    <th scope="col">Réference paiement</th>
+                                    <th scope="col">Montant depensé</th>
+                                    <th scope="col">Montant remboursé</th>
+                                    <th scope="col">% remboursé</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">1</th>
+                                    <td>19 / 05 / 2020</td>
+                                    <td>Hopital 1</td>
+                                    <td>4445</td>
+                                    <td>90000</td>
+                                    <td>35000</td>
+                                    <td>38,8 %</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">2</th>
+                                    <td>5 / 05 / 2020</td>
+                                    <td>Dispensaire 1</td>
+                                    <td>6678</td>
+                                    <td>50000</td>
+                                    <td>10000</td>
+                                    <td>20 %</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th scope="row" colspan=4>Total</th>
+                                    <td>140000</td>
+                                    <td>45000</td>
+                                    <td>32,1 %</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>     
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

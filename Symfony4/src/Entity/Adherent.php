@@ -12,7 +12,6 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=AdherentRepository::class)
- * @UniqueEntity(fields={"codeMutuelle"}, message="Code mutuelle existe déja")
  */
 class Adherent
 {
@@ -24,42 +23,10 @@ class Adherent
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=20, unique=true)
-     * @Assert\Length(min=3,max=10)
-     */
-    private $codeMutuelle;
-
-    /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
      */
     private $nom;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $prenom;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $sexe;
-
-    /**
-     * @ORM\Column(type="datetime")
-     * @Assert\LessThan("-18 years")
-     */
-    private $dateNaissance;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $profession;
-
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $salaire;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -103,12 +70,6 @@ class Adherent
     private $createdAt;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @Assert\Email()
-     */
-    private $email;
-
-    /**
      * @ORM\ManyToOne(targetEntity=Garantie::class, inversedBy="adherents")
      * @ORM\JoinColumn(nullable=false)
      */
@@ -120,51 +81,26 @@ class Adherent
     private $tailleFamille = [];
 
     /**
-     * @ORM\OneToMany(targetEntity=CotisationEmise::class, mappedBy="adherent", orphanRemoval=true, cascade={"persist", "remove"})
-     */
-    private $cotisationEmises;
-
-    /**
-     * @ORM\OneToMany(targetEntity=CotisationPercue::class, mappedBy="adherent", orphanRemoval=true, cascade={"persist", "remove"})
-     */
-    private $cotisationPercues;
-
-    /**
-     * @ORM\OneToMany(targetEntity=ArriereAvance::class, mappedBy="adherent", orphanRemoval=true, cascade={"persist", "remove"})
-     */
-    private $arriereAvances;
-
-    /**
      * @ORM\OneToMany(targetEntity=HistoriqueCotisation::class, mappedBy="adherent", orphanRemoval=true)
      */
     private $historiqueCotisations;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $email;
 
     public function __construct()
     {
         $this->dateInscription = new \DateTime();
         $this->etatAdherents = new ArrayCollection();
         $this->pacs = new ArrayCollection();
-        $this->cotisationEmises = new ArrayCollection();
-        $this->cotisationPercues = new ArrayCollection();
-        $this->arriereAvances = new ArrayCollection();
         $this->historiqueCotisations = new ArrayCollection();
     }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getCodeMutuelle(): ?string
-    {
-        return $this->codeMutuelle;
-    }
-
-    public function setCodeMutuelle(string $codeMutuelle): self
-    {
-        $this->codeMutuelle = $codeMutuelle;
-
-        return $this;
     }
 
     public function getNom(): ?string
@@ -175,66 +111,6 @@ class Adherent
     public function setNom(string $nom): self
     {
         $this->nom = $nom;
-
-        return $this;
-    }
-
-    public function getPrenom(): ?string
-    {
-        return $this->prenom;
-    }
-
-    public function setPrenom(string $prenom): self
-    {
-        $this->prenom = $prenom;
-
-        return $this;
-    }
-
-    public function getSexe(): ?string
-    {
-        return $this->sexe;
-    }
-
-    public function setSexe(string $sexe): self
-    {
-        $this->sexe = $sexe;
-
-        return $this;
-    }
-
-    public function getDateNaissance(): ?\DateTimeInterface
-    {
-        return $this->dateNaissance;
-    }
-
-    public function setDateNaissance(\DateTimeInterface $dateNaissance): self
-    {
-        $this->dateNaissance = $dateNaissance;
-
-        return $this;
-    }
-
-    public function getProfession(): ?string
-    {
-        return $this->profession;
-    }
-
-    public function setProfession(string $profession): self
-    {
-        $this->profession = $profession;
-
-        return $this;
-    }
-
-    public function getSalaire(): ?float
-    {
-        return $this->salaire;
-    }
-
-    public function setSalaire(?float $salaire): self
-    {
-        $this->salaire = $salaire;
 
         return $this;
     }
@@ -434,176 +310,23 @@ class Adherent
     }
 
     /**
-     * @return Collection|CotisationEmise[]
-     */
-    public function getCotisationEmises(): Collection
-    {
-        return $this->cotisationEmises;
-    }
-
-    public function getCurrentCotisationEmise(): CotisationEmise
-    {
-        $currentYear = date('Y');
-        foreach ($this->cotisationEmises as $cotisationEmise) {
-            if ($cotisationEmise->getExercice()->getAnnee() == $currentYear) {
-                return $cotisationEmise;
-            }
-        }
-        return null;
-    }
-
-    // After updating the taille famille 
-    public function updateCurrentCotisationEmise()
-    {
-        $currentCotisationEmise = $this->getCurrentCotisationEmise();
-        $montant1 = $this->getGarantie()->getMontant1();
-        $cotisations = $currentCotisationEmise->getCotisations();
-        // Option 2 : Montant unique par béneficiaires
-        foreach ($this->tailleFamille as $m => $n) {
-            $cotisations[$m] = $n * $montant1;
-        } 
-        $currentCotisationEmise->setCotisations($cotisations);
-        // update the current arriere avance
-        $this->updateCurrentArriereAvance();
-    }
-
-    public function addCotisationEmise(CotisationEmise $cotisationEmise): self
-    {
-        if (!$this->cotisationEmises->contains($cotisationEmise)) {
-            $this->cotisationEmises[] = $cotisationEmise;
-            $cotisationEmise->setAdherent($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCotisationEmise(CotisationEmise $cotisationEmise): self
-    {
-        if ($this->cotisationEmises->contains($cotisationEmise)) {
-            $this->cotisationEmises->removeElement($cotisationEmise);
-            // set the owning side to null (unless already changed)
-            if ($cotisationEmise->getAdherent() === $this) {
-                $cotisationEmise->setAdherent(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|CotisationPercue[]
-     */
-    public function getCotisationPercues(): Collection
-    {
-        return $this->cotisationPercues;
-    }
-
-    public function getCurrentCotisationPercue(): CotisationPercue
-    {
-        $currentYear = date('Y');
-        foreach ($this->cotisationPercues as $cotisationPercue) {
-            if ($cotisationPercue->getExercice()->getAnnee() == $currentYear) {
-                return $cotisationPercue;
-            }
-        }
-        return null;
-    }
-
-    public function addCotisationPercue(CotisationPercue $cotisationPercue): self
-    {
-        if (!$this->cotisationPercues->contains($cotisationPercue)) {
-            $this->cotisationPercues[] = $cotisationPercue;
-            $cotisationPercue->setAdherent($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCotisationPercue(CotisationPercue $cotisationPercue): self
-    {
-        if ($this->cotisationPercues->contains($cotisationPercue)) {
-            $this->cotisationPercues->removeElement($cotisationPercue);
-            // set the owning side to null (unless already changed)
-            if ($cotisationPercue->getAdherent() === $this) {
-                $cotisationPercue->setAdherent(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|ArriereAvance[]
-     */
-    public function getArriereAvances(): Collection
-    {
-        return $this->arriereAvances;
-    }
-
-    public function getCurrentArriereAvance(): ArriereAvance
-    {
-        $currentYear = date('Y');
-        foreach ($this->arriereAvances as $arriereAvance) {
-            if ($arriereAvance->getExercice()->getAnnee() == $currentYear) {
-                return $arriereAvance;
-            }
-        }
-        return null;
-    }
-
-    public function addArriereAvance(ArriereAvance $arriereAvance): self
-    {
-        if (!$this->arriereAvances->contains($arriereAvance)) {
-            $this->arriereAvances[] = $arriereAvance;
-            $arriereAvance->setAdherent($this);
-        }
-
-        return $this;
-    }
-
-    public function removeArriereAvance(ArriereAvance $arriereAvance): self
-    {
-        if ($this->arriereAvances->contains($arriereAvance)) {
-            $this->arriereAvances->removeElement($arriereAvance);
-            // set the owning side to null (unless already changed)
-            if ($arriereAvance->getAdherent() === $this) {
-                $arriereAvance->setAdherent(null);
-            }
-        }
-
-        return $this;
-    }
-
-    // After updating the taille famille (update cotisation emise) or pay cotisation (update cotisation percue) 
-    public function updateCurrentArriereAvance()
-    {
-        $currentArriereAvance = $this->getCurrentArriereAvance();
-        $cotisationsPercue = $this->getCurrentCotisationPercue()->getCotisations();
-        $cotisationsEmise = $this->getCurrentCotisationEmise()->getCotisations();
-        $cotisations = $currentArriereAvance->getCotisations();
-        //$cotisations = [];
-        // Arriere avance = cotisation percue - cotisation emise
-        foreach ($this->tailleFamille as $m => $n) {
-            $diff = $cotisationsPercue[$m] - $cotisationsEmise[$m];
-            if ( $diff > 0 && $m !== array_key_last($this->tailleFamille)) {
-                $cotisations[$m] = 0;
-                $cotisations[$m + 1] += $diff;
-            }
-            // Cummul arriere
-            if($m !== array_key_first($this->tailleFamille)) {
-                $cotisations[$m] += $cotisations[$m - 1];
-            }
-        }       
-        $currentArriereAvance->setCotisations($cotisations);
-    }
-
-    /**
      * @return Collection|HistoriqueCotisation[]
      */
     public function getHistoriqueCotisations(): Collection
     {
         return $this->historiqueCotisations;
     }
+
+    public function getCurrentHistoriqueCotisation()
+    {
+        $currentYear = date('Y');
+        foreach ($this->historiqueCotisations as $paiement) {
+            if ($paiement->getAnnee() == $currentYear) {
+                return $paiement;
+            }
+        }
+        return null;
+    }    
 
     public function addHistoriqueCotisation(HistoriqueCotisation $historiqueCotisation): self
     {

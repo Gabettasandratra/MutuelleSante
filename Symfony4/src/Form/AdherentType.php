@@ -20,18 +20,7 @@ class AdherentType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('codeMutuelle')
             ->add('nom')
-            ->add('prenom')
-            ->add('sexe', ChoiceType::class, [
-                'choices'  => [
-                    'Masculin' => 'Masculin',
-                    'Feminin' => 'Feminin',
-                ]
-            ])
-            ->add('dateNaissance', BirthdayType::class)
-            ->add('profession')
-            ->add('salaire')
             ->add('adresse')
             ->add('telephone1')
             ->add('telephone2')

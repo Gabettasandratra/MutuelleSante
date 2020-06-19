@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste des béneficiaires{% endblock %}
+{% block title %}Saisir prestation{% endblock %}
 {% block stylesheets %}
     <link href="{{ asset('assets/libs/datatable/dist/dataTables.bootstrap4.css') }}" rel="stylesheet">
 {% endblock %}
@@ -8,12 +8,12 @@
 {% block header %}
     <div class="page-breadcrumb">
         <div class="d-flex align-items-center">
-            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Liste des béneficiaires</h4>
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Liste des béneficaires inscrits</h4>
             <div class="ml-auto">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb m-0 p-0">
-                        <li class="breadcrumb-item text-muted active" aria-current="page">Adhésion</li>
-                        <li class="breadcrumb-item text-muted" aria-current="page">Béneficiaires</li>
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Prestation</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Liste</li>
                     </ol>
                 </nav>
             </div>
@@ -26,7 +26,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Liste des Béneficiaires</h4>
+                    <h4 class="card-title">Choisissez le béneficiaire parmi la liste</h4>
                     <hr>
                     <div class="table-responsive">
                         <table id="order" class="table">
@@ -36,9 +36,8 @@
                                     <th scope="col">Congrégation</th>
                                     <th scope="col">N°code</th>
                                     <th scope="col">Nom et prénom</th>
-                                    <th scope="col">Date de naissance</th>
-                                    <th scope="col">Sexe</th>
                                     <th scope="col">Status</th>
+                                    <th scope="col">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -51,9 +50,10 @@
                                                 <td>{{ adherent.nom }}</td>
                                                 <td>{{ pac.codeMutuelle }}</td>
                                                 <td>{{ pac.nom }} {{ pac.prenom }}</td>
-                                                <td>{{ pac.dateNaissance | date('d / m / Y') }}</td>
-                                                <td>{{ pac.sexe }}</td>
-                                                <td><span class="label label-rounded label-warning">En période d'observation</span></td>
+                                                <td><span class="label label-success">En cours de droit</span></td>
+                                                <td>
+                                                    <a href="{{ path('prestation_save', {'id': pac.id}) }}"class="label btn-primary label-primary">Selectionner</a>
+                                                </td>
                                             </tr> 
                                         {% endif %}                                       
                                     {% endfor %}

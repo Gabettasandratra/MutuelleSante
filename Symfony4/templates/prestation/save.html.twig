@@ -1,0 +1,246 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Saisir prestation consommé{% endblock %}
+
+{% block header %}
+    <div class="page-breadcrumb">
+        <div class="d-flex align-items-center">
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Saisir prestation consommé par {{ pac.nom ~ ' ' ~ pac.prenom }} </h4>
+            <div class="ml-auto">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0 p-0">
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Prestation</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Saisie</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">    
+                    <h4 class="card-title">Bénéficiaires</h4>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6 border-right">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <ul class="list-style-none">     
+                                        <li class="my-3">
+                                            <img src="{{ asset(pac.photo) }}" alt="profile" class="img-thumbnail mx-auto d-block" height="150" width="150">
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <ul class="list-style-none border-bottom-white">
+                                        <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark"> Congrégation:</span>
+                                        </li>
+                                        <li class="my-3">
+                                            <span class="font-weight-medium text-dark"> Nom et prénom:</span>
+                                        </li>
+                                        <li class="my-3">
+                                            <span class="font-weight-medium text-dark"> Code mutuelle:</span>
+                                        </li>
+                                        <li class="my-3">
+                                            <span class="font-weight-medium text-dark"> Date d'entrée:</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-8">
+                                    <ul class="list-style-none">
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ pac.adherent.nom }} </span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ pac.nom ~ ' ' ~ pac.prenom }} </span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ pac.codeMutuelle }}</span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ pac.dateEntrer | date('d / m / Y') }}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>                           
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-5">
+                            <h4 class="card-title">Caractéristiques des prestations consommées</h4>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <ul class="list-style-none">     
+                                <li class="my-3">
+                                    <span class="font-weight-medium text-dark"> Prestataire:</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-3 border-right">
+                            <ul class="list-style-none">   
+                                <li class="my-3">
+                                    <select name="" id="">
+                                        <option value="">Hopital 1</option>
+                                        <option value="">Hopital 2</option>
+                                        <option value="">Clinique 1</option>
+                                        <option value="">Dispensaire 1</option>
+                                        <option value="">Autre prestataire</option>
+                                    </select>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-style-none">
+                                <div class="btn-list d-flex">
+                                    <a class="my-3 ml-auto btn btn-sm btn-info" href="#add_acte" data-toggle="modal"><i class="mdi mdi-plus-outline"></i> Ajouter détail facture</a>
+                                </div>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table" id="factures">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Actes de soins</th>
+                                    <th scope="col">N° facture</th>
+                                    <th scope="col">Montant depensé</th>
+                                    <th scope="col">Montant remboursé</th>
+                                    <th scope="col">% remboursé</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">1</th>
+                                    <td>14 / 06 / 2020</td>
+                                    <td>Soins dentaire</td>
+                                    <td>12</td>
+                                    <td>40000</td>
+                                    <td>20000</td>
+                                    <td>50 %</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">2</th>
+                                    <td>28 / 06 / 2020</td>
+                                    <td>Lunetterie</td>
+                                    <td>783</td>
+                                    <td>50000</td>
+                                    <td>15000</td>
+                                    <td>30 %</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th scope="row" colspan=4 >Total</th>
+                                    <td id="dep">90000</td>
+                                    <td id="rem">35000</td>
+                                    <td>38,8 %</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <ul class="list-style-none">     
+                                <li class="my-3">
+                                    <span class="font-weight-medium text-dark"> Date de remboursement:  </span>
+                                </li>
+                                
+                            </ul>
+                        </div>
+                        <div class="col-md-3 border-right">
+                            <ul class="list-style-none"> 
+                                <li class="my-3">
+                                    <input type="date" name="" id="">
+                                </li>                                   
+                            </ul>
+                        </div>
+                        <div class="col-md-3">
+                            <ul class="list-style-none">     
+                                <li class="my-3">
+                                    <span class="font-weight-medium text-dark"> Référence du remboursement:  </span>
+                                </li>
+                                
+                            </ul>
+                        </div>
+                        <div class="col-md-3">
+                            <ul class="list-style-none"> 
+                                <li class="my-3">
+                                    <input type="text" name="" id="" placeholder="chèque, espèce,...">
+                                </li>                                   
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button class="btn btn-success"><i class="mdi mdi-book-multiple"></i> Enregistrer la prestation</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="add_acte" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>Ajouter un détail de facture</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="date_acte">Date</label>
+                            <input type="date" class="form-control form-control-sm" id="date_acte">
+                        </div>                
+                        <div class="form-group col-md-8">
+                            <label for="type_acte" class="form-label">Acte</label>
+                            <select name="" id="type_acte" class="form-control form-control-sm">
+                                <option value="Soins dentaire">Soins dentaire</option>
+                                <option value="Consultation cardiologique">Consultation cardiologique</option>
+                                <option value="Consultation et soins dermatologique">Consultation et soins dermatologique</option>
+                                <option value="Consultation et soins ophtalmologique">Consultation et soins ophtalmologique</option>
+                                <option value="Echographie">Echographie</option>
+                                <option value="Lunetterie">Lunetterie</option>
+                                <option value="Autres">Autres</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reference_acte" class="form-label">N° facture du paiement</label>
+                            <input type="text" class="form-control form-control-sm" placeholder="N°facture,.." id="reference_acte">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="montant_acte" class="form-label">Montant depensé</label>
+                            <input type="text" class="form-control form-control-sm" id="montant_acte">
+                        </div>
+                        <div class="form-group ml-auto">
+                            <label for="rembourse_acte" class="form-label">Montant remboursé</label>
+                            <input type="text" class="form-control form-control-sm" id="rembourse_acte">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="valid_acte" class="btn btn-primary" data-dismiss="modal">Valider</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

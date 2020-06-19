@@ -148,13 +148,12 @@
                         </li>
 
                         {% block sidebarMenu %}
-                            <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ path('dashboard') }}" aria-expanded="false"><i class="mdi mdi-view-dashboard"></i><span class="hide-menu"> Tableau de bord</span></a></li>
                             <li class="nav-small-cap"><span class="hide-menu">Gestion mutuelle</span></li>
                             <li class="sidebar-item"> 
                                 <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-account-multiple"></i><span class="hide-menu"> Adhesion </span></a>
                                 <ul aria-expanded="false" class="collapse first-level">
-                                    <li class="sidebar-item"><a href="{{ path('adhesion_new') }}" class="sidebar-link"><i class="mdi mdi-account-plus"></i><span class="hide-menu"> Inscrire adhérent </span></a></li>
-                                    <li class="sidebar-item"><a href="{{ path('adhesion') }}" class="sidebar-link"><i class="mdi mdi-account-search"></i><span class="hide-menu"> Liste adhérents </span></a></li>
+                                    <li class="sidebar-item"><a href="{{ path('adhesion_new') }}" class="sidebar-link"><i class="mdi mdi-account-plus"></i><span class="hide-menu"> Inscrire congrégation </span></a></li>
+                                    <li class="sidebar-item"><a href="{{ path('adhesion') }}" class="sidebar-link"><i class="mdi mdi-account-search"></i><span class="hide-menu"> Liste des congrégations </span></a></li>
                                     <li class="sidebar-item"><a href="{{ path('adhesion_beneficiaires') }}" class="sidebar-link"><i class="mdi mdi-format-list-bulleted"></i><span class="hide-menu"> Liste béneficiaires </span></a></li>
                                 </ul>
                             </li>
@@ -164,6 +163,33 @@
                                     <li class="sidebar-item"><a href="{{ path('cotisation') }}" class="sidebar-link"><i class="mdi mdi-calendar-check"></i><span class="hide-menu"> Fiche de cotistation </span></a></li>
                                 </ul>
                             </li>
+                            <li class="sidebar-item"> 
+                                <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-security-home"></i><span class="hide-menu"> Prestation </span></a>
+                                <ul aria-expanded="false" class="collapse first-level">
+                                    <li class="sidebar-item"><a href="{{ path('prestation') }}" class="sidebar-link"><i class="mdi mdi-verified"></i><span class="hide-menu"> Saisir prestation </span></a></li>
+                                    <li class="sidebar-item"><a href="{{ path('prestation_list') }}" class="sidebar-link"><i class="mdi mdi-clipboard-outline"></i><span class="hide-menu"> Prestation par bénéficiaire</span></a></li>
+                                </ul>
+                            </li>
+                            <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ path('dashboard') }}"><i class="mdi mdi-view-dashboard"></i><span class="hide-menu"> Tableau de bord</span></a></li>
+
+                            <li class="nav-small-cap"><span class="hide-menu">Gestion fincancier</span></li>
+                            <li class="sidebar-item"> 
+                                <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-scale-balance"></i><span class="hide-menu"> Comptabilité </span></a>
+                                <ul aria-expanded="false" class="collapse first-level">
+                                    <li class="sidebar-item"><a href="{{ path('comptabilite_journal') }}" class="sidebar-link"><i class="mdi mdi-clipboard-outline"></i><span class="hide-menu"> Journal </span></a></li>
+                                    <li class="sidebar-item"><a href="{{ path('comptabilite_livre') }}" class="sidebar-link"><i class="mdi mdi-book-open-page-variant"></i><span class="hide-menu"> Grand livre </span></a></li>
+                                    <li class="sidebar-item"><a href="{{ path('comptabilite_balance') }}" class="sidebar-link"><i class="mdi mdi-scale-balance"></i><span class="hide-menu"> Balance </span></a></li>
+                                    <li class="sidebar-item"><a href="{{ path('comptabilite_plan') }}" class="sidebar-link"><i class="mdi mdi-view-list"></i><span class="hide-menu"> Plan comptable </span></a></li>
+                                </ul>
+                            </li>
+                            <li class="sidebar-item"> 
+                                <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-cash-multiple"></i><span class="hide-menu"> Etats financiers </span></a>
+                                <ul aria-expanded="false" class="collapse first-level">
+                                    <li class="sidebar-item"><a href="{{ path('comptabilite_bilan') }}" class="sidebar-link"><i class="mdi mdi-chart-arc"></i><span class="hide-menu"> Bilan </span></a></li>
+                                    <li class="sidebar-item"><a href="{{ path('comptabilite_resultat') }}" class="sidebar-link"><i class="mdi mdi-chart-bar"></i><span class="hide-menu"> Compte de résultat </span></a></li>
+                                </ul>
+                            </li>
+
                             <li class="nav-small-cap"><span class="hide-menu">Paramètres</span></li>
                             <li class="sidebar-item"> 
                                 <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-human-male-female"></i><span class="hide-menu"> Garantie santé </span></a>
@@ -231,7 +257,7 @@
 
             {% block footer %}
             <footer class="footer text-center">
-                <i class="fa fa-copyright" aria-hidden="true"></i> Copyright 2020 - Mutuelle santé developpé par l'ONG Fidev.
+                <i class="fa fa-copyright" aria-hidden="true"></i> Copyright 2020 - Mutuelle santé - logiciel de gestion de mutuelle santé.
             </footer>
             {% endblock %}
             <!-- ============================================================== -->

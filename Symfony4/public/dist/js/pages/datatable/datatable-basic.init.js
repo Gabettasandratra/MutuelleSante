@@ -21,7 +21,7 @@ $('#zero_config').DataTable({
  ****************************************/
 $('#order').DataTable({
     "order": [
-        [1, "asc"]
+        [2, "asc"]
     ],
     "language": {
         "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/French.json"

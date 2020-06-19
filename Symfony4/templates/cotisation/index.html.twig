@@ -8,7 +8,7 @@
 {% block header %}
     <div class="page-breadcrumb">
         <div class="d-flex align-items-center">
-            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Liste des adhérents</h4>
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Liste des congrégations adhérées</h4>
             <div class="ml-auto">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb m-0 p-0">
@@ -26,15 +26,14 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Choisissez l'adherent parmi la liste</h4>
+                    <h4 class="card-title">Choisissez la congrégation parmi la liste</h4>
                     <hr>
                     <div class="table-responsive">
                         <table id="zero_config" class="table">
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
-                                    <th scope="col">N°code</th>
-                                    <th scope="col">Nom et prénom</th>
+                                    <th scope="col">Nom de la congrégation</th>
                                     <th scope="col">Situation de compte</th>
                                     <th scope="col">Actions</th>
                                 </tr>
@@ -43,9 +42,8 @@
                                 {% for adherent in adherents %}
                                     <tr>
                                         <th scope="row">{{ adherent.id }}</th>
-                                        <td>{{ adherent.codeMutuelle }}</td>
-                                        <td>{{ adherent.nom }} {{ adherent.prenom }}</td>
-                                        <td><span class="label label-rounded label-warning">Arriéré</span></td>
+                                        <td>{{ adherent.nom }}</td>
+                                        <td><span class="label label-rounded label-success">Cotisation payé</span></td>
                                         <td>
                                             <a href="{{ path('cotisation_show', {'id': adherent.id}) }}"class="label btn-primary label-primary">Voir fiche</a>
                                         </td>

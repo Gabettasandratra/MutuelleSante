@@ -27,9 +27,6 @@ class PacRepository extends ServiceEntityRepository
                             ->setParameter('a', $adherent) 
                             ->getSingleScalarResult();
         $id = (int)str_replace($adherent->getId().'/', '', $lastCode);
-        if ($id == 0) {
-            $id = 1;
-        }
         return $adherent->getId().'/'.++$id;
     }
 }

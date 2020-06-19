@@ -20,16 +20,14 @@ class HistoriqueCotisationType extends AbstractType
             ->add('adherent', EntityType::class, [
                 'required' => true,
                 'class' => Adherent::class,
-                'choice_label' => function ($adherent) {
-                    return $adherent->getCodeMutuelle().' - '.$adherent->getNom().' '.$adherent->getPrenom();
-                }
+                'choice_label' => 'nom'
             ])
             ->add('exercice', EntityType::class, [
                 'required' => true,
                 'class' => Exercice::class,
-                'choice_label' => 'annee'
+                'choice_label' => 'annee',
+                'label' => 'Cotisation annuelle'
             ])
-            ->add('month')
             ->add('montant')
         ;
     }

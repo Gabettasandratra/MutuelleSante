@@ -37,34 +37,24 @@ class CotisationController extends AbstractController
     }
 
     /**
-     * @Route("/cotisation/{id}/pay/{month}", name="cotisation_pay")
+     * @Route("/cotisation/{id}/pay/{year}", name="cotisation_pay")
      */
-    public function pay(Adherent $adherent, $month, Request $request)
+    public function pay(Adherent $adherent, $year, Request $request)
     {
         $manager = $this->getDoctrine()->getManager();
         $historiqueCotisation = new HistoriqueCotisation();
         $historiqueCotisation->setAdherent($adherent);
-        $historiqueCotisation->setMonth($month - 1);
+        $historiqueCotisation->setAnnee($year);
 
         $form = $this->createForm(HistoriqueCotisationType::class, $historiqueCotisation);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $historiqueCotisation->setCreatedAt(new \DateTime());
-            // update cotisation percue and update the arriere avance and persist 
-            $cotisationsPercue = $adherent->getCurrentCotisationPercue()->getCotisations();
-            if (array_key_exists($historiqueCotisation->getMonth(), $cotisationsPercue)) {
-                $cotisationsPercue[$historiqueCotisation->getMonth()] = $cotisationsPercue[$historiqueCotisation->getMonth()] + $historiqueCotisation->getMontant();
-                $adherent->getCurrentCotisationPercue()->setCotisations($cotisationsPercue);
-                $adherent->updateCurrentArriereAvance();
+            $historiqueCotisation->setCreatedAt(new \DateTime());        
+            $manager->persist($historiqueCotisation);
+            $manager->persist($adherent);
+            $manager->flush();
 
-                $manager->persist($historiqueCotisation);
-                $manager->persist($adherent);
-                $manager->flush();
-
-                return $this->redirectToRoute('cotisation_show', ['id' => $adherent->getId()]);
-            } else {
-                $form->get('month')->addError(new FormError('Specified month not valid'));
-            }      
+            return $this->redirectToRoute('cotisation_show', ['id' => $adherent->getId()]);     
         }
         return $this->render('cotisation/form.html.twig', [
             'form' => $form->createView(),

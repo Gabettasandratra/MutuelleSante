@@ -23,7 +23,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">    
-                    <h4 class="card-title">Adhérent</h4>
+                    <h4 class="card-title">Congrégation</h4>
                     <hr>
                     <div class="row">
                         <div class="col-md-6 border-right">
@@ -40,22 +40,16 @@
                                 <div class="col-md-4">
                                     <ul class="list-style-none border-bottom-white">
                                         <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Nom et prénom:</span>
-                                        </li>
-                                        <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Date de naissance:</span>
+                                            <span class="font-weight-medium text-dark"> Nom congrégation:</span>
                                         </li>
                                         <li class="my-3 ">
                                             <span class="font-weight-medium text-dark"> Adresse:</span>
                                         </li>
                                         <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Profession:</span>
-                                        </li>
-                                        <li class="my-3 ">
                                             <span class="font-weight-medium text-dark"> Numéro téléphone:</span>
                                         </li>
-                                        <li class="my-3">
-                                            <span class="font-weight-medium text-dark"> Numéro de code:</span>
+                                        <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark"> Email:</span>
                                         </li>
                                         <li class="my-3">
                                             <span class="font-weight-medium text-dark"> Date d'entrée:</span>
@@ -65,22 +59,16 @@
                                 <div class="col-md-8">
                                     <ul class="list-style-none">
                                         <li class="my-3 border-bottom">
-                                            <span> {{ adherent.nom }} {{ adherent.prenom }}</span>
-                                        </li>
-                                        <li class="my-3 border-bottom">
-                                            <span> {{ adherent.dateNaissance | date('d / m / Y') }}</span>
+                                            <span> {{ adherent.nom }} </span>
                                         </li>
                                         <li class="my-3 border-bottom">
                                             <span> {{ adherent.adresse }}</span>
                                         </li>
                                         <li class="my-3 border-bottom">
-                                            <span> {{ adherent.profession }}</span>
-                                        </li>
-                                        <li class="my-3 border-bottom">
                                             <span> {{ adherent.telephone1 }} {% if adherent.telephone2 %}/ {{ adherent.telephone2 }}{% endif %}</span>
                                         </li>
                                         <li class="my-3 border-bottom">
-                                            <span> {{ adherent.codeMutuelle }} </span>
+                                            <span> {% if adherent.email %}{{ adherent.email }}{% else %} ... {% endif %} </span>
                                         </li>
                                         <li class="my-3 border-bottom">
                                             <span> {{ adherent.dateInscription | date('d / m / Y') }}</span>
@@ -108,7 +96,7 @@
                                             <span class="font-weight-medium text-dark"> Montant cotisation:</span>
                                         </li>
                                         <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Cotisation mensuelle:</span>
+                                            <span class="font-weight-medium text-dark"> Cotisation annuelle:</span>
                                         </li>
                                         <li class="my-3 ">
                                             <span class="font-weight-medium text-dark"> Période observation:</span>
@@ -127,7 +115,7 @@
                                             <span> {{ adherent.garantie.typeCotisation.nom }}</span>
                                         </li>
                                         <li class="my-3 border-bottom">
-                                            <span> {{ adherent.garantie.montant1 }} / béneficiaire / mois</span>
+                                            <span> {{ adherent.garantie.montant1 }} / béneficiaire / ans</span>
                                         </li>
                                         <li class="my-3 border-bottom">
                                             <span> {{ adherent.garantie.montant1 * adherent.valueTailleFamille }}</span>
@@ -148,7 +136,7 @@
                     </div>
                     <div class="row mt-4">
                         <div class="col-5">
-                            <h4 class="card-title">Personnes à charge</h4>
+                            <h4 class="card-title">Béneficiaire</h4>
                         </div>
                         <div class="col-7">
                             <div class="text-right">
@@ -166,7 +154,7 @@
                                     <th scope="col">N° code</th>
                                     <th scope="col">Nom et prénom</th>
                                     <th scope="col">Date naissance</th>
-                                    <th scope="col">Lien parenté</th>
+                                    <th scope="col">Fonction</th>
                                     <th scope="col">Actions</th>
                                 </tr>
                             </thead>
