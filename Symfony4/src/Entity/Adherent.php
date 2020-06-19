@@ -120,21 +120,34 @@ class Adherent
     private $tailleFamille = [];
 
     /**
-     * @ORM\OneToMany(targetEntity=CotisationEmise::class, mappedBy="adherent", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=CotisationEmise::class, mappedBy="adherent", orphanRemoval=true, cascade={"persist", "remove"})
      */
     private $cotisationEmises;
 
     /**
-     * @ORM\OneToMany(targetEntity=CotisationPercue::class, mappedBy="adherent", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=CotisationPercue::class, mappedBy="adherent", orphanRemoval=true, cascade={"persist", "remove"})
      */
     private $cotisationPercues;
 
+    /**
+     * @ORM\OneToMany(targetEntity=ArriereAvance::class, mappedBy="adherent", orphanRemoval=true, cascade={"persist", "remove"})
+     */
+    private $arriereAvances;
+
+    /**
+     * @ORM\OneToMany(targetEntity=HistoriqueCotisation::class, mappedBy="adherent", orphanRemoval=true)
+     */
+    private $historiqueCotisations;
+
     public function __construct()
     {
+        $this->dateInscription = new \DateTime();
         $this->etatAdherents = new ArrayCollection();
         $this->pacs = new ArrayCollection();
         $this->cotisationEmises = new ArrayCollection();
         $this->cotisationPercues = new ArrayCollection();
+        $this->arriereAvances = new ArrayCollection();
+        $this->historiqueCotisations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -450,6 +463,8 @@ class Adherent
             $cotisations[$m] = $n * $montant1;
         } 
         $currentCotisationEmise->setCotisations($cotisations);
+        // update the current arriere avance
+        $this->updateCurrentArriereAvance();
     }
 
     public function addCotisationEmise(CotisationEmise $cotisationEmise): self
@@ -511,6 +526,102 @@ class Adherent
             // set the owning side to null (unless already changed)
             if ($cotisationPercue->getAdherent() === $this) {
                 $cotisationPercue->setAdherent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ArriereAvance[]
+     */
+    public function getArriereAvances(): Collection
+    {
+        return $this->arriereAvances;
+    }
+
+    public function getCurrentArriereAvance(): ArriereAvance
+    {
+        $currentYear = date('Y');
+        foreach ($this->arriereAvances as $arriereAvance) {
+            if ($arriereAvance->getExercice()->getAnnee() == $currentYear) {
+                return $arriereAvance;
+            }
+        }
+        return null;
+    }
+
+    public function addArriereAvance(ArriereAvance $arriereAvance): self
+    {
+        if (!$this->arriereAvances->contains($arriereAvance)) {
+            $this->arriereAvances[] = $arriereAvance;
+            $arriereAvance->setAdherent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeArriereAvance(ArriereAvance $arriereAvance): self
+    {
+        if ($this->arriereAvances->contains($arriereAvance)) {
+            $this->arriereAvances->removeElement($arriereAvance);
+            // set the owning side to null (unless already changed)
+            if ($arriereAvance->getAdherent() === $this) {
+                $arriereAvance->setAdherent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    // After updating the taille famille (update cotisation emise) or pay cotisation (update cotisation percue) 
+    public function updateCurrentArriereAvance()
+    {
+        $currentArriereAvance = $this->getCurrentArriereAvance();
+        $cotisationsPercue = $this->getCurrentCotisationPercue()->getCotisations();
+        $cotisationsEmise = $this->getCurrentCotisationEmise()->getCotisations();
+        $cotisations = $currentArriereAvance->getCotisations();
+        //$cotisations = [];
+        // Arriere avance = cotisation percue - cotisation emise
+        foreach ($this->tailleFamille as $m => $n) {
+            $diff = $cotisationsPercue[$m] - $cotisationsEmise[$m];
+            if ( $diff > 0 && $m !== array_key_last($this->tailleFamille)) {
+                $cotisations[$m] = 0;
+                $cotisations[$m + 1] += $diff;
+            }
+            // Cummul arriere
+            if($m !== array_key_first($this->tailleFamille)) {
+                $cotisations[$m] += $cotisations[$m - 1];
+            }
+        }       
+        $currentArriereAvance->setCotisations($cotisations);
+    }
+
+    /**
+     * @return Collection|HistoriqueCotisation[]
+     */
+    public function getHistoriqueCotisations(): Collection
+    {
+        return $this->historiqueCotisations;
+    }
+
+    public function addHistoriqueCotisation(HistoriqueCotisation $historiqueCotisation): self
+    {
+        if (!$this->historiqueCotisations->contains($historiqueCotisation)) {
+            $this->historiqueCotisations[] = $historiqueCotisation;
+            $historiqueCotisation->setAdherent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHistoriqueCotisation(HistoriqueCotisation $historiqueCotisation): self
+    {
+        if ($this->historiqueCotisations->contains($historiqueCotisation)) {
+            $this->historiqueCotisations->removeElement($historiqueCotisation);
+            // set the owning side to null (unless already changed)
+            if ($historiqueCotisation->getAdherent() === $this) {
+                $historiqueCotisation->setAdherent(null);
             }
         }
 

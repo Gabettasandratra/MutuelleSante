@@ -39,10 +39,22 @@ class Exercice
      */
     private $cotisationPercues;
 
+    /**
+     * @ORM\OneToMany(targetEntity=ArriereAvance::class, mappedBy="exercice", orphanRemoval=true)
+     */
+    private $arriereAvances;
+
+    /**
+     * @ORM\OneToMany(targetEntity=HistoriqueCotisation::class, mappedBy="exercice", orphanRemoval=true)
+     */
+    private $historiqueCotisations;
+
     public function __construct()
     {
         $this->cotisationEmises = new ArrayCollection();
         $this->cotisationPercues = new ArrayCollection();
+        $this->arriereAvances = new ArrayCollection();
+        $this->historiqueCotisations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -130,6 +142,68 @@ class Exercice
             // set the owning side to null (unless already changed)
             if ($cotisationPercue->getExercice() === $this) {
                 $cotisationPercue->setExercice(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ArriereAvance[]
+     */
+    public function getArriereAvances(): Collection
+    {
+        return $this->arriereAvances;
+    }
+
+    public function addArriereAvance(ArriereAvance $arriereAvance): self
+    {
+        if (!$this->arriereAvances->contains($arriereAvance)) {
+            $this->arriereAvances[] = $arriereAvance;
+            $arriereAvance->setExercice($this);
+        }
+
+        return $this;
+    }
+
+    public function removeArriereAvance(ArriereAvance $arriereAvance): self
+    {
+        if ($this->arriereAvances->contains($arriereAvance)) {
+            $this->arriereAvances->removeElement($arriereAvance);
+            // set the owning side to null (unless already changed)
+            if ($arriereAvance->getExercice() === $this) {
+                $arriereAvance->setExercice(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|HistoriqueCotisation[]
+     */
+    public function getHistoriqueCotisations(): Collection
+    {
+        return $this->historiqueCotisations;
+    }
+
+    public function addHistoriqueCotisation(HistoriqueCotisation $historiqueCotisation): self
+    {
+        if (!$this->historiqueCotisations->contains($historiqueCotisation)) {
+            $this->historiqueCotisations[] = $historiqueCotisation;
+            $historiqueCotisation->setExercice($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHistoriqueCotisation(HistoriqueCotisation $historiqueCotisation): self
+    {
+        if ($this->historiqueCotisations->contains($historiqueCotisation)) {
+            $this->historiqueCotisations->removeElement($historiqueCotisation);
+            // set the owning side to null (unless already changed)
+            if ($historiqueCotisation->getExercice() === $this) {
+                $historiqueCotisation->setExercice(null);
             }
         }
 

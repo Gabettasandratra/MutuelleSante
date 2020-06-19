@@ -155,13 +155,18 @@
                                 {% for m, tailleFamille in adherent.tailleFamille %}
                                     <tr>
                                         <th scope="row">{{ m + 1 }}</th>
-                                        <td>{{ m |date('2020-' ~ (m + 1) ~ '-01') |date('M') }}</td>
+                                        <td>{{ m |date('2020-' ~ (m + 1) ~ '-01') |localizeddate('none', 'none', 'fr_FR', null, 'MMMM') }}</td>
                                         <td>{{ adherent.currentCotisationEmise.cotisations[m] }}</td>
                                         <td>{{ adherent.currentCotisationPercue.cotisations[m] }}</td>
-                                        <td></td>
-                                        <td></td>
+                                        {% if adherent.currentArriereAvance.cotisations[m] <= 0 %}
+                                            <td>{{ adherent.currentArriereAvance.cotisations[m] |abs }}</td>
+                                            <td>0</td>
+                                        {% else %}
+                                            <td>0</td>
+                                            <td>{{ adherent.currentArriereAvance.cotisations[m] |abs }}</td>
+                                        {% endif %}
                                         <td>
-                                            <a href="#" class="label btn-primary label-primary">Payer</a>
+                                            <a href="{{ path('cotisation_pay', {'id': adherent.id, 'month': m + 1}) }}" class="label btn-primary label-primary">Payer</a>
                                         </td>
                                     </tr>
                                 {% endfor %}                        

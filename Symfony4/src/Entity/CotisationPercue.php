@@ -37,7 +37,6 @@ class CotisationPercue
     public function __construct(Exercice $exercice, Adherent $adherent)
     {
         $this->exercice = $exercice;
-        $this->adherent = $adherent;
         // Option 2 : Montant unique par béneficiaires
         foreach ($adherent->getTailleFamille() as $m => $n) {
             $this->cotisations[$m] = 0;

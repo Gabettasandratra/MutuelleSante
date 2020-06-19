@@ -2,15 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\CotisationEmiseRepository;
+use App\Repository\ArriereAvanceRepository;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Adherent;
-use App\Entity\Exercice;
 
 /**
- * @ORM\Entity(repositoryClass=CotisationEmiseRepository::class)
+ * @ORM\Entity(repositoryClass=ArriereAvanceRepository::class)
  */
-class CotisationEmise
+class ArriereAvance
 {
     /**
      * @ORM\Id()
@@ -25,13 +23,13 @@ class CotisationEmise
     private $cotisations = [];
 
     /**
-     * @ORM\ManyToOne(targetEntity=Adherent::class, inversedBy="cotisationEmises")
+     * @ORM\ManyToOne(targetEntity=Adherent::class, inversedBy="arriereAvances")
      * @ORM\JoinColumn(nullable=false)
      */
     private $adherent;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Exercice::class, inversedBy="cotisationEmises")
+     * @ORM\ManyToOne(targetEntity=Exercice::class, inversedBy="arriereAvances")
      * @ORM\JoinColumn(nullable=false)
      */
     private $exercice;
@@ -39,10 +37,16 @@ class CotisationEmise
     public function __construct(Exercice $exercice, Adherent $adherent)
     {
         $this->exercice = $exercice;
-        $montant1 = $adherent->getGarantie()->getMontant1();
-        // Option 2 : Montant unique par béneficiaires
-        foreach ($adherent->getTailleFamille() as $m => $n) {
-            $this->cotisations[$m] = $n * $montant1;
+        $cotisationsPercue = $adherent->getCurrentCotisationPercue()->getCotisations();
+        $cotisationsEmise = $adherent->getCurrentCotisationEmise()->getCotisations();
+        $tailleFamille = $adherent->getTailleFamille();
+        // Arriere avance = cotisation percue - cotisation emise
+        foreach ($tailleFamille as $m => $n) {
+            $this->cotisations[$m] = $cotisationsPercue[$m] - $cotisationsEmise[$m];
+            // Cummul arriere
+            if($m !== array_key_first($tailleFamille)) {
+                $this->cotisations[$m] += $this->cotisations[$m - 1];
+            }
         } 
     }
 
