@@ -34,6 +34,31 @@ class Exercice
      */
     private $historiqueCotisations;
 
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $cotNouveau;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $cotAncien;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $droitAdhesion;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $dateDebut;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $dateFin;
+
     public function __construct()
     {
         $this->historiqueCotisations = new ArrayCollection();
@@ -95,6 +120,66 @@ class Exercice
                 $historiqueCotisation->setExercice(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCotNouveau(): ?float
+    {
+        return $this->cotNouveau;
+    }
+
+    public function setCotNouveau(float $cotNouveau): self
+    {
+        $this->cotNouveau = $cotNouveau;
+
+        return $this;
+    }
+
+    public function getCotAncien(): ?float
+    {
+        return $this->cotAncien;
+    }
+
+    public function setCotAncien(float $cotAncien): self
+    {
+        $this->cotAncien = $cotAncien;
+
+        return $this;
+    }
+
+    public function getDroitAdhesion(): ?float
+    {
+        return $this->droitAdhesion;
+    }
+
+    public function setDroitAdhesion(float $droitAdhesion): self
+    {
+        $this->droitAdhesion = $droitAdhesion;
+
+        return $this;
+    }
+
+    public function getDateDebut(): ?\DateTimeInterface
+    {
+        return $this->dateDebut;
+    }
+
+    public function setDateDebut(\DateTimeInterface $dateDebut): self
+    {
+        $this->dateDebut = $dateDebut;
+
+        return $this;
+    }
+
+    public function getDateFin(): ?\DateTimeInterface
+    {
+        return $this->dateFin;
+    }
+
+    public function setDateFin(\DateTimeInterface $dateFin): self
+    {
+        $this->dateFin = $dateFin;
 
         return $this;
     }

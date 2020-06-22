@@ -26,7 +26,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Liste des Béneficiaires</h4>
+                    <h4 class="card-title">Liste des béneficiaires actifs</h4>
                     <hr>
                     <div class="table-responsive">
                         <table id="order" class="table">
@@ -34,11 +34,10 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Congrégation</th>
-                                    <th scope="col">N°code</th>
+                                    <th scope="col">N° Matricule</th>
                                     <th scope="col">Nom et prénom</th>
                                     <th scope="col">Date de naissance</th>
-                                    <th scope="col">Sexe</th>
-                                    <th scope="col">Status</th>
+                                    <th scope="col">Date d'entrée</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -49,11 +48,10 @@
                                             <tr>
                                                 <th scope="row">{{ row }} {% set row = row + 1 %}</th>
                                                 <td>{{ adherent.nom }}</td>
-                                                <td>{{ pac.codeMutuelle }}</td>
+                                                <td>{{ adherent.numero }} / {{ pac.codeMutuelle }}</td>
                                                 <td>{{ pac.nom }} {{ pac.prenom }}</td>
                                                 <td>{{ pac.dateNaissance | date('d / m / Y') }}</td>
-                                                <td>{{ pac.sexe }}</td>
-                                                <td><span class="label label-rounded label-warning">En période d'observation</span></td>
+                                                <td>{{ pac.dateEntrer | date('d / m / Y') }}</td>
                                             </tr> 
                                         {% endif %}                                       
                                     {% endfor %}
@@ -61,6 +59,21 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mt-4">
+                        <div class="col-5">
+                            <h4 class="card-title">Liste des béneficiaires retirés</h4>
+                        </div>
+                        <div class="col-7">
+                            <div class="text-right">
+                                <a href="{{ path('adhesion_beneficiaires_retires') }}" class="btn btn-sm btn-primary"><i class="mdi mdi-account-plus"></i> Acceder</a>
+                            </div> 
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
         </div>

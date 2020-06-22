@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste des congrégations adhérées{% endblock %}
+{% block title %}Liste des béneficiaires Retirés{% endblock %}
 {% block stylesheets %}
     <link href="{{ asset('assets/libs/datatable/dist/dataTables.bootstrap4.css') }}" rel="stylesheet">
 {% endblock %}
@@ -8,12 +8,13 @@
 {% block header %}
     <div class="page-breadcrumb">
         <div class="d-flex align-items-center">
-            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Liste des congrégations adhérées</h4>
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Liste des béneficiaires retirés</h4>
             <div class="ml-auto">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb m-0 p-0">
                         <li class="breadcrumb-item text-muted active" aria-current="page">Adhésion</li>
-                        <li class="breadcrumb-item text-muted" aria-current="page">Liste</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Béneficiaires</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Retirés</li>
                     </ol>
                 </nav>
             </div>
@@ -26,28 +27,35 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Liste des congrégations adhérées</h4>
+                    <h4 class="card-title">Liste des béneficiaires retirés</h4>
                     <hr>
                     <div class="table-responsive">
-                        <table id="zero_config" class="table">
+                        <table id="order" class="table">
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
-                                    <th scope="col">Nom de la congrégation</th>
-                                    <th scope="col">Status</th>
+                                    <th scope="col">Congrégation</th>
+                                    <th scope="col">N° Matricule</th>
+                                    <th scope="col">Nom et prénom</th>
+                                    <th scope="col">Date de sortie</th>
+                                    <th scope="col">Remarque</th>
                                     <th scope="col">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for adherent in adherents %}
+                                {% set row = 1 %}
+                                {% for pac in pacs %}                
                                     <tr>
-                                        <th scope="row">{{ adherent.id }}</th>
-                                        <td>{{ adherent.nom }}</td>
-                                        <td><span class="label label-rounded label-success">En cours de droit</span></td>
+                                        <th scope="row">{{ row }} {% set row = row + 1 %}</th>
+                                        <td>{{ pac.adherent.nom }}</td>
+                                        <td>{{ pac.adherent.numero }} / {{ pac.codeMutuelle }}</td>
+                                        <td>{{ pac.nom }} {{ pac.prenom }}</td>
+                                        <td>{{ pac.dateSortie | date('d / m / Y') }}</td>
+                                        <td>{{ pac.remarque }}</td>
                                         <td>
-                                            <a href="{{ path('adhesion_show', {'id': adherent.id}) }}"class="label btn-primary label-primary">Voir</a>
+                                            <a href="{{ path('adhesion_beneficiaires_integre', {'id': pac.id}) }}" class="label btn-primary label-primary">Re-Ajouter</a>
                                         </td>
-                                    </tr>
+                                    </tr> 
                                 {% endfor %}
                             </tbody>
                         </table>

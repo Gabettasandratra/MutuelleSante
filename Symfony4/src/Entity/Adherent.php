@@ -12,6 +12,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=AdherentRepository::class)
+ * @UniqueEntity(fields={"numero"}, message="Le numéro de congrégation donné existe déja")
  */
 class Adherent
 {
@@ -55,11 +56,6 @@ class Adherent
     private $photo;
 
     /**
-     * @ORM\OneToMany(targetEntity=EtatAdherent::class, mappedBy="adherent", orphanRemoval=true)
-     */
-    private $etatAdherents;
-
-    /**
      * @ORM\OneToMany(targetEntity=Pac::class, mappedBy="adherent", orphanRemoval=true)
      */
     private $pacs;
@@ -68,17 +64,6 @@ class Adherent
      * @ORM\Column(type="datetime")
      */
     private $createdAt;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=Garantie::class, inversedBy="adherents")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $garantie;
-
-    /**
-     * @ORM\Column(type="array")
-     */
-    private $tailleFamille = [];
 
     /**
      * @ORM\OneToMany(targetEntity=HistoriqueCotisation::class, mappedBy="adherent", orphanRemoval=true)
@@ -90,10 +75,19 @@ class Adherent
      */
     private $email;
 
+    /**
+     * @ORM\Column(type="integer", unique=true)
+     */
+    private $numero;
+
+    // temporary
+    private $nbNouveau;
+    private $nbAncien;
+
+
     public function __construct()
     {
         $this->dateInscription = new \DateTime();
-        $this->etatAdherents = new ArrayCollection();
         $this->pacs = new ArrayCollection();
         $this->historiqueCotisations = new ArrayCollection();
     }
@@ -176,37 +170,6 @@ class Adherent
     }
 
     /**
-     * @return Collection|EtatAdherent[]
-     */
-    public function getEtatAdherents(): Collection
-    {
-        return $this->etatAdherents;
-    }
-
-    public function addEtatAdherent(EtatAdherent $etatAdherent): self
-    {
-        if (!$this->etatAdherents->contains($etatAdherent)) {
-            $this->etatAdherents[] = $etatAdherent;
-            $etatAdherent->setAdherent($this);
-        }
-
-        return $this;
-    }
-
-    public function removeEtatAdherent(EtatAdherent $etatAdherent): self
-    {
-        if ($this->etatAdherents->contains($etatAdherent)) {
-            $this->etatAdherents->removeElement($etatAdherent);
-            // set the owning side to null (unless already changed)
-            if ($etatAdherent->getAdherent() === $this) {
-                $etatAdherent->setAdherent(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection|Pac[]
      */
     public function getPacs(): Collection
@@ -261,54 +224,6 @@ class Adherent
         return $this;
     }
 
-    public function getGarantie(): ?Garantie
-    {
-        return $this->garantie;
-    }
-
-    public function setGarantie(?Garantie $garantie): self
-    {
-        $this->garantie = $garantie;
-
-        return $this;
-    }
-
-    public function getTailleFamille(): ?array
-    {
-        return $this->tailleFamille;
-    }
-
-    public function setTailleFamille(array $tailleFamille): self
-    {
-        $this->tailleFamille = $tailleFamille;
-
-        return $this;
-    }
-
-    public function getValueTailleFamille($m = null)
-    {
-        if ($m == null) {
-            $m = date('m');
-        }
-        return $this->tailleFamille[$m-1];
-    }
-
-    public function getStatus()
-    {
-        $debObs =   new \DateTime(date("Y-m-d H:i:s", $this->dateInscription->getTimestamp()));
-        $obs = $this->garantie->getPeriodeObservation();
-        $finObs = $this->dateInscription;
-        date_add($finObs, date_interval_create_from_date_string("$obs months"));
-        $today = new \DateTime();
-
-        if($today->getTimestamp() > $debObs->getTimestamp() && $today->getTimestamp() < $finObs->getTimestamp()) {
-            return "En période d'observation";
-        } else {
-            return "En cours de droit";
-        }   
-        
-    }
-
     /**
      * @return Collection|HistoriqueCotisation[]
      */
@@ -316,17 +231,6 @@ class Adherent
     {
         return $this->historiqueCotisations;
     }
-
-    public function getCurrentHistoriqueCotisation()
-    {
-        $currentYear = date('Y');
-        foreach ($this->historiqueCotisations as $paiement) {
-            if ($paiement->getAnnee() == $currentYear) {
-                return $paiement;
-            }
-        }
-        return null;
-    }    
 
     public function addHistoriqueCotisation(HistoriqueCotisation $historiqueCotisation): self
     {
@@ -347,6 +251,42 @@ class Adherent
                 $historiqueCotisation->setAdherent(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getNumero(): ?int
+    {
+        return $this->numero;
+    }
+
+    public function setNumero(int $numero): self
+    {
+        $this->numero = $numero;
+
+        return $this;
+    }
+
+    public function getNbNouveau(): ?int
+    {
+        return $this->nbNouveau;
+    }
+
+    public function setNbNouveau(int $n): self
+    {
+        $this->nbNouveau = $n;
+
+        return $this;
+    }
+
+    public function getNbAncien(): ?int
+    {
+        return $this->nbAncien;
+    }
+
+    public function setNbAncien(int $n): self
+    {
+        $this->nbAncien = $n;
 
         return $this;
     }

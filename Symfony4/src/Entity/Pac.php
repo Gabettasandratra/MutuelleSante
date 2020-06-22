@@ -80,11 +80,6 @@ class Pac
     private $adherent;
 
     /**
-     * @ORM\OneToMany(targetEntity=EtatPac::class, mappedBy="pac", orphanRemoval=true)
-     */
-    private $etatPacs;
-
-    /**
      * @ORM\Column(type="boolean")
      */
     private $isSortie;
@@ -99,10 +94,14 @@ class Pac
      */
     private $remarque;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $cin;
+
     public function __construct()
     {
         $this->dateEntrer = new \DateTime();
-        $this->etatPacs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -230,37 +229,6 @@ class Pac
         return $this;
     }
 
-    /**
-     * @return Collection|EtatPac[]
-     */
-    public function getEtatPacs(): Collection
-    {
-        return $this->etatPacs;
-    }
-
-    public function addEtatPac(EtatPac $etatPac): self
-    {
-        if (!$this->etatPacs->contains($etatPac)) {
-            $this->etatPacs[] = $etatPac;
-            $etatPac->setPac($this);
-        }
-
-        return $this;
-    }
-
-    public function removeEtatPac(EtatPac $etatPac): self
-    {
-        if ($this->etatPacs->contains($etatPac)) {
-            $this->etatPacs->removeElement($etatPac);
-            // set the owning side to null (unless already changed)
-            if ($etatPac->getPac() === $this) {
-                $etatPac->setPac(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getIsSortie(): ?bool
     {
         return $this->isSortie;
@@ -293,6 +261,18 @@ class Pac
     public function setRemarque(?string $remarque): self
     {
         $this->remarque = $remarque;
+
+        return $this;
+    }
+
+    public function getCin(): ?string
+    {
+        return $this->cin;
+    }
+
+    public function setCin(?string $cin): self
+    {
+        $this->cin = $cin;
 
         return $this;
     }

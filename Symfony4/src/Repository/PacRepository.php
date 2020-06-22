@@ -23,10 +23,19 @@ class PacRepository extends ServiceEntityRepository
     public function generateCode(Adherent $adherent)
     {
         // get the last id
-        $lastCode = $this->_em->createQuery('select max(p.codeMutuelle) from App\Entity\Pac p where p.adherent = :a')
+        $lastCode = (int) $this->_em->createQuery('select max(p.codeMutuelle) from App\Entity\Pac p where p.adherent = :a')
                             ->setParameter('a', $adherent) 
                             ->getSingleScalarResult();
-        $id = (int)str_replace($adherent->getId().'/', '', $lastCode);
-        return $adherent->getId().'/'.++$id;
+        return ++$lastCode;
+    }
+
+    public function findPacRetirer()
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.isSortie = true')
+            ->orderBy('p.codeMutuelle', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
     }
 }

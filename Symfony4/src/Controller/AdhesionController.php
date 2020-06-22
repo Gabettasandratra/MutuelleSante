@@ -2,18 +2,25 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-
-use App\Entity\Adherent;
-use App\Form\AdherentType;
 use App\Entity\Pac;
 use App\Form\PacType;
+use App\Entity\Adherent;
 use App\Entity\Exercice;
+use App\Form\AdherentType;
+use App\Service\ExcelReader;
+
+use Symfony\Component\Form\FormError;
+use App\Repository\AdherentRepository;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class AdhesionController extends AbstractController
 {
@@ -44,18 +51,53 @@ class AdhesionController extends AbstractController
     }
 
     /**
+     * @Route("/adhesion/beneficiaires/retires", name="adhesion_beneficiaires_retires")
+     */
+    public function beneficiairesRetires()
+    {
+        $pacs = $this->getDoctrine()
+                         ->getRepository(Pac::class)
+                         ->findPacRetirer();
+        return $this->render('adhesion/beneficiairesRetires.html.twig', [
+            'pacs' => $pacs
+        ]);
+    }
+
+    /**
+     * @Route("/adhesion/beneficiaires/retires/{id}", name="adhesion_beneficiaires_integre")
+     */
+    public function beneficiairesIntegrer(Pac $pac)
+    {
+        $manager = $this->getDoctrine()->getManager();
+        $pac->setIsSortie(false);
+        $pac->setRemarque(null);
+        $pac->setDateSortie(null);
+
+        $manager->persist($pac);
+        $manager->flush();
+
+        return $this->redirectToRoute('adhesion_show', ['id' => $pac->getAdherent()->getId()]);
+
+    }
+
+    /**
      * @Route("/adhesion/inscrire", name="adhesion_new")
      */
     public function create(Request $request)
     { 
-        $manager = $this->getDoctrine()->getManager();
-        $adherent = new Adherent();
+        $exercice = $this->getDoctrine()
+                         ->getRepository(Exercice::class)
+                         ->findCurrent();
 
+        $adherent = new Adherent();
+        $generatedNumero = $this->getDoctrine()
+                         ->getRepository(Adherent::class)
+                         ->generateNumero();
+        $adherent->setNumero($generatedNumero);
         $formAdherent = $this->createForm(AdherentType::class, $adherent);
         $formAdherent->handleRequest($request);
         if ($formAdherent->isSubmitted() && $formAdherent->isValid()) {
-            $photoFile = $formAdherent->get('photo')->getData();
-            
+            $photoFile = $formAdherent->get('photo')->getData();           
             if ($photoFile) {
                 $fileName = uniqid().'.'.$photoFile->guessExtension();
                 try {
@@ -70,10 +112,9 @@ class AdhesionController extends AbstractController
             } else {
                 $adherent->setPhoto('http://placehold.it/100x100');
             }
-            $m = date('m', $adherent->getDateInscription()->getTimestamp());
-            $adherent->setTailleFamille(array_fill($m-1, 13-$m, 0));
             $adherent->setCreatedAt(new \DateTime());
             
+            $manager = $this->getDoctrine()->getManager();
             $manager->persist($adherent);
             $manager->flush();
 
@@ -81,6 +122,7 @@ class AdhesionController extends AbstractController
         }
         return $this->render('adhesion/form.html.twig', [
             'form' => $formAdherent->createView(),
+            'exercice' => $exercice,
         ]);
     }
 
@@ -122,11 +164,80 @@ class AdhesionController extends AbstractController
 
     /**
      * @Route("/adhesion/{id}", name="adhesion_show")
+     * @Entity("adherent", expr="repository.findOneById(id)")
      */
-    public function show(Adherent $adherent)
+    public function show(Adherent $adherent, AdherentRepository $adherentRepo)
     {
+        $exercice = $this->getDoctrine()
+                         ->getRepository(Exercice::class)
+                         ->findCurrent();
+        
         return $this->render('adhesion/show.html.twig', [
-            'adherent' => $adherent
+            'adherent' => $adherent,
+            'exercice' => $exercice,
+        ]);
+    }
+
+    /**
+     * @Route("/adhesion/{id}/pac/{idPac}/remove", name="adhesion_remove_pac")
+     */
+    public function removePac(Adherent $adherent, $idPac, Request $request)
+    { 
+        $manager = $this->getDoctrine()->getManager();
+        $pac = $this->getDoctrine()
+                    ->getRepository(Pac::class)
+                    ->find($idPac);
+
+        $formPac = $this->createFormBuilder($pac)
+                        ->add('dateSortie', DateType::class)
+                        ->add('remarque', TextareaType::class)
+                        ->getForm();
+        $formPac->handleRequest($request);
+        if ($formPac->isSubmitted() && $formPac->isValid()) {
+            $pac->setIsSortie(true);
+            $manager->persist($adherent);
+            $manager->persist($pac);
+            $manager->flush();
+
+            return $this->redirectToRoute('adhesion_show', ['id' => $adherent->getId()]);
+        }
+        return $this->render('adhesion/removePac.html.twig', [
+            'form' => $formPac->createView(),
+            'adherent' => $adherent,
+            'pac' => $pac
+        ]);
+    }
+
+    /**
+     * @Route("/adhesion/{id}/pac/xlsx", name="adhesion_add_pac_xlsx")
+     */
+    public function addPacFromExcel(Adherent $adherent, Request $request, ExcelReader $excelReader)
+    {
+        $form = $this->createFormBuilder()
+                    ->add('file', FileType::class, [
+                        'mapped' => false,
+                        'required' => true,
+                    ])
+                    ->add('save', SubmitType::class, ['label' => 'Importer xlsx'])
+                    ->getForm();
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $xlsxFile = $form->get('file')->getData();
+            if ($xlsxFile) {
+                $output = $excelReader->savePacFromExcel($adherent, $xlsxFile);  
+                if ($output['hasError'] === false) {
+                    return $this->redirectToRoute('adhesion_show', ['id' => $adherent->getId()]); 
+                } else {
+                    $error = new FormError($output['ErrorMessage']);
+                    $form->get('file')->addError($error);
+                }             
+            }
+            
+        }
+        
+        return $this->render('adhesion/addPacXlsx.html.twig', [
+            'form' => $form->createView(),
+            'adherent' => $adherent,
         ]);
     }
 
@@ -161,16 +272,6 @@ class AdhesionController extends AbstractController
                 }
                 $pac->setPhoto($this->getParameter('users_img_directory').'/'.$fileName);
             }
-            // Update taille famille from the current month
-            $m = date('m', $pac->getDateEntrer()->getTimestamp());
-            $tF = $adherent->getTailleFamille();
-            foreach ($tF as $key => $value) {
-                if ($key >= $m-1) {
-                    $tF[$key] = $value + 1; 
-                }
-            }
-            $adherent->setTailleFamille($tF);
-            $adherent->updateCurrentCotisationEmise();
             $manager->persist($adherent);
             $manager->persist($pac);
             $manager->flush();
@@ -221,45 +322,4 @@ class AdhesionController extends AbstractController
             'editMode' => true,
         ]);
     } 
-
-    /**
-     * @Route("/adhesion/{id}/pac/{idPac}/remove", name="adhesion_remove_pac")
-     */
-    public function removePac(Adherent $adherent, $idPac, Request $request)
-    { 
-        $manager = $this->getDoctrine()->getManager();
-        $pac = $this->getDoctrine()
-                    ->getRepository(Pac::class)
-                    ->find($idPac);
-
-        $formPac = $this->createFormBuilder($pac)
-                        ->add('dateSortie', DateType::class)
-                        ->add('remarque', TextareaType::class)
-                        ->getForm();
-        $formPac->handleRequest($request);
-        if ($formPac->isSubmitted() && $formPac->isValid()) {
-            $pac->setIsSortie(true);
-            // Update taille famille from the current month
-            $m = date('m', $pac->getDateSorite()->getTimestamp());
-            $tF = $adherent->getTailleFamille();
-            foreach ($tF as $key => $value) {
-                if ($key >= $m-1) {
-                    $tF[$key] = $value - 1; 
-                }
-            }
-            $adherent->setTailleFamille($tF);
-            $adherent->updateCurrentCotisationEmise();
-            $manager->persist($adherent);
-            $manager->persist($adherent->getCurrentCotisationEmise());
-            $manager->persist($pac);
-            $manager->flush();
-
-            return $this->redirectToRoute('adhesion_show', ['id' => $adherent->getId()]);
-        }
-        return $this->render('adhesion/removePac.html.twig', [
-            'form' => $formPac->createView(),
-            'adherent' => $adherent,
-            'pac' => $pac
-        ]);
-    }
 }

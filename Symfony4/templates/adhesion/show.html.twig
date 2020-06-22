@@ -18,6 +18,10 @@
     </div>
 {% endblock %}
 
+{% block stylesheets %}
+    <link href="{{ asset('assets/libs/datatable/dist/dataTables.bootstrap4.css') }}" rel="stylesheet">
+{% endblock %}
+
 {% block body %}
     <div class="row">
         <div class="col-md-12">
@@ -79,49 +83,50 @@
                             
                         </div>
                         <div class="col-md-6">
-                            <h4 class="card-title">Garantie santé</h4>
+                            <h4 class="card-title">Détails</h4>
                             <div class="row">
                                 <div class="col-md-4">
-                                    <ul class="list-style-none border-bottom-white">
+                                    <ul class="list-style-none border-bottom-white">                
                                         <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Nom de la garantie:</span>
+                                            <span class="font-weight-medium text-dark"> Droit d'ahésion payé:</span>
                                         </li>
                                         <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Droit d'ahésion:</span>
+                                            <span class="font-weight-medium text-dark"> Cotisation ancien :</span>
                                         </li>
                                         <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Type de cotisation:</span>
+                                            <span class="font-weight-medium text-dark"> Cotisation nouveau :</span>
                                         </li>
                                         <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Montant cotisation:</span>
+                                            <span class="font-weight-medium text-dark"> Ancien béneficiaire :</span>
+                                        </li>
+                                        <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark"> Nouveau béneficiaire :</span>
                                         </li>
                                         <li class="my-3 ">
                                             <span class="font-weight-medium text-dark"> Cotisation annuelle:</span>
-                                        </li>
-                                        <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Période observation:</span>
                                         </li>
                                     </ul>
                                 </div>
                                 <div class="col-md-8">
                                     <ul class="list-style-none">
                                         <li class="my-3 border-bottom">
-                                            <span> {{ adherent.garantie.nom }}</span>
+                                            <span> {{ exercice.droitAdhesion }} </span>
                                         </li>
                                         <li class="my-3 border-bottom">
-                                            <span> {{ adherent.garantie.droitAdhesion }}</span>
+                                            <span> {{ exercice.cotAncien }} / bénéficiaire / ans</span>
                                         </li>
                                         <li class="my-3 border-bottom">
-                                            <span> {{ adherent.garantie.typeCotisation.nom }}</span>
+                                            <span> {{ exercice.cotNouveau }} / bénéficiaire / ans</span>
                                         </li>
-                                        <li class="my-3 border-bottom">
-                                            <span> {{ adherent.garantie.montant1 }} / béneficiaire / ans</span>
+                                        <li class="my-3 border-bottom">               
+                                            <span> {{ adherent.nbAncien }}</span>
                                         </li>
-                                        <li class="my-3 border-bottom">
-                                            <span> {{ adherent.garantie.montant1 * adherent.valueTailleFamille }}</span>
+                                        <li class="my-3 border-bottom">               
+                                            <span> {{ adherent.nbNouveau }}</span>
                                         </li>
-                                        <li class="my-3 border-bottom">
-                                            <span> {{ adherent.dateInscription | date('d / m / Y') }}  au  {{ adherent.dateInscription | date_modify('+' ~ adherent.garantie.periodeObservation ~ 'months') | date('d / m / Y') }}</span>
+                                        <li class="my-3 border-bottom">   
+                                            {% set cotisation = adherent.nbNouveau * exercice.cotNouveau + exercice.cotAncien * adherent.nbAncien %}   
+                                            <span> {{ cotisation }} </span>
                                         </li>
                                     </ul>
                                 </div>
@@ -138,20 +143,25 @@
                         <div class="col-5">
                             <h4 class="card-title">Béneficiaire</h4>
                         </div>
-                        <div class="col-7">
+                        <div class="col-4">
+                            <div class="text-right">
+                                <a href="{{ path('adhesion_add_pac_xlsx', {'id': adherent.id}) }}" class="btn btn-sm btn-primary"><i class="mdi mdi-upload"></i> Importer</a>
+                            </div> 
+                        </div>
+                        <div class="col-3">
                             <div class="text-right">
                                 <a href="{{ path('adhesion_add_pac', {'id': adherent.id}) }}" class="btn btn-sm btn-info"><i class="mdi mdi-account-plus"></i> Ajouter</a>
-                            </div>
+                            </div> 
                         </div>
                     </div>
                     <hr>
                     <div class="table-responsive">
-                        <table class="table">
+                        <table class="table" id="zero_config">
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Date d'entrée</th>
-                                    <th scope="col">N° code</th>
+                                    <th scope="col">N° Matricule</th>
                                     <th scope="col">Nom et prénom</th>
                                     <th scope="col">Date naissance</th>
                                     <th scope="col">Fonction</th>
@@ -165,7 +175,7 @@
                                         <tr>
                                             <th scope="row">{{ key }}</th>
                                             <td>{{ pac.dateEntrer | date('d / m / Y') }}</td>
-                                            <td>{{ pac.codeMutuelle }}</td>
+                                            <td>{{ adherent.numero }} / {{ pac.codeMutuelle }}</td>
                                             <td>{{ pac.nom }} {{ pac.prenom }}</td>
                                             <td>{{ pac.dateNaissance | date('d / m / Y') }}</td>
                                             <td>{{ pac.parente }}</td>
@@ -184,4 +194,9 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('assets/libs/datatable/dist/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('dist/js/pages/datatable/datatable-basic.init.js') }}"></script>
 {% endblock %}
