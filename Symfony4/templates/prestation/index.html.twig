@@ -50,10 +50,18 @@
                                                 <td>{{ adherent.nom }}</td>
                                                 <td>{{ pac.codeMutuelle }}</td>
                                                 <td>{{ pac.nom }} {{ pac.prenom }}</td>
-                                                <td><span class="label label-success">En cours de droit</span></td>
-                                                <td>
-                                                    <a href="{{ path('prestation_save', {'id': pac.id}) }}"class="label btn-primary label-primary">Selectionner</a>
-                                                </td>
+ 
+                                                {% if pac.adherent.possedeDroit %}
+                                                    <td><span class="label label-rounded label-success">Droit au préstation</span></td>
+                                                    <td>
+                                                        <a href="{{ path('prestation_save', {'id': pac.id}) }}"class="label  label-rounded btn-primary label-primary">Selectionner</a>
+                                                    </td>
+                                                {% else %}
+                                                    <td><span class="label label-rounded label-warning">Pas de droit au préstation</span></td>
+                                                    <td>
+                                                        <span class="label label-rounded btn-secondary label-secondary disabled">Selectionner</span>
+                                                    </td>
+                                                {% endif %}
                                             </tr> 
                                         {% endif %}                                       
                                     {% endfor %}

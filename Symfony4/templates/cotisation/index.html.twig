@@ -33,15 +33,18 @@
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
+                                    <th scope="col">Numéro</th>
                                     <th scope="col">Nom de la congrégation</th>
                                     <th scope="col">Situation de compte</th>
                                     <th scope="col">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                {% set key = 1 %}
                                 {% for adherent in adherents %}
                                     <tr>
-                                        <th scope="row">{{ adherent.id }}</th>
+                                        <th scope="row">{{ key }} {% set key = key + 1 %} </th>
+                                        <th>{{ adherent.numero }}</th>
                                         <td>{{ adherent.nom }}</td>
                                         <td><span class="label label-rounded label-success">Cotisation payé</span></td>
                                         <td>

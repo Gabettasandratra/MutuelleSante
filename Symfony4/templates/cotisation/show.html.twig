@@ -5,7 +5,7 @@
 {% block header %}
     <div class="page-breadcrumb">
         <div class="d-flex align-items-center">
-            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Fiche de cotisation N°{{ adherent.id }}</h4>
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Fiche de cotisation de la congrégation N°{{ adherent.numero }} / {{ adherent.nom }}</h4>
             <div class="ml-auto">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb m-0 p-0">
@@ -23,7 +23,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">    
-                    <h4 class="card-title">Adhérent</h4>
+                    <h4 class="card-title">Congrégation</h4>
                     <hr>
                     <div class="row">
                         <div class="col-md-6 border-right">
@@ -47,10 +47,7 @@
                                         </li>
                                         <li class="my-3">
                                             <span class="font-weight-medium text-dark"> Date d'entrée:</span>
-                                        </li>
-                                        <li class="my-3">
-                                            <span class="font-weight-medium text-dark"> Nombre bénefiaire:</span>
-                                        </li>
+                                        </li>                                       
                                     </ul>
                                 </div>
                                 <div class="col-md-8">
@@ -59,13 +56,10 @@
                                             <span> {{ adherent.nom }} </span>
                                         </li>
                                         <li class="my-3 border-bottom">
-                                            <span> {{ adherent.id }} </span>
+                                            <span> {{ adherent.numero }} </span>
                                         </li>
                                         <li class="my-3 border-bottom">
                                             <span> {{ adherent.dateInscription | date('d / m / Y') }}</span>
-                                        </li>
-                                        <li class="my-3 border-bottom">
-                                            <span> {{ adherent.getValueTailleFamille }}</span>
                                         </li>
                                     </ul>
                                 </div>
@@ -73,63 +67,115 @@
                             
                         </div>
                         <div class="col-md-6">
-                            <h4 class="card-title">Garantie santé</h4>
+                            <h4 class="card-title">Détails du compte pour l'année {{ "now" | date('Y') }}</h4>
                             <div class="row">
                                 <div class="col-md-4">
-                                    <ul class="list-style-none border-bottom-white">
+                                    <ul class="list-style-none border-bottom-white">                
                                         <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Nom de la garantie:</span>
+                                            <span class="font-weight-medium text-dark"> Droit d'ahésion payé:</span>
                                         </li>
                                         <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Droit d'ahésion:</span>
+                                            <span class="font-weight-medium text-dark"> Cotisation ancien :</span>
                                         </li>
                                         <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Type de cotisation:</span>
+                                            <span class="font-weight-medium text-dark"> Cotisation nouveau :</span>
                                         </li>
                                         <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Montant cotisation:</span>
+                                            <span class="font-weight-medium text-dark"> Ancien béneficiaire :</span>
+                                        </li>
+                                        <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark"> Nouveau béneficiaire :</span>
                                         </li>
                                         <li class="my-3 ">
                                             <span class="font-weight-medium text-dark"> Cotisation annuelle:</span>
                                         </li>
-                                        <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Période observation:</span>
-                                        </li>
                                     </ul>
                                 </div>
                                 <div class="col-md-8">
+                                    {# Some logic : get the compte cotisation of the exercice given #}
+                                    {% set compteCotisation = adherent.compteCotisation(exercice) %}
+
                                     <ul class="list-style-none">
                                         <li class="my-3 border-bottom">
-                                            <span> {{ adherent.garantie.nom }}</span>
+                                            <span> {{ exercice.droitAdhesion }} </span>
                                         </li>
                                         <li class="my-3 border-bottom">
-                                            <span> {{ adherent.garantie.droitAdhesion }}</span>
+                                            <span> {{ exercice.cotAncien }} / bénéficiaire / ans</span>
                                         </li>
                                         <li class="my-3 border-bottom">
-                                            <span> {{ adherent.garantie.typeCotisation.nom }}</span>
+                                            <span> {{ exercice.cotNouveau }} / bénéficiaire / ans</span>
                                         </li>
-                                        <li class="my-3 border-bottom">
-                                            <span> {{ adherent.garantie.montant1 }} / béneficiaire / ans</span>
+                                        <li class="my-3 border-bottom">               
+                                            <span> {{ compteCotisation.ancien }}</span>
                                         </li>
-                                        <li class="my-3 border-bottom">
-                                            <span> {{ adherent.garantie.montant1 * adherent.valueTailleFamille }}</span>
+                                        <li class="my-3 border-bottom">               
+                                            <span> {{ compteCotisation.nouveau }}</span>
                                         </li>
-                                        <li class="my-3 border-bottom">
-                                            <span> {{ adherent.dateInscription | date('d / m / Y') }}  au  {{ adherent.dateInscription | date_modify('+' ~ adherent.garantie.periodeObservation ~ 'months') | date('d / m / Y') }}</span>
+                                        <li class="my-3 border-bottom">   
+                                            <span> {{ compteCotisation.due }} </span>
                                         </li>
                                     </ul>
                                 </div>
                             </div>
                             <ul class="list-style-none">
                                 <div class="btn-list">
-                                    <a href="{{ path('adhesion_show', {'id': adherent.id}) }}"class="btn btn-sm btn-success"><i class="mdi mdi-contact-mail"></i>  Voir fiche d'adhésion</a>
+                                    <a href="{{ path('adhesion_show', {'id': adherent.id}) }}"class="btn btn-sm btn-primary"><i class="mdi mdi-calendar-check"></i> Voir fiche d'adhésion</a>
                                 </div>
                             </ul>
                         </div>
                     </div>
+
+                    <div class="row mt-4">
+                        <div class="col-5">
+                            <h4 class="card-title">Situation de compte</h4>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="table m-t-20">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Année</th>
+                                        <th scope="col">Ancien</th>
+                                        <th scope="col">Nouveau</th>
+                                        <th scope="col">Cotisation due</th>
+                                        <th scope="col">Cotisation percue</th>
+                                        <th scope="col">Situation</th>
+                                        <th scope="col">Reste à payé</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for compteCotisation in adherent.compteCotisations %}
+                                        <tr>
+                                            <th scope="row">{{ compteCotisation.exercice.annee }}</th>
+                                            <td>{{ compteCotisation.ancien }}</td>
+                                            <td>{{ compteCotisation.nouveau }}</td>
+                                            <td>{{ compteCotisation.due }}</td>
+                                            <td>{{ compteCotisation.paye }}</td>
+                                            <td>
+                                                {% if compteCotisation.isPaye %}
+                                                    <span class="label label-rounded label-success">Payé</span>
+                                                {% else %}
+                                                    <span class="label label-rounded label-warning">Non payé</span>
+                                                {% endif %}         
+                                            </td>
+                                            <td>{{ compteCotisation.reste }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        
+                        </div>
+                    </div>
+
                     <div class="row mt-4">
                         <div class="col-5">
                             <h4 class="card-title">Versement de cotisation</h4>
+                        </div>
+                        <div class="col-7">
+                            <div class="text-right">
+                                <a href="{{ path('cotisation_pay', {'id': adherent.id}) }}" class="btn btn-sm btn-info"><i class="mdi mdi-plus-circle-outline"></i> Enregistrer nouveau paiement</a>
+                            </div> 
                         </div>
                     </div>
                     <hr>
@@ -137,50 +183,27 @@
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Date de paiement</th>
-                                    <th scope="col">Cotisation anneé</th>
-                                    <th scope="col">Montant due</th>
-                                    <th scope="col">Montant percue</th>
-                                    <th scope="col">Arriéré</th>
-                                    <th scope="col">Avance</th>
-                                    <th scope="col">Etat</th>
-                                    <th scope="col">Actions</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Cotisation année</th>
+                                    <th scope="col">Montant</th>
+                                    <th scope="col">Méthode</th>
+                                    <th scope="col">Réference</th>
+                                    <th scope="col">Remarque</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% set paiement = adherent.currentHistoriqueCotisation %}
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>{% if paiement %} {{ paiement.datePaiement | date('d / m / Y') }} {% endif %}</td>
-                                    <td>{{ 'now' |date('Y') }}</td>
-                                    <td>{{ adherent.garantie.montant1 * adherent.valueTailleFamille }}</td>
-                                    <td>{% if paiement %} {{ paiement.montant }} {% endif %}</td>
-                                    {% if paiement %}
-                                        {% set diff = paiement.montant - adherent.garantie.montant1 * adherent.valueTailleFamille %}
-                                        {% if diff < 0 %}
-                                            <td>{{ diff | abs }}</td>
-                                            <td></td>
-                                            <td><span class="label label-warning">Non payé</span></td>
-                                            <td>
-                                                <a href="{{ path('cotisation_pay', {'id': adherent.id, 'year': 'now' |date('Y') }) }}" class="label btn-primary label-primary">Payer</a>
-                                            </td>
-                                        {% else %}
-                                            <td></td>
-                                            <td>{{ diff | abs }}</td>
-                                            <td><span class="label label-success">Payé</span></td>
-                                            <td></td>
-                                        {% endif %}
-                                    {% else %}
-                                        <td></td>
-                                        <td></td>
-                                        <td><span class="label label-warning">Non payé</span></td>
-                                        <td>
-                                            <a href="{{ path('cotisation_pay', {'id': adherent.id, 'year': 'now' |date('Y') }) }}" class="label btn-primary label-primary">Payer</a>
-                                        </td>
-                                    {% endif %}
-                                    
-                                </tr>                       
+                                {% for compteCotisation in adherent.compteCotisations %}
+                                    {% for historiqueCotisation in compteCotisation.historiqueCotisations %}                                                               
+                                        <tr>
+                                            <th scope="row">{{ historiqueCotisation.datePaiement |date('d/m/Y') }}</th>
+                                            <td>{{ compteCotisation.exercice.annee }}</td>
+                                            <td>{{ historiqueCotisation.montant }}</td>
+                                            <td>{{ historiqueCotisation.moyen }}</td>
+                                            <td>{{ historiqueCotisation.reference }}</td>
+                                            <td>{{ historiqueCotisation.remarque }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% endfor %}                  
                             </tbody>
                         </table>
                     </div>

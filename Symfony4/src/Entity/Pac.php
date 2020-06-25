@@ -2,18 +2,20 @@
 
 namespace App\Entity;
 
-use App\Repository\PacRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Entity\Exercice;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
+use App\Repository\PacRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 
 /**
  * @ORM\Entity(repositoryClass=PacRepository::class)
- * @UniqueEntity(fields={"codeMutuelle"}, message="Code mutuelle existe déja")
+ * @UniqueEntity(fields={"codeMutuelle"}, message="Le numéro matricule {{ value }} existe déja")
+ * @UniqueEntity(fields={"cin"}, message="Le N° CIN {{ value }} est déja pris par d'autre béneficiaire")
  */
 class Pac
 {
@@ -25,7 +27,7 @@ class Pac
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="integer", columnDefinition="INT(5) UNSIGNED ZEROFILL" )
      */
     private $codeMutuelle;
 
@@ -95,13 +97,19 @@ class Pac
     private $remarque;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=15, nullable=true, unique=true)
      */
     private $cin;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Prestation::class, mappedBy="pac")
+     */
+    private $prestations;
 
     public function __construct()
     {
         $this->dateEntrer = new \DateTime();
+        $this->prestations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -273,6 +281,48 @@ class Pac
     public function setCin(?string $cin): self
     {
         $this->cin = $cin;
+
+        return $this;
+    }
+
+    // Logic section
+    // test if the pac is nouveau or ancien in a given exercice
+    public function isNouveau(Exercice $exercice)
+    {
+        $dateEntrer = $this->dateEntrer;
+        if ($dateEntrer >= $exercice->getDateDebut() && $dateEntrer < $exercice->getDateFin()) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @return Collection|Prestation[]
+     */
+    public function getPrestations(): Collection
+    {
+        return $this->prestations;
+    }
+
+    public function addPrestation(Prestation $prestation): self
+    {
+        if (!$this->prestations->contains($prestation)) {
+            $this->prestations[] = $prestation;
+            $prestation->setPac($this);
+        }
+
+        return $this;
+    }
+
+    public function removePrestation(Prestation $prestation): self
+    {
+        if ($this->prestations->contains($prestation)) {
+            $this->prestations->removeElement($prestation);
+            // set the owning side to null (unless already changed)
+            if ($prestation->getPac() === $this) {
+                $prestation->setPac(null);
+            }
+        }
 
         return $this;
     }

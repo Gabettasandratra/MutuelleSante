@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\HistoriqueCotisationRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\HistoriqueCotisationRepository;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=HistoriqueCotisationRepository::class)
+ * @UniqueEntity(fields={"reference"}, message="Ce réference de paiement a été déja enregistrer")
  */
 class HistoriqueCotisation
 {
@@ -26,20 +28,9 @@ class HistoriqueCotisation
 
     /**
      * @ORM\Column(type="datetime")
+     * @Assert\LessThan("+1 day")
      */
     private $datePaiement;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=Adherent::class, inversedBy="historiqueCotisations")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $adherent;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=Exercice::class, inversedBy="historiqueCotisations")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $exercice;
 
     /**
      * @ORM\Column(type="datetime")
@@ -49,11 +40,29 @@ class HistoriqueCotisation
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $annee;
+    private $moyen;
+
+    /**
+     * @ORM\Column(type="string", length=255, unique=true)
+     * @Assert\NotBlank
+     */
+    private $reference;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=CompteCotisation::class, inversedBy="historiqueCotisations")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $compteCotisation;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $remarque;
 
     public function __construct()
     {
         $this->datePaiement = new \DateTime();
+        $this->createdAt = new \DateTime();
     }
 
     public function getId(): ?int
@@ -85,30 +94,6 @@ class HistoriqueCotisation
         return $this;
     }
 
-    public function getAdherent(): ?Adherent
-    {
-        return $this->adherent;
-    }
-
-    public function setAdherent(?Adherent $adherent): self
-    {
-        $this->adherent = $adherent;
-
-        return $this;
-    }
-
-    public function getExercice(): ?Exercice
-    {
-        return $this->exercice;
-    }
-
-    public function setExercice(?Exercice $exercice): self
-    {
-        $this->exercice = $exercice;
-
-        return $this;
-    }
-
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
@@ -121,14 +106,50 @@ class HistoriqueCotisation
         return $this;
     }
 
-    public function getAnnee(): ?string
+    public function getMoyen(): ?string
     {
-        return $this->annee;
+        return $this->moyen;
     }
 
-    public function setAnnee(string $annee): self
+    public function setMoyen(string $moyen): self
     {
-        $this->annee = $annee;
+        $this->moyen = $moyen;
+
+        return $this;
+    }
+
+    public function getReference(): ?string
+    {
+        return $this->reference;
+    }
+
+    public function setReference(string $reference): self
+    {
+        $this->reference = $reference;
+
+        return $this;
+    }
+
+    public function getCompteCotisation(): ?CompteCotisation
+    {
+        return $this->compteCotisation;
+    }
+
+    public function setCompteCotisation(?CompteCotisation $compteCotisation): self
+    {
+        $this->compteCotisation = $compteCotisation;
+
+        return $this;
+    }
+
+    public function getRemarque(): ?string
+    {
+        return $this->remarque;
+    }
+
+    public function setRemarque(?string $remarque): self
+    {
+        $this->remarque = $remarque;
 
         return $this;
     }

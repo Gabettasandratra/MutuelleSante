@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Paiement cotisation annuelle{% endblock %}
+{% block title %}Enregistrement de paiement cotisation{% endblock %}
 
 {% block header %}
     <div class="page-breadcrumb">
         <div class="d-flex align-items-center">
-            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Paiement cotisation annuelle</h4>
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Enregistrement paiement cotisation</h4>
             <div class="ml-auto">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb m-0 p-0">
@@ -25,7 +25,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Paiement cotisation annuelle</h4>
+                    <h4 class="card-title">Paiement cotisation de la congrégation N° {{ adherent.numero }} / {{ adherent.nom }}</h4>
                     <hr>
                     <div class="row">
                         <div class="col-6">

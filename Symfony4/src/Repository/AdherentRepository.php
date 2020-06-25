@@ -27,9 +27,6 @@ class AdherentRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult()
         ;
-        $adherent->setNbNouveau($this->getNbNouveauBeneficiaires($adherent));
-        $adherent->setNbAncien($this->getNbAncienBeneficiaires($adherent));
-
         return $adherent;
     }
 
@@ -39,23 +36,5 @@ class AdherentRepository extends ServiceEntityRepository
         $lastNum = (int) $this->_em->createQuery('select max(a.numero) from App\Entity\Adherent a')
                             ->getSingleScalarResult();
         return $lastNum + 1;
-    }
-
-    public function getNbNouveauBeneficiaires(Adherent $adherent)
-    {
-
-        $nb = $this->_em->createQuery('select count(p) from App\Entity\Pac p where p.adherent = :val and p.isSortie = false and year(p.dateEntrer) = year(CURRENT_DATE()) ')
-                        ->setParameter('val', $adherent)
-                        ->getSingleScalarResult();
-        return $nb;
-    }
-
-    public function getNbAncienBeneficiaires(Adherent $adherent)
-    {
-
-        $nb = $this->_em->createQuery('select count(p) from App\Entity\Pac p where p.adherent = :val and p.isSortie = false and year(p.dateEntrer) < year(CURRENT_DATE()) ')
-                        ->setParameter('val', $adherent)
-                        ->getSingleScalarResult();
-        return $nb;
     }
 }

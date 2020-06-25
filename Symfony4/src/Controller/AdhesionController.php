@@ -9,6 +9,7 @@ use App\Entity\Exercice;
 use App\Form\AdherentType;
 use App\Service\ExcelReader;
 
+use App\Entity\CompteCotisation;
 use Symfony\Component\Form\FormError;
 use App\Repository\AdherentRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -85,10 +86,6 @@ class AdhesionController extends AbstractController
      */
     public function create(Request $request)
     { 
-        $exercice = $this->getDoctrine()
-                         ->getRepository(Exercice::class)
-                         ->findCurrent();
-
         $adherent = new Adherent();
         $generatedNumero = $this->getDoctrine()
                          ->getRepository(Adherent::class)
@@ -97,6 +94,7 @@ class AdhesionController extends AbstractController
         $formAdherent = $this->createForm(AdherentType::class, $adherent);
         $formAdherent->handleRequest($request);
         if ($formAdherent->isSubmitted() && $formAdherent->isValid()) {
+            // Set the adherent photo
             $photoFile = $formAdherent->get('photo')->getData();           
             if ($photoFile) {
                 $fileName = uniqid().'.'.$photoFile->guessExtension();
@@ -113,16 +111,22 @@ class AdhesionController extends AbstractController
                 $adherent->setPhoto('http://placehold.it/100x100');
             }
             $adherent->setCreatedAt(new \DateTime());
-            
+
+            // create the current compteCotisation
+            $currentExercice = $this->getDoctrine()
+                                    ->getRepository(Exercice::class)
+                                    ->findCurrent();
+            $newCompteCotisation = new CompteCotisation($currentExercice, $adherent);
+
             $manager = $this->getDoctrine()->getManager();
             $manager->persist($adherent);
+            $manager->persist($newCompteCotisation);
             $manager->flush();
 
             return $this->redirectToRoute('adhesion_show', ['id' => $adherent->getId()]);
         }
         return $this->render('adhesion/form.html.twig', [
             'form' => $formAdherent->createView(),
-            'exercice' => $exercice,
         ]);
     }
 
@@ -179,9 +183,9 @@ class AdhesionController extends AbstractController
     }
 
     /**
-     * @Route("/adhesion/{id}/pac/{idPac}/remove", name="adhesion_remove_pac")
+     * @Route("/adhesion/{id}/pac/{idPac}/retirer", name="adhesion_remove_pac")
      */
-    public function removePac(Adherent $adherent, $idPac, Request $request)
+    public function retirerPac(Adherent $adherent, $idPac, Request $request)
     { 
         $manager = $this->getDoctrine()->getManager();
         $pac = $this->getDoctrine()
@@ -189,14 +193,31 @@ class AdhesionController extends AbstractController
                     ->find($idPac);
 
         $formPac = $this->createFormBuilder($pac)
-                        ->add('dateSortie', DateType::class)
+                        ->add('dateSortie', DateType::class,[
+                            'data' => new \DateTime()
+                        ])
                         ->add('remarque', TextareaType::class)
                         ->getForm();
         $formPac->handleRequest($request);
         if ($formPac->isSubmitted() && $formPac->isValid()) {
             $pac->setIsSortie(true);
+
+            // update the compte cotisation / if nouveau ++
+            $currentExercice = $this->getDoctrine()
+                                    ->getRepository(Exercice::class)
+                                    ->findCurrent();
+            $currentCompteCotisation = $adherent->getCompteCotisation($currentExercice);
+            // test if the pac is nouveau or ancien
+            $isNouveau = $pac->isNouveau($currentExercice);
+            if ($isNouveau) {
+                $currentCompteCotisation->decrementNouveau();
+            } else {
+                $currentCompteCotisation->decrementAncien();
+            }
+
             $manager->persist($adherent);
             $manager->persist($pac);
+            $manager->persist($currentCompteCotisation);
             $manager->flush();
 
             return $this->redirectToRoute('adhesion_show', ['id' => $adherent->getId()]);
@@ -222,14 +243,16 @@ class AdhesionController extends AbstractController
                     ->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            // read data from Excel file
             $xlsxFile = $form->get('file')->getData();
             if ($xlsxFile) {
                 $output = $excelReader->savePacFromExcel($adherent, $xlsxFile);  
                 if ($output['hasError'] === false) {
                     return $this->redirectToRoute('adhesion_show', ['id' => $adherent->getId()]); 
                 } else {
-                    $error = new FormError($output['ErrorMessage']);
-                    $form->get('file')->addError($error);
+                    foreach ($output['ErrorMessages'] as $message) {
+                        $form->get('file')->addError(new FormError($message));
+                    }
                 }             
             }
             
@@ -246,7 +269,6 @@ class AdhesionController extends AbstractController
      */
     public function addPac(Adherent $adherent, Request $request)
     { 
-        $manager = $this->getDoctrine()->getManager();
         $pac = new Pac();
         $generatedCode = $this->getDoctrine()
                          ->getRepository(Pac::class)
@@ -256,9 +278,6 @@ class AdhesionController extends AbstractController
         $formPac = $this->createForm(PacType::class, $pac);
         $formPac->handleRequest($request);
         if ($formPac->isSubmitted() && $formPac->isValid()) {
-            $pac->setCreatedAt(new \DateTime());
-            $pac->setIsSortie(false);
-            $pac->setAdherent($adherent);
             $photoFile = $formPac->get('photo')->getData();           
             if ($photoFile) {
                 $fileName = uniqid().'.'.$photoFile->guessExtension();
@@ -271,9 +290,32 @@ class AdhesionController extends AbstractController
                     // ... handle exception if something happens during file upload
                 }
                 $pac->setPhoto($this->getParameter('users_img_directory').'/'.$fileName);
+            } else {
+                $pac->setPhoto('http://placehold.it/100x100');
             }
+
+            $pac->setCreatedAt(new \DateTime());
+            $pac->setIsSortie(false);
+
+            // update the compte cotisation / if nouveau ++
+            $currentExercice = $this->getDoctrine()
+                                    ->getRepository(Exercice::class)
+                                    ->findCurrent();
+            $currentCompteCotisation = $adherent->getCompteCotisation($currentExercice);
+            // test if the pac is nouveau or ancien
+            $isNouveau = $pac->isNouveau($currentExercice);
+            if ($isNouveau) {
+                $currentCompteCotisation->incrementNouveau();
+            } else {
+                $currentCompteCotisation->incrementAncien();
+            }
+
+            $adherent->addPac($pac);
+            
+            $manager = $this->getDoctrine()->getManager();
             $manager->persist($adherent);
             $manager->persist($pac);
+            $manager->persist($currentCompteCotisation);
             $manager->flush();
 
             return $this->redirectToRoute('adhesion_show', ['id' => $adherent->getId()]);

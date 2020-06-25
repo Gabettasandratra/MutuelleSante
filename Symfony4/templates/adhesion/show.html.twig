@@ -83,7 +83,7 @@
                             
                         </div>
                         <div class="col-md-6">
-                            <h4 class="card-title">Détails</h4>
+                            <h4 class="card-title">Détails du compte pour l'année {{ "now" | date('Y') }}</h4>
                             <div class="row">
                                 <div class="col-md-4">
                                     <ul class="list-style-none border-bottom-white">                
@@ -108,6 +108,9 @@
                                     </ul>
                                 </div>
                                 <div class="col-md-8">
+                                    {# Some logic : get the compte cotisation of the exercice given #}
+                                    {% set compteCotisation = adherent.compteCotisation(exercice) %}
+
                                     <ul class="list-style-none">
                                         <li class="my-3 border-bottom">
                                             <span> {{ exercice.droitAdhesion }} </span>
@@ -119,14 +122,13 @@
                                             <span> {{ exercice.cotNouveau }} / bénéficiaire / ans</span>
                                         </li>
                                         <li class="my-3 border-bottom">               
-                                            <span> {{ adherent.nbAncien }}</span>
+                                            <span> {{ compteCotisation.ancien }}</span>
                                         </li>
                                         <li class="my-3 border-bottom">               
-                                            <span> {{ adherent.nbNouveau }}</span>
+                                            <span> {{ compteCotisation.nouveau }}</span>
                                         </li>
                                         <li class="my-3 border-bottom">   
-                                            {% set cotisation = adherent.nbNouveau * exercice.cotNouveau + exercice.cotAncien * adherent.nbAncien %}   
-                                            <span> {{ cotisation }} </span>
+                                            <span> {{ compteCotisation.due }} </span>
                                         </li>
                                     </ul>
                                 </div>
@@ -145,7 +147,7 @@
                         </div>
                         <div class="col-4">
                             <div class="text-right">
-                                <a href="{{ path('adhesion_add_pac_xlsx', {'id': adherent.id}) }}" class="btn btn-sm btn-primary"><i class="mdi mdi-upload"></i> Importer</a>
+                                <a href="{{ path('adhesion_add_pac_xlsx', {'id': adherent.id}) }}" class="btn btn-sm btn-success"><i class="mdi mdi-upload"></i>  Importer depuis Excel</a>
                             </div> 
                         </div>
                         <div class="col-3">
@@ -156,12 +158,11 @@
                     </div>
                     <hr>
                     <div class="table-responsive">
-                        <table class="table" id="zero_config">
+                        <table class="table" id="order_2_desc">
                             <thead>
                                 <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Date d'entrée</th>
                                     <th scope="col">N° Matricule</th>
+                                    <th scope="col">Date d'entrée</th>
                                     <th scope="col">Nom et prénom</th>
                                     <th scope="col">Date naissance</th>
                                     <th scope="col">Fonction</th>
@@ -169,13 +170,11 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% set key = 1 %}
                                 {% for pac in adherent.pacs %}
                                     {% if not pac.isSortie %}
                                         <tr>
-                                            <th scope="row">{{ key }}</th>
+                                            <th scope="row">{{ adherent.numero }} / {{ pac.codeMutuelle }}</th>
                                             <td>{{ pac.dateEntrer | date('d / m / Y') }}</td>
-                                            <td>{{ adherent.numero }} / {{ pac.codeMutuelle }}</td>
                                             <td>{{ pac.nom }} {{ pac.prenom }}</td>
                                             <td>{{ pac.dateNaissance | date('d / m / Y') }}</td>
                                             <td>{{ pac.parente }}</td>
@@ -184,7 +183,6 @@
                                                 <a href="{{ path('adhesion_remove_pac', { 'id': adherent.id, 'idPac': pac.id }) }}" class="label btn-danger label-danger">Retirer</button>
                                             </td>
                                         </tr>
-                                        {% set key = key + 1 %}  
                                     {% endif %}                                
                                 {% endfor %}                                
                             </tbody>

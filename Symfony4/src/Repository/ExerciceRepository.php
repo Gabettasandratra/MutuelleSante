@@ -21,13 +21,16 @@ class ExerciceRepository extends ServiceEntityRepository
     
     public function findCurrent(): ?Exercice
     {
-        $year = date('Y');
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.annee = :val')
-            ->setParameter('val', $year)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        $exercice = $this->_em->createQuery('select e from App\Entity\Exercice e where CURRENT_DATE() between e.dateDebut and e.dateFin')  
+                        ->getOneOrNullResult();
+        return $exercice;
+    }
+
+    public function findExerciceFromInscription(Adherent $adherent)
+    {
+        return $this->_em->createQuery('select e from App\Entity\Exercice e where :dateInscription < e.dateFin')  
+                                        ->setParameter('dateInscription', $adherent->getDateInscription())
+                                        ->getResult();   
     }
 
 }

@@ -2,10 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\AdherentRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Entity\Exercice;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\AdherentRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -36,11 +37,14 @@ class Adherent
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Regex("/^(\+261|0)3[2,3,4,9][0-9]{7}$/")
+     * @Assert\NotBlank
      */
     private $telephone1;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\Regex("/^(\+261|0)3[2,3,4,9][0-9]{7}$/")
      */
     private $telephone2;
 
@@ -66,30 +70,40 @@ class Adherent
     private $createdAt;
 
     /**
-     * @ORM\OneToMany(targetEntity=HistoriqueCotisation::class, mappedBy="adherent", orphanRemoval=true)
-     */
-    private $historiqueCotisations;
-
-    /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\Email()
      */
     private $email;
 
     /**
      * @ORM\Column(type="integer", unique=true)
+     * @Assert\Regex("/^[0-9]*$/")
      */
     private $numero;
 
-    // temporary
-    private $nbNouveau;
-    private $nbAncien;
+    /**
+     * @ORM\OneToMany(targetEntity=CompteCotisation::class, mappedBy="adherent")
+     */
+    private $compteCotisations;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Prestation::class, mappedBy="adherent")
+     */
+    private $prestations;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Remboursement::class, mappedBy="adherent")
+     */
+    private $remboursements;
 
 
     public function __construct()
-    {
+    {   
         $this->dateInscription = new \DateTime();
         $this->pacs = new ArrayCollection();
-        $this->historiqueCotisations = new ArrayCollection();
+        $this->compteCotisations = new ArrayCollection();
+        $this->prestations = new ArrayCollection();
+        $this->remboursements = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -224,37 +238,6 @@ class Adherent
         return $this;
     }
 
-    /**
-     * @return Collection|HistoriqueCotisation[]
-     */
-    public function getHistoriqueCotisations(): Collection
-    {
-        return $this->historiqueCotisations;
-    }
-
-    public function addHistoriqueCotisation(HistoriqueCotisation $historiqueCotisation): self
-    {
-        if (!$this->historiqueCotisations->contains($historiqueCotisation)) {
-            $this->historiqueCotisations[] = $historiqueCotisation;
-            $historiqueCotisation->setAdherent($this);
-        }
-
-        return $this;
-    }
-
-    public function removeHistoriqueCotisation(HistoriqueCotisation $historiqueCotisation): self
-    {
-        if ($this->historiqueCotisations->contains($historiqueCotisation)) {
-            $this->historiqueCotisations->removeElement($historiqueCotisation);
-            // set the owning side to null (unless already changed)
-            if ($historiqueCotisation->getAdherent() === $this) {
-                $historiqueCotisation->setAdherent(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getNumero(): ?int
     {
         return $this->numero;
@@ -267,27 +250,139 @@ class Adherent
         return $this;
     }
 
-    public function getNbNouveau(): ?int
+    /**
+     * @return Collection|CompteCotisation[]
+     */
+    public function getCompteCotisations(): Collection
     {
-        return $this->nbNouveau;
+        return $this->compteCotisations;
     }
 
-    public function setNbNouveau(int $n): self
+    public function getCompteCotisation(Exercice $exercice)
+    {        
+        foreach ($this->compteCotisations as  $compteCotisation) {
+            if ( $compteCotisation->getExercice() === $exercice) {
+                return $compteCotisation;
+            }
+        }
+        return null;
+    }
+
+    // l'exercice courant
+    public function getCurrentCompteCotisation()
+    {       
+        $now = new \DateTime();
+        $exercice = null;
+        foreach ($this->compteCotisations as  $compteCotisation) {
+            $exercice = $compteCotisation->getExercice();
+            if ( $exercice->getDateDebut() <= $now && $exercice->getDateFin() > $now) {
+                return $compteCotisation;
+            }
+        }
+        return null;
+    }
+
+    public function verifyPrevCompteCotisation(Exercice $exercice)
     {
-        $this->nbNouveau = $n;
+        foreach ($this->compteCotisations as  $compteCotisation) {
+            if ( $compteCotisation->getExercice()->getAnnee() < $exercice->getAnnee()) { // A chaque compte de l'année précedente
+                if (!$compteCotisation->getIsPaye()) { // si non payé
+                    return $compteCotisation; // On retourne l'année non payé
+                }
+            }
+        }
+        return null;
+    }
+
+    public function addCompteCotisation(CompteCotisation $compteCotisation): self
+    {
+        if (!$this->compteCotisations->contains($compteCotisation)) {
+            $this->compteCotisations[] = $compteCotisation;
+            $compteCotisation->setAdherent($this);
+        }
 
         return $this;
     }
 
-    public function getNbAncien(): ?int
+    public function removeCompteCotisation(CompteCotisation $compteCotisation): self
     {
-        return $this->nbAncien;
+        if ($this->compteCotisations->contains($compteCotisation)) {
+            $this->compteCotisations->removeElement($compteCotisation);
+            // set the owning side to null (unless already changed)
+            if ($compteCotisation->getAdherent() === $this) {
+                $compteCotisation->setAdherent(null);
+            }
+        }
+
+        return $this;
+    }  
+
+    // get if adherent est en cours de droit ou non
+    public function getPossedeDroit()
+    {
+        $compteCotisation = $this->getCurrentCompteCotisation();
+        return $compteCotisation->getIsPaye();
     }
 
-    public function setNbAncien(int $n): self
+    /**
+     * @return Collection|Prestation[]
+     */
+    public function getPrestations(): Collection
     {
-        $this->nbAncien = $n;
+        return $this->prestations;
+    }
+
+    public function addPrestation(Prestation $prestation): self
+    {
+        if (!$this->prestations->contains($prestation)) {
+            $this->prestations[] = $prestation;
+            $prestation->setAdherent($this);
+        }
 
         return $this;
     }
+
+    public function removePrestation(Prestation $prestation): self
+    {
+        if ($this->prestations->contains($prestation)) {
+            $this->prestations->removeElement($prestation);
+            // set the owning side to null (unless already changed)
+            if ($prestation->getAdherent() === $this) {
+                $prestation->setAdherent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Remboursement[]
+     */
+    public function getRemboursements(): Collection
+    {
+        return $this->remboursements;
+    }
+
+    public function addRemboursement(Remboursement $remboursement): self
+    {
+        if (!$this->remboursements->contains($remboursement)) {
+            $this->remboursements[] = $remboursement;
+            $remboursement->setAdherent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRemboursement(Remboursement $remboursement): self
+    {
+        if ($this->remboursements->contains($remboursement)) {
+            $this->remboursements->removeElement($remboursement);
+            // set the owning side to null (unless already changed)
+            if ($remboursement->getAdherent() === $this) {
+                $remboursement->setAdherent(null);
+            }
+        }
+
+        return $this;
+    } 
 }

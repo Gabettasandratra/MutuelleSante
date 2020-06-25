@@ -30,11 +30,6 @@ class Exercice
     private $isCloture;
 
     /**
-     * @ORM\OneToMany(targetEntity=HistoriqueCotisation::class, mappedBy="exercice", orphanRemoval=true)
-     */
-    private $historiqueCotisations;
-
-    /**
      * @ORM\Column(type="float")
      */
     private $cotNouveau;
@@ -89,37 +84,6 @@ class Exercice
     public function setIsCloture(bool $isCloture): self
     {
         $this->isCloture = $isCloture;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|HistoriqueCotisation[]
-     */
-    public function getHistoriqueCotisations(): Collection
-    {
-        return $this->historiqueCotisations;
-    }
-
-    public function addHistoriqueCotisation(HistoriqueCotisation $historiqueCotisation): self
-    {
-        if (!$this->historiqueCotisations->contains($historiqueCotisation)) {
-            $this->historiqueCotisations[] = $historiqueCotisation;
-            $historiqueCotisation->setExercice($this);
-        }
-
-        return $this;
-    }
-
-    public function removeHistoriqueCotisation(HistoriqueCotisation $historiqueCotisation): self
-    {
-        if ($this->historiqueCotisations->contains($historiqueCotisation)) {
-            $this->historiqueCotisations->removeElement($historiqueCotisation);
-            // set the owning side to null (unless already changed)
-            if ($historiqueCotisation->getExercice() === $this) {
-                $historiqueCotisation->setExercice(null);
-            }
-        }
 
         return $this;
     }
