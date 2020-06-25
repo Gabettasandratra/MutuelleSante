@@ -4,13 +4,15 @@ namespace App\Entity;
 
 use App\Entity\Adherent;
 use App\Entity\Exercice;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
 use App\Repository\CompteCotisationRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=CompteCotisationRepository::class)
+ * @UniqueEntity(fields={"adherent", "exercice"}, message="Ce compte de cotisation est deja creer")
  */
 class CompteCotisation
 {

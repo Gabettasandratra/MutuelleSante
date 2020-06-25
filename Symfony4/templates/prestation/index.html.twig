@@ -42,29 +42,28 @@
                             </thead>
                             <tbody>
                                 {% set row = 1 %}
-                                {% for adherent in adherents %}
-                                    {% for pac in adherent.pacs %}
-                                        {% if not pac.isSortie %}
-                                            <tr>
-                                                <th scope="row">{{ row }} {% set row = row + 1 %}</th>
-                                                <td>{{ adherent.nom }}</td>
-                                                <td>{{ pac.codeMutuelle }}</td>
-                                                <td>{{ pac.nom }} {{ pac.prenom }}</td>
- 
-                                                {% if pac.adherent.possedeDroit %}
-                                                    <td><span class="label label-rounded label-success">Droit au préstation</span></td>
-                                                    <td>
-                                                        <a href="{{ path('prestation_save', {'id': pac.id}) }}"class="label  label-rounded btn-primary label-primary">Selectionner</a>
-                                                    </td>
-                                                {% else %}
-                                                    <td><span class="label label-rounded label-warning">Pas de droit au préstation</span></td>
-                                                    <td>
-                                                        <span class="label label-rounded btn-secondary label-secondary disabled">Selectionner</span>
-                                                    </td>
-                                                {% endif %}
-                                            </tr> 
-                                        {% endif %}                                       
-                                    {% endfor %}
+                                {% for pac in pacs %}
+                                    {% if not pac.isSortie %}
+                                        <tr>
+                                            <th scope="row">{{ row }} {% set row = row + 1 %}</th>
+                                            <td>{{ pac.adherent.nom }}</td>
+                                            <td>{{ pac.codeMutuelle }}</td>
+                                            <td>{{ pac.nom }} {{ pac.prenom }}</td>
+
+                                            {% if pac.adherent.possedeDroit %}
+                                                <td><span class="label label-rounded label-success">Droit au préstation</span></td>
+                                                <td>
+                                                    <a href="{{ path('prestation_beneficiare', {'id': pac.id}) }}"class="label  label-rounded btn-primary label-primary">Selectionner</a>
+                                                </td>
+                                            {% else %}
+                                                <td><span class="label label-rounded label-warning">Pas de droit au préstation</span></td>
+                                                <td>
+                                                    <span class="label label-rounded btn-secondary label-secondary disabled">Selectionner</span>
+                                                </td>
+                                            {% endif %}
+                                        </tr> 
+                                    {% endif %}                                       
+                                 
                                 {% endfor %}
                             </tbody>
                         </table>
