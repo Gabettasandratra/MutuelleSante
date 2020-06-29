@@ -2,9 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\Adherent;
 use App\Entity\Prestation;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Entity\Remboursement;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method Prestation|null find($id, $lockMode = null, $lockVersion = null)
@@ -19,22 +21,21 @@ class PrestationRepository extends ServiceEntityRepository
         parent::__construct($registry, Prestation::class);
     }
 
-    // /**
-    //  * @return Prestation[] Returns an array of Prestation objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+    * @return Prestation[] Returns an array of Prestation objects
+    */
+
+    public function findNotPayed($adherent)
     {
         return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
+            ->andWhere('p.adherent = :ad')
+            ->andWhere('p.isPaye = false')
+            ->setParameter('ad', $adherent)
+            ->orderBy('p.date', 'ASC')
             ->getQuery()
             ->getResult()
         ;
     }
-    */
 
     /*
     public function findOneBySomeField($value): ?Prestation
@@ -47,4 +48,19 @@ class PrestationRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function getMontantNotPayed(Adherent $adherent)
+    {
+        return $this->_em->createQuery('select sum(p.frais),sum(p.rembourse) from App\Entity\Prestation p where p.adherent = :ad and p.isPaye = false')
+                            ->setParameter('ad', $adherent)
+                            ->getResult();                    
+    }
+
+    public function payAll(Remboursement $remboursement)
+    {
+        return $this->_em->createQuery('update App\Entity\Prestation p set p.isPaye = true, p.remboursement = :rem where p.adherent = :ad and p.isPaye = false ')
+                ->setParameter('rem', $remboursement)
+                ->setParameter('ad', $remboursement->getAdherent())
+                ->getResult();               
+    }
 }

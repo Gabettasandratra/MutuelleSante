@@ -2,8 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\RemboursementRepository;
+use App\Entity\Adherent;
+use App\Entity\Exercice;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use App\Repository\RemboursementRepository;
 
 /**
  * @ORM\Entity(repositoryClass=RemboursementRepository::class)
@@ -19,16 +24,19 @@ class Remboursement
 
     /**
      * @ORM\Column(type="float")
+     * @Assert\Positive()
      */
     private $montant;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Assert\LessThan("+1 day")
      */
     private $date;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
      */
     private $reference;
 
@@ -37,6 +45,31 @@ class Remboursement
      * @ORM\JoinColumn(nullable=false)
      */
     private $adherent;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Exercice::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $exercice;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $moyen;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Prestation::class, mappedBy="remboursement")
+     */
+    private $prestations;
+
+    public function __construct(Adherent $adherent, Exercice $exercice, $montant)
+    {   
+        $this->date = new \DateTime();
+        $this->montant = $montant;
+        $this->adherent = $adherent;
+        $this->exercice = $exercice;
+        $this->prestations = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -87,6 +120,61 @@ class Remboursement
     public function setAdherent(?Adherent $adherent): self
     {
         $this->adherent = $adherent;
+
+        return $this;
+    }
+
+    public function getExercice(): ?Exercice
+    {
+        return $this->exercice;
+    }
+
+    public function setExercice(?Exercice $exercice): self
+    {
+        $this->exercice = $exercice;
+
+        return $this;
+    }
+
+    public function getMoyen(): ?string
+    {
+        return $this->moyen;
+    }
+
+    public function setMoyen(string $moyen): self
+    {
+        $this->moyen = $moyen;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Prestation[]
+     */
+    public function getPrestations(): Collection
+    {
+        return $this->prestations;
+    }
+
+    public function addPrestation(Prestation $prestation): self
+    {
+        if (!$this->prestations->contains($prestation)) {
+            $this->prestations[] = $prestation;
+            $prestation->setRemboursement($this);
+        }
+
+        return $this;
+    }
+
+    public function removePrestation(Prestation $prestation): self
+    {
+        if ($this->prestations->contains($prestation)) {
+            $this->prestations->removeElement($prestation);
+            // set the owning side to null (unless already changed)
+            if ($prestation->getRemboursement() === $this) {
+                $prestation->setRemboursement(null);
+            }
+        }
 
         return $this;
     }

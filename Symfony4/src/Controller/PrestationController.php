@@ -5,8 +5,11 @@ namespace App\Controller;
 use App\Entity\Pac;
 use App\Entity\Adherent;
 
+use App\Entity\Exercice;
 use App\Entity\Prestation;
 use App\Form\PrestationType;
+use App\Entity\Remboursement;
+use App\Form\RemboursementType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,7 +30,7 @@ class PrestationController extends AbstractController
     }
 
     /**
-     * @Route("/prestation/{id}", name="prestation_beneficiare", requirements={"id"="\d+"})
+     * @Route("/prestation/beneficiaire/{id}", name="prestation_beneficiaire", requirements={"id"="\d+"})
      */
     public function show(Pac $pac)
     {
@@ -37,15 +40,18 @@ class PrestationController extends AbstractController
     }
 
     /**
-     * @Route("/prestation/{id}/add", name="prestation_beneficiare_add", requirements={"id"="\d+"})
+     * @Route("/prestation/beneficiaire/{id}/add", name="prestation_beneficiaire_add", requirements={"id"="\d+"})
      */
     public function addPrestation(Pac $pac, Request $request)
     {
-        $prestation = new Prestation();
+        $prestation = new Prestation($pac);
         $form = $this->createForm(PrestationType::class, $prestation);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-
+            $manager = $this->getDoctrine()->getManager();
+            $manager->persist($prestation);
+            $manager->flush();
+            return $this->redirectToRoute('prestation_beneficiaire', ['id' => $pac->getId()]);
         }
 
         return $this->render('prestation/form.html.twig', [
@@ -54,27 +60,59 @@ class PrestationController extends AbstractController
     }
 
     /**
-     * @Route("/prestation/list", name="prestation_list")
+     * @Route("/prestation/adherent", name="prestation_adherent")
      */
-    public function list()
+    public function adherent()
     {
         $adherents = $this->getDoctrine()
                           ->getRepository(Adherent::class)
                           ->findAll();
-        return $this->render('prestation/list.html.twig', [
+        return $this->render('prestation/adherent.html.twig', [
             'adherents' => $adherents
+        ]);
+    }
+    
+    /**
+     * @Route("/prestation/adherent/{id}", name="prestation_adherent_show", requirements={"id"="\d+"})
+     */
+    public function prestationAdherent(Adherent $adherent)
+    {
+        $prestationNotPayed = $this->getDoctrine()->getRepository(Prestation::class)->findNotPayed($adherent);
+        return $this->render('prestation/show.html.twig', [
+            'adherent' => $adherent,
+            'prestationNotPayed' => $prestationNotPayed,
         ]);
     }
 
     /**
-     * @Route("/prestation/list/{id}", name="prestation_consomme")
+     * @Route("/prestation/adherent/{id}/rembourser", name="prestation_adherent_rembourser", requirements={"id"="\d+"})
      */
-    public function showPrestation(Pac $pac)
+    public function rembourserAdherent(Adherent $adherent, Request $request)
     {
-        return $this->render('prestation/consomme.html.twig', [
-            'pac' => $pac
+        $exercice = $this->getDoctrine()->getRepository(Exercice::class)->findCurrent();
+        $montantNoPayed = $this->getDoctrine()->getRepository(Prestation::class)->getMontantNotPayed($adherent);
+        $remboursement = new Remboursement($adherent, $exercice, $montantNoPayed[0][2]);
+        $form = $this->createForm(RemboursementType::class, $remboursement);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $manager = $this->getDoctrine()->getManager();
+            $manager->persist($remboursement); 
+            // A chaque prestation non payer, on paye
+            $prestationNotPayed = $this->getDoctrine()->getRepository(Prestation::class)->findNotPayed($adherent);
+            foreach ($prestationNotPayed as $prestation) {
+                $prestation->setIsPaye(true);
+                $prestation->setRemboursement($remboursement);
+                $manager->persist($prestation); 
+            }
+
+            $manager->flush();
+            return $this->redirectToRoute('prestation_adherent_show', ['id' => $adherent->getId()]);
+        }
+
+        return $this->render('prestation/rembourser.html.twig', [
+            'adherent' => $adherent,
+            'form' => $form->createView(),
         ]);
     }
-
-    
 }

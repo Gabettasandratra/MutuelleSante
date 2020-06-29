@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Enregistrer remboursement{% endblock %}
+
+{% block header %}
+    <div class="page-breadcrumb">
+        <div class="d-flex align-items-center">
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Enregistrer remboursement</h4>
+            <div class="ml-auto">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0 p-0">
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Prestation</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Remboursement</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% form_theme form 'bootstrap_4_layout.html.twig' %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Remboursement de la congrégation {{ adherent.id ~ ' - ' ~ adherent.nom }}</h4>
+                    <hr>
+                    <div class="row">
+                        <div class="col-6">
+                            {{ form_start(form) }}
+                                {{ form_widget(form) }}                           
+                                <button type="submit" class="btn btn-success">Enregistrer</button>
+                            {{ form_end(form) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,169 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Remboursement congrégation {{ adherent.id }}{% endblock %}
+
+{% block header %}
+    <div class="page-breadcrumb">
+        <div class="d-flex align-items-center">
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Remboursement congrégation N°{{ adherent.numero }} - {{ adherent.nom }}</h4>
+            <div class="ml-auto">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0 p-0">
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Prestation</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Remboursement</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">    
+                    <h4 class="card-title">Congrégation</h4>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6 border-right">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <ul class="list-style-none">     
+                                        <li class="my-3">
+                                            <img src="{{ asset(adherent.photo) }}" alt="profile" class="img-thumbnail mx-auto d-block" height="150" width="150">
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <ul class="list-style-none border-bottom-white">
+                                        <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark"> Nom congrégation:</span>
+                                        </li>
+                                        <li class="my-3">
+                                            <span class="font-weight-medium text-dark"> N° fiche d'adhésion:</span>
+                                        </li>
+                                        <li class="my-3">
+                                            <span class="font-weight-medium text-dark"> Date d'entrée:</span>
+                                        </li>                                       
+                                    </ul>
+                                </div>
+                                <div class="col-md-8">
+                                    <ul class="list-style-none">
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ adherent.nom }} </span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ adherent.numero }} </span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ adherent.dateInscription | date('d / m / Y') }}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-5">
+                            <h4 class="card-title">Historique des remboursements</h4>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="table m-t-20">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Date</th>
+                                        <th scope="col">Exercice</th>
+                                        <th scope="col">Montant</th>
+                                        <th scope="col">Méthode de paiement</th>
+                                        <th scope="col">Reférence</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for remboursement in adherent.remboursements %}
+                                        <tr>
+                                            <th scope="row">{{ loop.index }}</th>
+                                            <td>{{ remboursement.date |date('d / m / Y') }}</td>
+                                            <td>{{ remboursement.exercice.annee }}</td>
+                                            <td>{{ remboursement.montant }}</td>
+                                            <td>{{ remboursement.moyen }}</td>
+                                            <td>{{ remboursement.reference }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>                     
+                        </div>
+                    </div>
+
+                    
+                    <div class="row mt-4">
+                        <div class="col-5">
+                            <h4 class="card-title">Présations en attente de remboursement</h4>
+                        </div>
+                    </div>
+                    {% if prestationNotPayed|length != 0 %} {# Si on possede des prestations non paye #}
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="table m-t-20">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Date</th>
+                                            <th scope="col">Béneficiaire</th>
+                                            <th scope="col">Designation</th>
+                                            <th scope="col">Frais</th>
+                                            <th scope="col">Remboursé</th>
+                                            <th scope="col">% Remb</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% set tFrais = 0 %}
+                                        {% set  tRembourse = 0 %}
+                                        {% for prestation in prestationNotPayed %}
+                                            <tr>
+                                                <th>{{ prestation.date |date('d / m / Y') }}</th>
+                                                <td>{{ prestation.pac.codeMutuelle ~ ' - ' ~ prestation.pac.nom ~ ' ' ~ prestation.pac.prenom }}</td>
+                                                <td>{{ prestation.designation }}</td>
+                                                <td>{{ prestation.frais }}</td> {% set tFrais = tFrais + prestation.frais %}
+                                                <td>{{ prestation.rembourse }}</td> {% set tRembourse = tRembourse + prestation.rembourse %}
+                                                <td>{{ (prestation.rembourse / prestation.frais) | round(3, 'floor') * 100 }}%</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    
+                                    <tfoot>
+                                        <tr>
+                                            <th scope="row" colspan=3>Total</th>
+                                            <td>{{ tFrais }}</td>
+                                            <td>{{ tRembourse }}</td>
+                                            <td>{{ (tRembourse / tFrais)| round(3, 'floor') * 100 }}%</td>
+                                        </tr>
+                                    </tfoot>
+                        
+                                </table>
+                            
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 text-right">
+                                <a href="{{ path('prestation_adherent_rembourser', {'id': adherent.id}) }}" class="btn btn-info"><i class="mdi mdi-credit-card"></i> Enregistrer paiement</a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <h5> Aucun prestation en attente de remboursement </h5> 
+                            </div>
+                        </div>
+                    {% endif %}                    
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

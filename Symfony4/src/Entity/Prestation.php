@@ -64,6 +64,19 @@ class Prestation
      */
     private $adherent;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Remboursement::class, inversedBy="prestations")
+     */
+    private $remboursement;
+
+    public function __construct(Pac $pac)
+    {
+        $this->date = new \DateTime(); // Afin que la date d'aujourdui sera afficher par defaut
+        $this->pac = $pac;
+        $this->adherent = $pac->getAdherent();
+        $this->isPaye = false;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -173,6 +186,18 @@ class Prestation
     public function setAdherent(?Adherent $adherent): self
     {
         $this->adherent = $adherent;
+
+        return $this;
+    }
+
+    public function getRemboursement(): ?Remboursement
+    {
+        return $this->remboursement;
+    }
+
+    public function setRemboursement(?Remboursement $remboursement): self
+    {
+        $this->remboursement = $remboursement;
 
         return $this;
     }

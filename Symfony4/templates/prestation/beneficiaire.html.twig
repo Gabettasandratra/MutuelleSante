@@ -14,7 +14,7 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb m-0 p-0">
                         <li class="breadcrumb-item text-muted active" aria-current="page">Prestation</li>
-                        <li class="breadcrumb-item text-muted" aria-current="page">Saisie</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Béneficiaire</li>
                     </ol>
                 </nav>
             </div>
@@ -82,7 +82,7 @@
                         </div>
                         <div class="col-4">
                             <div class="text-right">
-                                <a href="{{ path('prestation_beneficiare_add', {'id' : pac.id}) }}" class="btn btn-sm btn-info"><i class="mdi mdi-hospital"></i> Ajouter prestation</a>
+                                <a href="{{ path('prestation_beneficiaire_add', {'id' : pac.id}) }}" class="btn btn-sm btn-info"><i class="mdi mdi-hospital"></i> Ajouter prestation</a>
                             </div> 
                         </div>
                     </div>
@@ -93,41 +93,32 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Date</th>
-                                    <th scope="col">Actes de soins</th>
-                                    <th scope="col">N° facture</th>
-                                    <th scope="col">Montant depensé</th>
+                                    <th scope="col">Designation</th>
+                                    <th scope="col">Montant des frais</th>
                                     <th scope="col">Montant remboursé</th>
-                                    <th scope="col">% remboursé</th>
+                                    <th scope="col">%</th>
+                                    <th scope="col">Paiement</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>14 / 06 / 2020</td>
-                                    <td>Soins dentaire</td>
-                                    <td>12</td>
-                                    <td>40000</td>
-                                    <td>20000</td>
-                                    <td>50 %</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">2</th>
-                                    <td>28 / 06 / 2020</td>
-                                    <td>Lunetterie</td>
-                                    <td>783</td>
-                                    <td>50000</td>
-                                    <td>15000</td>
-                                    <td>30 %</td>
-                                </tr>
+                                {% for prestation in pac.prestations %}
+                                    <tr data-toggle="tooltip" title="Prestataire : {{ prestation.prestataire }} | Facture : {{ prestation.facture }}">
+                                        <th scope="row">{{ loop.index }}</th>
+                                        <td>{{ prestation.date | date('d / m / Y') }}</td>
+                                        <td>{{ prestation.designation }}</td>
+                                        <td>{{ prestation.frais }}</td>
+                                        <td>{{ prestation.rembourse }}</td>
+                                        <td>{{ (prestation.rembourse / prestation.frais)| round(3, 'floor') * 100 }}%</td>
+                                        <td>
+                                            {% if prestation.isPaye %}
+                                                <span class="label label-rounded label-success">Payé</span>
+                                            {% else %}
+                                                <span class="label label-rounded label-primary">En attente</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
                             </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th scope="row" colspan=4 >Total</th>
-                                    <td id="dep">90000</td>
-                                    <td id="rem">35000</td>
-                                    <td>38,8 %</td>
-                                </tr>
-                            </tfoot>
                         </table>
                     </div>
                 </div>
