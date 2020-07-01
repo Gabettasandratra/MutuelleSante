@@ -37,30 +37,18 @@ class PrestationRepository extends ServiceEntityRepository
         ;
     }
 
-    /*
-    public function findOneBySomeField($value): ?Prestation
+    public function generateNumero($pac)
     {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        $lastNum = (int) $this->_em->createQuery('select max(p.decompte) from App\Entity\Prestation p where p.adherent = :ad')
+                                    ->setParameter('ad', $pac->getAdherent())
+                                    ->getSingleScalarResult();
+        return $lastNum + 1;
     }
-    */
 
     public function getMontantNotPayed(Adherent $adherent)
     {
         return $this->_em->createQuery('select sum(p.frais),sum(p.rembourse) from App\Entity\Prestation p where p.adherent = :ad and p.isPaye = false')
                             ->setParameter('ad', $adherent)
                             ->getResult();                    
-    }
-
-    public function payAll(Remboursement $remboursement)
-    {
-        return $this->_em->createQuery('update App\Entity\Prestation p set p.isPaye = true, p.remboursement = :rem where p.adherent = :ad and p.isPaye = false ')
-                ->setParameter('rem', $remboursement)
-                ->setParameter('ad', $remboursement->getAdherent())
-                ->getResult();               
     }
 }

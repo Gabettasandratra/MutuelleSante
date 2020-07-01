@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Journal des remboursements{% endblock %}
+
+{% block header %}
+    <div class="page-breadcrumb">
+        <div class="d-flex align-items-center">
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Journal des remboursements</h4>
+            <div class="ml-auto">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0 p-0">
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Comptabilité</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Journal</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Remboursement</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Journal des rebousements</h4>
+                    <hr>                           
+                    <div class="table-responsive-lg">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">N° article</th>
+                                    <th scope="col">Libellé écriture</th>
+                                    <th scope="col">Montant</th>
+                                    <th scope="col">Réference</th>
+                                    <th scope="col">Compte débité</th>
+                                    <th scope="col">Compte crédité</th>
+                                    <th scope="col">Compte analytique</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for article in articles %}                                
+                                    <tr>
+                                        <th scope="col">{{ loop.index }}</th>
+                                        <td>{{ article.date |date('d/m/Y') }}</td>
+                                        <td>{{ article.id }}</td>
+                                        <td>{{ article.libelle }}</td>
+                                        <td>{{ article.montant }}</td>
+                                        <td>{{ article.piece }}</td>
+                                        <td>{{ article.compteDebit.poste }}</td>
+                                        <td>{{ article.compteCredit.poste }}</td>
+                                        <td>{{ article.analytique }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

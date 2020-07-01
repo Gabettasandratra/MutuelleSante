@@ -186,7 +186,7 @@
                                     <th scope="col">Date</th>
                                     <th scope="col">Cotisation année</th>
                                     <th scope="col">Montant</th>
-                                    <th scope="col">Méthode</th>
+                                    <th scope="col">Paiement</th>
                                     <th scope="col">Réference</th>
                                     <th scope="col">Note</th>
                                 </tr>
@@ -198,7 +198,7 @@
                                             <th scope="row">{{ historiqueCotisation.datePaiement |date('d/m/Y') }}</th>
                                             <td>{{ compteCotisation.exercice.annee }}</td>
                                             <td>{{ historiqueCotisation.montant }}</td>
-                                            <td>{{ historiqueCotisation.moyen }}</td>
+                                            <td>{{ historiqueCotisation.tresorerie.libelle }}</td>
                                             <td>{{ historiqueCotisation.reference }}</td>
                                             <td>{{ historiqueCotisation.remarque }}</td>
                                         </tr>

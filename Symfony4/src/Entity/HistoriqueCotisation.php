@@ -38,11 +38,6 @@ class HistoriqueCotisation
     private $createdAt;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $moyen;
-
-    /**
      * @ORM\Column(type="string", length=255, unique=true)
      * @Assert\NotBlank
      */
@@ -58,6 +53,12 @@ class HistoriqueCotisation
      * @ORM\Column(type="text", nullable=true)
      */
     private $remarque;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Compte::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $tresorerie;
 
     public function __construct()
     {
@@ -106,18 +107,6 @@ class HistoriqueCotisation
         return $this;
     }
 
-    public function getMoyen(): ?string
-    {
-        return $this->moyen;
-    }
-
-    public function setMoyen(string $moyen): self
-    {
-        $this->moyen = $moyen;
-
-        return $this;
-    }
-
     public function getReference(): ?string
     {
         return $this->reference;
@@ -150,6 +139,18 @@ class HistoriqueCotisation
     public function setRemarque(?string $remarque): self
     {
         $this->remarque = $remarque;
+
+        return $this;
+    }
+
+    public function getTresorerie(): ?Compte
+    {
+        return $this->tresorerie;
+    }
+
+    public function setTresorerie(?Compte $tresorerie): self
+    {
+        $this->tresorerie = $tresorerie;
 
         return $this;
     }

@@ -69,6 +69,11 @@ class Prestation
      */
     private $remboursement;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $decompte;
+
     public function __construct(Pac $pac)
     {
         $this->date = new \DateTime(); // Afin que la date d'aujourdui sera afficher par defaut
@@ -198,6 +203,18 @@ class Prestation
     public function setRemboursement(?Remboursement $remboursement): self
     {
         $this->remboursement = $remboursement;
+
+        return $this;
+    }
+
+    public function getDecompte(): ?int
+    {
+        return $this->decompte;
+    }
+
+    public function setDecompte(int $decompte): self
+    {
+        $this->decompte = $decompte;
 
         return $this;
     }

@@ -48,18 +48,13 @@ class Article
     private $categorie;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $moyen;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=Compte::class, inversedBy="articles")
+     * @ORM\ManyToOne(targetEntity=Compte::class)
      * @ORM\JoinColumn(nullable=false)
      */
     private $compteDebit;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Compte::class, inversedBy="articles")
+     * @ORM\ManyToOne(targetEntity=Compte::class)
      * @ORM\JoinColumn(nullable=false)
      */
     private $compteCredit;
@@ -137,18 +132,6 @@ class Article
     public function setCategorie(string $categorie): self
     {
         $this->categorie = $categorie;
-
-        return $this;
-    }
-
-    public function getMoyen(): ?string
-    {
-        return $this->moyen;
-    }
-
-    public function setMoyen(string $moyen): self
-    {
-        $this->moyen = $moyen;
 
         return $this;
     }

@@ -6,6 +6,7 @@ use App\Repository\CompteRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=CompteRepository::class)
@@ -21,11 +22,13 @@ class Compte
 
     /**
      * @ORM\Column(type="string", length=10)
+     * @Assert\Regex("/^[1-7][0-9]{1,5}$/")
      */
     private $poste;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
      */
     private $titre;
 
@@ -39,9 +42,29 @@ class Compte
      */
     private $type;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isTresor;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $libelle;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $note;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $classe;
+
     public function __construct()
     {
-        $this->articles = new ArrayCollection();
+        
     }
 
     public function getId(): ?int
@@ -56,7 +79,8 @@ class Compte
 
     public function setPoste(string $poste): self
     {
-        $this->poste = $poste;
+        
+        $this->poste = str_pad($poste, 6, "0");
 
         return $this;
     }
@@ -93,6 +117,54 @@ class Compte
     public function setType(bool $type): self
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    public function getIsTresor(): ?bool
+    {
+        return $this->isTresor;
+    }
+
+    public function setIsTresor(bool $isTresor): self
+    {
+        $this->isTresor = $isTresor;
+
+        return $this;
+    }
+
+    public function getLibelle(): ?string
+    {
+        return $this->libelle;
+    }
+
+    public function setLibelle(?string $libelle): self
+    {
+        $this->libelle = $libelle;
+
+        return $this;
+    }
+
+    public function getNote(): ?string
+    {
+        return $this->note;
+    }
+
+    public function setNote(?string $note): self
+    {
+        $this->note = $note;
+
+        return $this;
+    }
+
+    public function getClasse(): ?string
+    {
+        return $this->classe;
+    }
+
+    public function setClasse(string $classe): self
+    {
+        $this->classe = $classe;
 
         return $this;
     }

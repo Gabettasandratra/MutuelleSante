@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Plan comptable{% endblock %}
+{% block title %}Gestion de trésorerie{% endblock %}
 
 {% block header %}
     <div class="page-breadcrumb">
         <div class="d-flex align-items-center">
-            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Plan comptable génerale</h4>
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Gestion de trésorerie</h4>
             <div class="ml-auto">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb m-0 p-0">
-                        <li class="breadcrumb-item text-muted active" aria-current="page">Comptabilité</li>
-                        <li class="breadcrumb-item text-muted" aria-current="page">Plan comptable</li>
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Trésorerie</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Gestion</li>
                     </ol>
                 </nav>
             </div>
@@ -18,24 +18,22 @@
     </div>
 {% endblock %}
 
-{% form_theme form 'bootstrap_4_layout.html.twig' %}
-
 {% block body %}
     <div class="row">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Plan comptable génerale</h4>
+                    <h4 class="card-title">Trésorerie</h4>
                     <hr>
                     <div class="row">
-                        <div class="col-md-12">
-                            <table class="table m-t-20">
-                                <thead>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead class="thead-light">
                                     <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">Poste</th>
                                         <th scope="col">Intitulé</th>
-                                        <th scope="col">Type</th>
+                                        <th scope="col">Solde</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -44,30 +42,16 @@
                                             <th scope="row">{{ loop.index }}</th>
                                             <td>{{ compte.poste }}</td>
                                             <td>{{ compte.titre }}</td>
-                                            <td>{{ compte.categorie }}</td>
+                                            <td>0</td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
-                            </table>                       
+                            </table>
                         </div>
                     </div>
-
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">Ajouter nouveau compte génerale</h4>
-                    <hr>
                     <div class="row">
-                        <div class="col-6">
-                            {{ form_start(form) }}
-                            {{ form_row(form.poste, {'attr': {'placeholder':'53...'}}) }}
-                            {{ form_row(form.titre, {'label': 'Intitulé', 'attr': {'placeholder':'Caisse...'}}) }}
-                            {{ form_row(form.categorie) }}
-                            {{ form_row(form.type) }}
-                            <button type="submit" class="btn btn-success">Ajouter</button>
-                            {{ form_end(form) }}
+                        <div class="col-12 text-right">
+                            <a href="{{ path('tresorerie_add') }}" class="btn btn-success">Ajouter nouveau trésorerie <i class="mdi mdi-arrow-right"></i></a>
                         </div>
                     </div>
                 </div>

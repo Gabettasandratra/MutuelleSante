@@ -1,0 +1,207 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Saisir decompte de prestations{% endblock %}
+
+{% block stylesheets %}
+    <link href="{{ asset('dist/css/bootstrap-datepicker.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block header %}
+    <div class="page-breadcrumb">
+        <div class="d-flex align-items-center">
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Saisir decompte de prestations</h4>
+            <div class="ml-auto">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0 p-0">
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Prestation</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Saisie</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Decompte de prestations <span class="text-right"> | Réference : {{ pac.adherent.numero }} / {{ numero }}</span></h4>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <p> Béneficiaire : {{ pac.nom ~ ' ' ~ pac.prenom }} </p>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <button class="btn btn-info" data-toggle="modal" href="#modal">Ajouter prestation</button>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="decompte">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Date</th>
+                                        <th scope="col">Designation</th>
+                                        <th scope="col">Montant des frais</th>
+                                        <th scope="col">Montant de remboursement</th>
+                                        <th scope="col">%</th>
+                                        <th scope="col">Prestataire</th>
+                                        <th scope="col">Facture</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                </tbody>
+                                <tfoot>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    <form action="{{ path('prestation_beneficiaire_save_decompte', {'id' : pac.id}) }}" method="post" id="formDecompte">
+                        <button type="submit" class="btn btn-success">Enregistrer</button>
+                    </form>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Saisie de prestation</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="prestation">
+                    <div class="modal-body">
+                        <div class="row">                                                  
+                            <div class="col-12">
+                                
+                                    <div class="form-group row">
+                                        <label for="prestation_date" class="col-form-label col-sm-3 required">Date</label>
+                                        <div class="col-sm-6">
+                                            <input type="text" id="prestation_date" name="prestation[date]" required="required" class="form-control datepicker">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="prestation_designation" class=" col-form-label col-sm-3 required">Designation</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" id="prestation_designation" name="prestation[designation]" required="required" maxlength="255" class="form-control" placeholder="Designation du prestation...">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="prestation_frais" class="col-form-label col-sm-3 required">Frais</label>
+                                        <div class="col-sm-9">
+                                            <input type="number" id="prestation_frais" name="prestation[frais]" required="required" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="prestation_rembourse" class="col-form-label col-sm-3 required">Rembourse</label>
+                                        <div class="col-sm-9">    
+                                            <input type="number" id="prestation_rembourse" name="prestation[rembourse]" required="required" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="prestation_prestataire" class="col-form-label col-sm-3">Prestataire</label>
+                                        <div class="col-sm-9">    
+                                            <input type="text" id="prestation_prestataire" name="prestation[prestataire]" maxlength="255" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="prestation_facture" class="col-form-label col-sm-3">Facture</label>
+                                        <div class="col-sm-9">    
+                                            <input type="text" id="prestation_facture" name="prestation[facture]" maxlength="255" class="form-control">
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>                       
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" id="Ajouter">Ajouter</button>
+                    </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('dist/js/bootstrap-datepicker.min.js') }}"></script>
+    <script src="{{ asset('dist/js/datepicker.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            
+            var prestations = new Array();
+            
+            $('#Ajouter').click(function(e) {
+                e.preventDefault();
+                var prestation = {
+                    'date'            :   $('#prestation_date').val(),
+                    'designation'     :   $('#prestation_designation').val(),
+                    'frais'           :   $('#prestation_frais').val(),
+                    'rembourse'       :   $('#prestation_rembourse').val(),
+                    'prestataire'     :   $('#prestation_prestataire').val(),
+                    'facture'         :   $('#prestation_facture').val()
+                };
+                prestations.push(prestation);
+
+                refreshTable(prestations);
+                $('#prestation').trigger("reset");
+            });    
+
+            $("#formDecompte").submit(function(event){
+                event.preventDefault(); 
+                var post_url = $(this).attr("action");
+                var form_data = { 
+                    'prestations': prestations,
+                    'numero': {{ numero }}
+                }; 
+
+                $.post( post_url, JSON.stringify(form_data), function(response) {
+                    if (response.hasError == false) {
+                        window.location.href = "{{ path('prestation_beneficiaire', {'id' : pac.id}) }}";
+                    } else {
+                        console.log(response);
+                    }                   
+                });
+            });    
+        });
+
+        function refreshTable(prestations) {
+            $('#decompte tbody').empty();
+            $('#decompte tfoot').empty();
+
+            var totFrais = 0, totRembourse = 0;
+            
+            for (let index = 0; index < prestations.length; index++) {
+                var prestation = prestations[index];
+                var markup = "<tr><th scope='row'>"+ (index + 1) +"</th>";
+                markup += "<td>" + prestation.date + "</td>";
+                markup += "<td>" + prestation.designation + "</td>";
+                markup += "<td>" + prestation.frais + "</td>";
+                markup += "<td>" + prestation.rembourse + "</td>";
+                markup += "<td>" + Math.round((prestation.rembourse / prestation.frais)*100) + " %</td>";
+                markup += "<td>" + prestation.prestataire + "</td>";
+                markup += "<td>" + prestation.facture + "</td>";
+                markup += "</tr>";
+
+                totRembourse += parseFloat(prestation.rembourse); 
+                totFrais += parseFloat(prestation.frais); 
+
+                $('#decompte tbody').append(markup);                   
+            }
+
+            var totMarkup = "<tr><th scope='row' colspan=3>Total</th>";
+            totMarkup += "<td>" + totFrais + "</td>";
+            totMarkup += "<td>" + totRembourse + "</td>";
+            totMarkup += "<td colspan=3>" + Math.round((totRembourse / totFrais)*100) + " %</td>";
+            $('#decompte tfoot').append(totMarkup);                   
+        }
+    </script>
+{% endblock %}

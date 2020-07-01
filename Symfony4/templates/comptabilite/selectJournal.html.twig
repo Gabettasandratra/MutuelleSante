@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Type journal{% endblock %}
+
+{% block header %}
+    <div class="page-breadcrumb">
+        <div class="d-flex align-items-center">
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Journaux comptables</h4>
+            <div class="ml-auto">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0 p-0">
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Comptabilité</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Journal</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Journaux comptables</h4>
+                    <div class="feed-widget">
+                        <ul class="list-style-none feed-body m-0 p-b-20">
+                            <li class="feed-item">
+                                <div class="feed-icon bg-info"></div> <a href="{{ path('comptabilite_journal_cotisation') }}"> Journal des cotisations. <span class="ml-auto font-12 text-muted"></span></a></li>
+                            <li class="feed-item">
+                                <div class="feed-icon bg-success"></div> <a href="{{ path('comptabilite_journal_reboursement') }}"> Journal des remboursements.<span class="ml-auto font-12 text-muted"></span></a></li>
+                            <li class="feed-item">
+                                <div class="feed-icon bg-warning"></div> Journal des opérations divers.<span class="ml-auto font-12 text-muted"></span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

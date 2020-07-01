@@ -4,9 +4,10 @@ namespace App\Controller;
 
 use App\Entity\Adherent;
 use App\Entity\Exercice;
+use App\Service\ComptaService;
 use App\Entity\HistoriqueCotisation;
-use Symfony\Component\Form\FormError;
 
+use Symfony\Component\Form\FormError;
 use App\Form\HistoriqueCotisationType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -48,7 +49,7 @@ class CotisationController extends AbstractController
      * @Route("/cotisation/{id}/pay", name="cotisation_pay")
      * @Entity("adherent", expr="repository.findOneById(id)")
      */
-    public function pay(Adherent $adherent, Request $request)
+    public function pay(Adherent $adherent, Request $request, ComptaService $comptaService)
     {
         $historiqueCotisation = new HistoriqueCotisation();    
         $form = $this->createForm(HistoriqueCotisationType::class, $historiqueCotisation);
@@ -72,6 +73,9 @@ class CotisationController extends AbstractController
                             $manager->persist($compteCotisation);
                             $manager->persist($historiqueCotisation);
                             $manager->flush();
+
+                            // enregistrement comptable
+                            $comptaService->payCotisation($historiqueCotisation);
 
                             return $this->redirectToRoute('cotisation_show', ['id' => $adherent->getId()]);                   
                         } else {

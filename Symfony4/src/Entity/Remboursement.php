@@ -53,14 +53,15 @@ class Remboursement
     private $exercice;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $moyen;
-
-    /**
      * @ORM\OneToMany(targetEntity=Prestation::class, mappedBy="remboursement")
      */
     private $prestations;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Compte::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $tresorerie;
 
     public function __construct(Adherent $adherent, Exercice $exercice, $montant)
     {   
@@ -136,18 +137,6 @@ class Remboursement
         return $this;
     }
 
-    public function getMoyen(): ?string
-    {
-        return $this->moyen;
-    }
-
-    public function setMoyen(string $moyen): self
-    {
-        $this->moyen = $moyen;
-
-        return $this;
-    }
-
     /**
      * @return Collection|Prestation[]
      */
@@ -175,6 +164,18 @@ class Remboursement
                 $prestation->setRemboursement(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTresorerie(): ?Compte
+    {
+        return $this->tresorerie;
+    }
+
+    public function setTresorerie(?Compte $tresorerie): self
+    {
+        $this->tresorerie = $tresorerie;
 
         return $this;
     }

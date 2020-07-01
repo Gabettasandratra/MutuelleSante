@@ -12,6 +12,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class ExcelReader
 {
     private $manager;
+    private $validator;
+    private $exerciceRepo;
 
     public function __construct(EntityManagerInterface $entityManager, ValidatorInterface $validator, ExerciceRepository $exerciceRepo)
     {

@@ -9,9 +9,14 @@ use App\Entity\Exercice;
 use App\Entity\Prestation;
 use App\Form\PrestationType;
 use App\Entity\Remboursement;
+use App\Service\ComptaService;
 use App\Form\RemboursementType;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class PrestationController extends AbstractController
@@ -40,22 +45,53 @@ class PrestationController extends AbstractController
     }
 
     /**
-     * @Route("/prestation/beneficiaire/{id}/add", name="prestation_beneficiaire_add", requirements={"id"="\d+"})
+     * @Route("/prestation/beneficiaire/{id}/decompte", name="prestation_beneficiaire_decompte", requirements={"id"="\d+"})
      */
-    public function addPrestation(Pac $pac, Request $request)
+    public function addDecompte(Pac $pac)
     {
-        $prestation = new Prestation($pac);
-        $form = $this->createForm(PrestationType::class, $prestation);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $manager = $this->getDoctrine()->getManager();
-            $manager->persist($prestation);
-            $manager->flush();
-            return $this->redirectToRoute('prestation_beneficiaire', ['id' => $pac->getId()]);
+        $generatedNumero = $this->getDoctrine()
+                                ->getRepository(Prestation::class)
+                                ->generateNumero($pac);
+        return $this->render('prestation/decompte.html.twig', [
+            'pac' => $pac,
+            'numero' => $generatedNumero,
+        ]);
+    }
+
+    /**
+     * @Route("/prestation/beneficiaire/{id}/decompte/save", name="prestation_beneficiaire_save_decompte", requirements={"id"="\d+"})
+     * @Method("POST")
+     */
+    public function saveJsonDecompte(Pac $pac, Request $request, ValidatorInterface $validator)
+    {
+        $manager = $this->getDoctrine()->getManager();
+        $data = json_decode( $request->getContent(), true);
+        $prestations = $data['prestations'];
+        foreach ($prestations as $prestationJs) {
+            $prestation = new Prestation($pac);
+            $prestation->setDate(\DateTime::createFromFormat('d/m/Y', $prestationJs['date']));
+            $prestation->setDesignation($prestationJs['designation']);
+            $prestation->setFrais($prestationJs['frais']);
+            $prestation->setRembourse($prestationJs['rembourse']);
+            $prestation->setPrestataire($prestationJs['prestataire']);
+            $prestation->setFacture($prestationJs['facture']);
+            $prestation->setDecompte($data['numero']);
+            $errors = $validator->validate($prestation);
+            if (0 === count($errors)) {
+                $manager->persist($prestation);
+            } else {    
+                $retour['hasError'] = true;
+                $retour['ErrorMessages'][] = "Les informations sont invalide"; 
+                foreach ($errors as $error) {
+                    $retour['ErrorMessages'][] = $error->getMessage();
+                }
+                return new JsonResponse($retour);
+            }
         }
 
-        return $this->render('prestation/form.html.twig', [
-            'form' => $form->createView(),
+        $manager->flush();
+        return new JsonResponse([
+            'hasError' => false
         ]);
     }
 
@@ -87,7 +123,7 @@ class PrestationController extends AbstractController
     /**
      * @Route("/prestation/adherent/{id}/rembourser", name="prestation_adherent_rembourser", requirements={"id"="\d+"})
      */
-    public function rembourserAdherent(Adherent $adherent, Request $request)
+    public function rembourserAdherent(Adherent $adherent, Request $request, ComptaService $comptaService)
     {
         $exercice = $this->getDoctrine()->getRepository(Exercice::class)->findCurrent();
         $montantNoPayed = $this->getDoctrine()->getRepository(Prestation::class)->getMontantNotPayed($adherent);
@@ -107,6 +143,10 @@ class PrestationController extends AbstractController
             }
 
             $manager->flush();
+
+            // Enregistrement comptable
+            $comptaService->payRemboursement($remboursement);
+
             return $this->redirectToRoute('prestation_adherent_show', ['id' => $adherent->getId()]);
         }
 

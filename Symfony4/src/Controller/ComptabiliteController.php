@@ -2,25 +2,43 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Entity\Compte;
+use App\Entity\Article;
+use App\Form\CompteType;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ComptabiliteController extends AbstractController
 {
-    /**
-     * @Route("/comptabilite", name="comptabilite")
-     */
-    public function index()
-    {
-        return $this->render('comptabilite/journal.html.twig');
-    }
-
     /**
      * @Route("/comptabilite/journal", name="comptabilite_journal")
      */
     public function journal()
     {
-        return $this->render('comptabilite/journal.html.twig');
+        return $this->render('comptabilite/selectJournal.html.twig');
+    }
+
+    /**
+     * @Route("/comptabilite/journal/cotisation", name="comptabilite_journal_cotisation")
+     */
+    public function journalCotisation()
+    {
+        $articlesCotisations = $this->getDoctrine()->getRepository(Article::class)->findCotisations();
+        return $this->render('comptabilite/journalCotisation.html.twig', [
+            'articles' => $articlesCotisations,
+        ]);
+    }
+
+    /**
+     * @Route("/comptabilite/journal/reboursement", name="comptabilite_journal_reboursement")
+     */
+    public function journalRemboursement()
+    {
+        $articles = $this->getDoctrine()->getRepository(Article::class)->findRemboursements();
+        return $this->render('comptabilite/journalRemboursement.html.twig', [
+            'articles' => $articles,
+        ]);
     }
 
     /**
@@ -42,9 +60,22 @@ class ComptabiliteController extends AbstractController
     /**
      * @Route("/comptabilite/plan", name="comptabilite_plan")
      */
-    public function plan()
+    public function plan(Request $request)
     {
-        return $this->render('comptabilite/plan.html.twig');
+        $compte = new Compte();
+        $form = $this->createForm(CompteType::class, $compte);        
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $manager = $this->getDoctrine()->getManager();
+            $manager->persist($compte);
+            $manager->flush();
+        }
+
+        $comptes = $this->getDoctrine()->getRepository(Compte::class)->findAll();
+        return $this->render('comptabilite/plan.html.twig',[
+            'comptes' => $comptes,
+            'form' => $form->createView(),
+        ]);
     }
 
     /**

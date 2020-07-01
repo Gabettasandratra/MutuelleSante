@@ -82,7 +82,7 @@
                         </div>
                         <div class="col-4">
                             <div class="text-right">
-                                <a href="{{ path('prestation_beneficiaire_add', {'id' : pac.id}) }}" class="btn btn-sm btn-info"><i class="mdi mdi-hospital"></i> Ajouter prestation</a>
+                                <a href="{{ path('prestation_beneficiaire_decompte', {'id' : pac.id}) }}" class="btn btn-sm btn-info"><i class="mdi mdi-hospital"></i> Saisir decompte de prestations</a>
                             </div> 
                         </div>
                     </div>
@@ -95,8 +95,9 @@
                                     <th scope="col">Date</th>
                                     <th scope="col">Designation</th>
                                     <th scope="col">Montant des frais</th>
-                                    <th scope="col">Montant remboursé</th>
+                                    <th scope="col">Montant de remboursement</th>
                                     <th scope="col">%</th>
+                                    <th scope="col">Réf décompte</th>
                                     <th scope="col">Paiement</th>
                                 </tr>
                             </thead>
@@ -104,11 +105,12 @@
                                 {% for prestation in pac.prestations %}
                                     <tr data-toggle="tooltip" title="Prestataire : {{ prestation.prestataire }} | Facture : {{ prestation.facture }}">
                                         <th scope="row">{{ loop.index }}</th>
-                                        <td>{{ prestation.date | date('d / m / Y') }}</td>
+                                        <td>{{ prestation.date | date('d/m/Y') }}</td>
                                         <td>{{ prestation.designation }}</td>
                                         <td>{{ prestation.frais }}</td>
                                         <td>{{ prestation.rembourse }}</td>
                                         <td>{{ (prestation.rembourse / prestation.frais)| round(3, 'floor') * 100 }}%</td>
+                                        <td>{{ pac.adherent.numero ~ ' / ' ~ prestation.decompte }}</td>
                                         <td>
                                             {% if prestation.isPaye %}
                                                 <span class="label label-rounded label-success">Payé</span>
