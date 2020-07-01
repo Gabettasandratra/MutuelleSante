@@ -7,6 +7,9 @@ use App\Entity\Article;
 use App\Form\CompteType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Form\Extension\Core\Type\RadioType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ComptabiliteController extends AbstractController
@@ -62,18 +65,89 @@ class ComptabiliteController extends AbstractController
      */
     public function plan(Request $request)
     {
+        $classesBilan = $this->getDoctrine()->getRepository(Compte::class)->findBilanGroupByClass();
+        $classesGestion = $this->getDoctrine()->getRepository(Compte::class)->findGestionGroupByClass();
+        return $this->render('comptabilite/plan.html.twig',[
+            'classes' => [
+                'bilan' => $classesBilan,
+                'gestion' => $classesGestion
+            ]
+        ]);
+    }
+
+    /**
+     * @Route("/comptabilite/plan/bilan", name="comptabilite_plan_bilan")
+     */
+    public function addCompteBilan(Request $request)
+    {
         $compte = new Compte();
-        $form = $this->createForm(CompteType::class, $compte);        
+        $compte->setIsTresor(false);
+        $compte->setCategorie('COMPTES DE BILAN');
+        $compte->setType(true); // Actif default
+        $form = $this->createFormBuilder($compte)
+                     ->add('classe', ChoiceType::class, [
+                        'choices'  => [
+                            '1-COMPTES DE CAPITAUX' => '1-COMPTES DE CAPITAUX',
+                            '2-COMPTES D\'IMMOBILISATIONS' => '2-COMPTES D\'IMMOBILISATIONS',
+                            '3-COMPTES DE STOCKS ET EN-COURS' => '3-COMPTES DE STOCKS ET EN-COURS',
+                            '4-COMPTES DE TIERS' => '4-COMPTES DE TIERS',
+                            '5-COMPTES FINANCIERS' => '5-COMPTES FINANCIERS',
+                        ]
+                     ])
+                     ->add('poste')
+                     ->add('titre')
+                     ->add('type', CheckboxType::class, [ 'required' => false, 'label' => 'Actif / Passif' ])
+                     ->add('note')
+                     ->getForm();       
         $form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid()) {
             $manager = $this->getDoctrine()->getManager();
             $manager->persist($compte);
             $manager->flush();
+            return $this->redirectToRoute('comptabilite_plan');
         }
 
-        $comptes = $this->getDoctrine()->getRepository(Compte::class)->findAll();
-        return $this->render('comptabilite/plan.html.twig',[
-            'comptes' => $comptes,
+        return $this->render('comptabilite/compteForm.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/comptabilite/plan/gestion", name="comptabilite_plan_gestion")
+     */
+    public function addCompteGestion(Request $request)
+    {
+        $compte = new Compte();
+        $compte->setIsTresor(false);
+        $compte->setCategorie('COMPTES DE GESTION');
+        $form = $this->createFormBuilder($compte)
+                    ->add('classe', ChoiceType::class, [
+                    'choices'  => [
+                        '6-COMPTES DE CHARGES' => '6-COMPTES DE CHARGES',
+                        '7-COMPTES DE PRODUITS' => '7-COMPTES DE PRODUITS'
+                    ]
+                    ])
+                    ->add('poste')
+                    ->add('titre')
+                    ->add('note')
+                    ->getForm();       
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ($compte->getClasse() === '6-COMPTES DE CHARGES') {
+                $compte->setType(true);
+            } else {
+                $compte->setType(false);
+            }
+
+            $manager = $this->getDoctrine()->getManager();
+            $manager->persist($compte);
+            $manager->flush();
+            return $this->redirectToRoute('comptabilite_plan');
+        }
+
+        return $this->render('comptabilite/compteForm.html.twig', [
             'form' => $form->createView(),
         ]);
     }

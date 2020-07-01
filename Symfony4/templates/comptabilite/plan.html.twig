@@ -18,56 +18,94 @@
     </div>
 {% endblock %}
 
-{% form_theme form 'bootstrap_4_layout.html.twig' %}
-
 {% block body %}
     <div class="row">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Plan comptable génerale</h4>
+                    <h4 class="card-title">COMPTE DE BILAN OU SITUATION</h4>
                     <hr>
                     <div class="row">
                         <div class="col-md-12">
                             <table class="table m-t-20">
-                                <thead>
+                                <thead class="thead-light">
                                     <tr>
-                                        <th scope="col">#</th>
                                         <th scope="col">Poste</th>
                                         <th scope="col">Intitulé</th>
                                         <th scope="col">Type</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for compte in comptes %}
+                                    {% for classe, comptes in classes.bilan %}
                                         <tr>
-                                            <th scope="row">{{ loop.index }}</th>
-                                            <td>{{ compte.poste }}</td>
-                                            <td>{{ compte.titre }}</td>
-                                            <td>{{ compte.categorie }}</td>
+                                            <th scope="row" colspan=3>{{ classe }}</th>
                                         </tr>
-                                    {% endfor %}
+                                        {% for compte in comptes %}
+                                        
+                                            <tr {% if compte.note %}title="{{ compte.note }}" data-toggle="tooltip"{% endif %}>
+                                                <td>{{ compte.poste }}</td>
+                                                <td>{{ compte.titre }}</td>
+                                                <td>{% if compte.type %}
+                                                        <span class="label label-rounded label-info">Actif</span>
+                                                    {% else %}
+                                                        <span class="label label-rounded label-primary">Passif</span>
+                                                    {% endif %}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endfor %}                                
                                 </tbody>
                             </table>                       
                         </div>
                     </div>
-
+                    <div class="row">
+                        <div class="col-md-12 text-right">
+                            <a href="{{ path('comptabilite_plan_bilan') }}" class="btn btn-success">Nouveau compte de bilan <i class="mdi mdi-arrow-right"></i></a>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
 
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Ajouter nouveau compte génerale</h4>
+                    <h4 class="card-title">COMPTE DE GESTION</h4>
                     <hr>
                     <div class="row">
-                        <div class="col-6">
-                            {{ form_start(form) }}
-                            {{ form_row(form.poste, {'attr': {'placeholder':'53...'}}) }}
-                            {{ form_row(form.titre, {'label': 'Intitulé', 'attr': {'placeholder':'Caisse...'}}) }}
-                            {{ form_row(form.categorie) }}
-                            {{ form_row(form.type) }}
-                            <button type="submit" class="btn btn-success">Ajouter</button>
-                            {{ form_end(form) }}
+                        <div class="col-md-12">
+                            <table class="table m-t-20">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col">Poste</th>
+                                        <th scope="col">Intitulé</th>
+                                        <th scope="col">Type</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for classe, comptes in classes.gestion %}
+                                        <tr>
+                                            <th scope="row" colspan=3>{{ classe }}</th>
+                                        </tr>
+                                        {% for compte in comptes %}
+                                        
+                                            <tr {% if compte.note %}title="{{ compte.note }}" data-toggle="tooltip"{% endif %}>
+                                                <td>{{ compte.poste }}</td>
+                                                <td>{{ compte.titre }}</td>
+                                                <td>{% if compte.type %}
+                                                        <span class="label label-rounded label-primary">Charge</span>
+                                                    {% else %}
+                                                        <span class="label label-rounded label-info">Produit</span>
+                                                    {% endif %}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endfor %}                                
+                                </tbody>
+                            </table>                       
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 text-right">
+                            <a href="{{ path('comptabilite_plan_gestion') }}" class="btn btn-success">Nouveau compte de gestion <i class="mdi mdi-arrow-right"></i></a>
                         </div>
                     </div>
                 </div>

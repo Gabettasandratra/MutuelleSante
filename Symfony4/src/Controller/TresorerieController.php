@@ -31,7 +31,7 @@ class TresorerieController extends AbstractController
     {
         $compteTresorerie = new Compte();
         $compteTresorerie->setIsTresor(true);
-        $compteTresorerie->setClasse('COMPTE FINANCIERS');
+        $compteTresorerie->setClasse('5-COMPTE FINANCIERS');
         $compteTresorerie->setCategorie('COMPTES DE BILAN');
         $compteTresorerie->setType(true); // Actif 
 

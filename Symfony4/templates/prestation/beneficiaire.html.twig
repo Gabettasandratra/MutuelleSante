@@ -102,13 +102,16 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                {% set tFrais = 0 %}
+                                {% set tRemb = 0 %}
+
                                 {% for prestation in pac.prestations %}
                                     <tr data-toggle="tooltip" title="Prestataire : {{ prestation.prestataire }} | Facture : {{ prestation.facture }}">
                                         <th scope="row">{{ loop.index }}</th>
                                         <td>{{ prestation.date | date('d/m/Y') }}</td>
                                         <td>{{ prestation.designation }}</td>
-                                        <td>{{ prestation.frais }}</td>
-                                        <td>{{ prestation.rembourse }}</td>
+                                        <td>{{ prestation.frais }}</td> {% set tFrais = tFrais + prestation.frais %}
+                                        <td>{{ prestation.rembourse }}</td> {% set tRemb = tRemb + prestation.rembourse %}
                                         <td>{{ (prestation.rembourse / prestation.frais)| round(3, 'floor') * 100 }}%</td>
                                         <td>{{ pac.adherent.numero ~ ' / ' ~ prestation.decompte }}</td>
                                         <td>
@@ -121,6 +124,14 @@
                                     </tr>
                                 {% endfor %}
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th scope="row" colspan=3>Total</th>
+                                    <td>{{ tFrais }}</td>
+                                    <td>{{ tRemb }}</td>
+                                    <td colspan=3>{{ (tRemb / tFrais)| round(3, 'floor') * 100 }}%</td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>

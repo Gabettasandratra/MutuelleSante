@@ -77,6 +77,7 @@ class ExcelReader
             $pac->setNom($donnee[1]);
             $pac->setPrenom($donnee[2]);
             $pac->setSexe($donnee[3]);
+            dump($donnee[4]);
             $pac->setDateNaissance(\DateTime::createFromFormat('d/m/Y', $donnee[4]));
             $pac->setCin($donnee[5]);
             $pac->setParente($donnee[6]);

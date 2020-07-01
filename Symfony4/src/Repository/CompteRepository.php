@@ -19,16 +19,35 @@ class CompteRepository extends ServiceEntityRepository
         parent::__construct($registry, Compte::class);
     }
 
-    /**
-    * @return Compte[] Returns an array of Compte objects
-    */
-    public function findAll()
+    public function findBilanGroupByClass()
     {
-        return $this->createQueryBuilder('c')
-            ->orderBy('c.poste', 'ASC')
-            ->getQuery()
-            ->getResult()
-        ;
+        $classes =  $this->_em->createQuery('select distinct c.classe from App\Entity\Compte c where c.categorie = :cat order by c.classe')
+                                ->setParameter('cat', 'COMPTES DE BILAN')                      
+                                ->getResult();
+        $retour = [];
+        foreach ($classes as $classe) {
+            $str = $classe['classe'];
+            $retour[$str] = $this->_em->createQuery('select c.poste,c.titre,c.type,c.note from App\Entity\Compte c where c.classe = :cl')
+                                    ->setParameter('cl', $str)
+                                    ->getResult();
+        }
+
+        return $retour;
+    }
+
+    public function findGestionGroupByClass()
+    {
+        $classes =  $this->_em->createQuery('select distinct c.classe from App\Entity\Compte c where c.categorie = :cat order by c.classe')
+                                ->setParameter('cat', 'COMPTES DE GESTION')                      
+                                ->getResult();
+        $retour = [];
+        foreach ($classes as $classe) {
+            $str = $classe['classe'];
+            $retour[$str] = $this->_em->createQuery('select c.poste,c.titre,c.type,c.note from App\Entity\Compte c where c.classe = :cl')
+                                    ->setParameter('cl', $str)
+                                    ->getResult();
+        }
+        return $retour;
     }
 
     /*
