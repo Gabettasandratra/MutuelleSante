@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Compte;
 use App\Entity\Article;
 use App\Form\CompteType;
+use App\Form\ArticleType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\Extension\Core\Type\RadioType;
@@ -15,41 +16,85 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class ComptabiliteController extends AbstractController
 {
     /**
-     * @Route("/comptabilite/journal", name="comptabilite_journal")
+     * @Route("/comptabilite/journal", name="comptabilite_select_journal")
      */
-    public function journal()
+    public function selectJournal()
     {
         return $this->render('comptabilite/selectJournal.html.twig');
     }
 
     /**
-     * @Route("/comptabilite/journal/cotisation", name="comptabilite_journal_cotisation")
+     * @Route("/comptabilite/journal/{journal}", name="comptabilite_journal")
      */
-    public function journalCotisation()
+    public function journal($journal)
     {
-        $articlesCotisations = $this->getDoctrine()->getRepository(Article::class)->findCotisations();
-        return $this->render('comptabilite/journalCotisation.html.twig', [
-            'articles' => $articlesCotisations,
-        ]);
-    }
-
-    /**
-     * @Route("/comptabilite/journal/reboursement", name="comptabilite_journal_reboursement")
-     */
-    public function journalRemboursement()
-    {
-        $articles = $this->getDoctrine()->getRepository(Article::class)->findRemboursements();
-        return $this->render('comptabilite/journalRemboursement.html.twig', [
+        if ($journal == 'cotisation') {
+            $articles = $this->getDoctrine()->getRepository(Article::class)->findByCategorie('Cotisation');
+        } else if ($journal == 'remboursement') {
+            $articles = $this->getDoctrine()->getRepository(Article::class)->findByCategorie('Remboursement');
+        } else if ($journal == 'divers') {
+            $articles = $this->getDoctrine()->getRepository(Article::class)->findByCategorie('Divers');
+        } else {
+            throw $this->createNotFoundException('Ce journal comptable n\'existe pas');
+        }
+        
+        return $this->render('comptabilite/journal.html.twig', [
             'articles' => $articles,
+            'journal'  => $journal
         ]);
     }
 
     /**
-     * @Route("/comptabilite/livre", name="comptabilite_livre")
+     * @Route("/comptabilite/journal/{journal}/saisie", name="comptabilite_saisie")
      */
-    public function livre()
+    public function saisie($journal, Request $request)
     {
-        return $this->render('comptabilite/livre.html.twig');
+        $article = new Article();
+        $article->setCategorie('Divers');
+        $form = $this->createForm(ArticleType::class, $article);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $manager = $this->getDoctrine()->getManager();
+            $manager->persist($article);
+            $manager->flush();
+
+            return $this->redirectToRoute('comptabilite_journal', ['journal' => 'divers']);
+        }
+
+        return $this->render('comptabilite/saisie.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/comptabilite/grandlivre", name="comptabilite_livre")
+     * @Route("/comptabilite/grandlivre/{poste}", name="comptabilite_livre_aux")
+     */
+    public function livre($poste = null)
+    {
+        if ($poste === null) {
+            $donnees = $this->getDoctrine()->getRepository(Article::class)->findGrandLivre();
+        } else {
+            $compte = $this->getDoctrine()->getRepository(Compte::class)->findOneByPoste($poste);
+            if ($compte) {
+                $articles = $this->getDoctrine()->getRepository(Article::class)->findGrandLivreCompte($compte);
+                $donnees['compte'] = $compte;
+                $donnees['articles'] = $articles;
+            } else {
+                throw $this->createNotFoundException("Le compte numéro $poste n'existe pas");
+            }
+        }
+
+        dump($donnees);
+    
+        $labelcomptes = $this->getDoctrine()->getRepository(Compte::class)->findPosteTitre();
+
+        return $this->render('comptabilite/livre.html.twig', [
+            'labelComptes' => $labelcomptes,
+            'donnees' => $donnees,
+            'isAux' => $poste != null,
+
+        ]);
     }
 
     /**

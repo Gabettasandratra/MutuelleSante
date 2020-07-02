@@ -27,11 +27,11 @@
                     <div class="feed-widget">
                         <ul class="list-style-none feed-body m-0 p-b-20">
                             <li class="feed-item">
-                                <div class="feed-icon bg-info"></div> <a href="{{ path('comptabilite_journal_cotisation') }}"> Journal des cotisations. <span class="ml-auto font-12 text-muted"></span></a></li>
+                                <div class="feed-icon bg-info"></div> <a href="{{ path('comptabilite_journal', { 'journal' : 'cotisation' }) }}"> Journal des cotisations. <span class="ml-auto font-12 text-muted"></span></a></li>
                             <li class="feed-item">
-                                <div class="feed-icon bg-success"></div> <a href="{{ path('comptabilite_journal_reboursement') }}"> Journal des remboursements.<span class="ml-auto font-12 text-muted"></span></a></li>
+                                <div class="feed-icon bg-success"></div> <a href="{{ path('comptabilite_journal', { 'journal' : 'remboursement' }) }}"> Journal des remboursements.<span class="ml-auto font-12 text-muted"></span></a></li>
                             <li class="feed-item">
-                                <div class="feed-icon bg-warning"></div> Journal des opérations divers.<span class="ml-auto font-12 text-muted"></span></li>
+                                <div class="feed-icon bg-warning"></div> <a href="{{ path('comptabilite_journal', { 'journal' : 'divers' }) }}"> Journal des opérations divers.<span class="ml-auto font-12 text-muted"></span></a></li>
                         </ul>
                     </div>
                 </div>

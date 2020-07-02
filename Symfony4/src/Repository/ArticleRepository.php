@@ -2,9 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\Compte;
 use App\Entity\Article;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method Article|null find($id, $lockMode = null, $lockVersion = null)
@@ -19,43 +20,38 @@ class ArticleRepository extends ServiceEntityRepository
         parent::__construct($registry, Article::class);
     }
 
-    /**
-    * @return Article[] Returns an array of Article objects
-    */
-    public function findCotisations()
+    public function findGrandLivre()
     {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.categorie = :cat')
-            ->setParameter('cat', 'Cotisation')
-            ->orderBy('a.date', 'ASC')
-            ->getQuery()
-            ->getResult()
-        ;
+        $classes =  $this->_em->createQuery('select distinct c.classe from App\Entity\Compte c order by c.classe')
+                                ->getResult();
+        $retour = [];
+        foreach ($classes as $classe) {
+            $str = $classe['classe'];
+            $comptes = $this->_em->createQuery('select c from App\Entity\Compte c where c.classe = :cl order by c.poste')
+                                    ->setParameter('cl', $str)
+                                    ->getResult();
+            foreach ($comptes as $compte) {
+                $articles = $this->findGrandLivreCompte($compte);
+                if ($articles) {
+                    $labelCompte = $compte->getPoste()." ".$compte->getTitre();
+                    $retour[$str][$labelCompte] = $articles;
+                }
+                
+            }
+        }
+        return $retour; 
     }
 
-    /**
-    * @return Article[] Returns an array of Article objects
-    */
-    public function findRemboursements()
+    public function findGrandLivreCompte(Compte $compte)
     {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.categorie = :cat')
-            ->setParameter('cat', 'Remboursement')
-            ->orderBy('a.date', 'ASC')
-            ->getQuery()
-            ->getResult()
-        ;
+        $debit = $this->_em->createQuery('select a.date,a.libelle,a.piece,a.categorie,a.montant as debit,0 as credit from App\Entity\Article a where a.compteDebit = :cp order by a.date DESC')
+                                ->setParameter('cp', $compte)                      
+                                ->getResult(); 
+        $credit = $this->_em->createQuery('select a.date,a.libelle,a.piece,a.categorie,0 as debit,a.montant as credit from App\Entity\Article a where a.compteCredit = :cp order by a.date DESC')
+                            ->setParameter('cp', $compte)                      
+                            ->getResult(); 
+        return array_merge($debit, $credit);
+
     }
 
-    /*
-    public function findOneBySomeField($value): ?Article
-    {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

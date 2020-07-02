@@ -43,11 +43,17 @@ class CompteRepository extends ServiceEntityRepository
         $retour = [];
         foreach ($classes as $classe) {
             $str = $classe['classe'];
-            $retour[$str] = $this->_em->createQuery('select c.poste,c.titre,c.type,c.note from App\Entity\Compte c where c.classe = :cl')
+            $retour[$str] = $this->_em->createQuery('select c.poste,c.titre,c.type,c.note from App\Entity\Compte c where c.classe = :cl order by c.poste')
                                     ->setParameter('cl', $str)
                                     ->getResult();
         }
         return $retour;
+    }
+
+    public function findPosteTitre()
+    {
+        return $this->_em->createQuery('select c.poste,c.titre from App\Entity\Compte c order by c.poste')
+                        ->getResult();
     }
 
     /*

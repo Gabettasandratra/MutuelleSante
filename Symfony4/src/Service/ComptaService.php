@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Article;
 use App\Entity\Remboursement;
+use App\Service\ParametreService;
 use App\Entity\HistoriqueCotisation;
 use App\Repository\CompteRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,10 +17,11 @@ class ComptaService
     private $validator;
     private $comptaRepo;
 
-    public function __construct(EntityManagerInterface $entityManager, CompteRepository $comptaRepo)
+    public function __construct(ParametreService $paramService, EntityManagerInterface $entityManager, CompteRepository $comptaRepo)
     {
         $this->manager = $entityManager;
         $this->comptaRepo = $comptaRepo;
+        $this->paramService = $paramService;
     }
 
     /*
@@ -27,13 +29,14 @@ class ComptaService
     */
     public function payCotisation(HistoriqueCotisation $cotisation)
     {
-        // Ce compte est provisoire
-        $compteCotisation = $this->comptaRepo->find(1);
+        // Charger le compte depuis le parametre
+        $posteCotisation = $this->paramService->getParametre('compte_cotisation');
+        $compteCotisation = $this->comptaRepo->findOneByPoste($posteCotisation);
 
         $article = new Article();
         $article->setCompteDebit($cotisation->getTresorerie());
         $article->setCompteCredit($compteCotisation);
-        $article->setLibelle('Cotisation '. $cotisation->getCompteCotisation()->getExercice()->getAnnee() .'| '. $cotisation->getCompteCotisation()->getAdherent()->getNom());
+        $article->setLibelle('Cotisation '. $cotisation->getCompteCotisation()->getExercice()->getAnnee() .' | '. $cotisation->getCompteCotisation()->getAdherent()->getNom());
         $article->setCategorie('Cotisation'); // journal
         $article->setAnalytique('Cotisation');
         $article->setMontant($cotisation->getMontant());
@@ -49,8 +52,8 @@ class ComptaService
     */
     public function payRemboursement(Remboursement $remboursement)
     {
-        // Ce compte est provisoire
-        $compteRemboursement = $this->comptaRepo->find(4);
+        $posteRemboursement = $this->paramService->getParametre('compte_prestation');
+        $compteRemboursement = $this->comptaRepo->findOneByPoste($posteRemboursement);
 
         $article = new Article();
         $article->setCompteDebit($compteRemboursement);        

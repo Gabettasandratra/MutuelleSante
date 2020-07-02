@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\ArticleRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ArticleRepository::class)
@@ -19,16 +20,19 @@ class Article
 
     /**
      * @ORM\Column(type="float")
+     * @Assert\Positive
      */
     private $montant;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
      */
     private $libelle;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
      */
     private $piece;
 
@@ -39,11 +43,13 @@ class Article
 
     /**
      * @ORM\Column(type="datetime")
+     * @Assert\LessThan("+1 day")
      */
     private $date;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
      */
     private $categorie;
 
@@ -56,6 +62,7 @@ class Article
     /**
      * @ORM\ManyToOne(targetEntity=Compte::class)
      * @ORM\JoinColumn(nullable=false)
+     * @Assert\NotEqualTo(propertyPath="compteDebit", message="Les comptes debit et credit doivent être différentes ")
      */
     private $compteCredit;
 

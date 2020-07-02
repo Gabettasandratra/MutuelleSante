@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Configurations comptable{% endblock %}
+
+{% block header %}
+    <div class="page-breadcrumb">
+        <div class="d-flex align-items-center">
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Configurations comptable</h4>
+            <div class="ml-auto">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0 p-0">
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Configuration</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Comptable</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% form_theme form 'bootstrap_4_layout.html.twig' %}
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Comptes associées au opération de la Mutuelle</h4>
+                    <hr>
+                    <div class="row">
+                        <div class="col-6">
+                            {{ form_start(form) }}
+                                {{ form_row(form.compteCotisation, { 'label' : 'Compte génerale associé au cotisation des membres'}) }}
+                                {{ form_row(form.comptePrestation, { 'label' : 'Compte génerale associé au remboursement des membres'}) }}
+                                <div class="form-row">
+                                    <div class="col-12 text-right">
+                                        <button type="submit" class="btn btn-success">Enregistrer <i class="mdi mdi-keyboard-return"></i></button>
+                                    </div>
+                                </div>                                                     
+                            {{ form_end(form) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
