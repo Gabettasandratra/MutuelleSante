@@ -59,7 +59,7 @@ class ArticleRepository extends ServiceEntityRepository
 
     }
 
-    public function findBalance()
+    public function findBalance(Exercice $exercice)
     {
         $classes =  $this->_em->createQuery('select distinct c.classe from App\Entity\Compte c order by c.classe')
                                 ->getResult();
@@ -70,11 +70,15 @@ class ArticleRepository extends ServiceEntityRepository
                                     ->setParameter('cl', $str)
                                     ->getResult();
             foreach ($comptes as $compte) {
-                $debit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteDebit = :cp')
-                                ->setParameter('cp', $compte)                      
+                $debit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteDebit = :cp and a.date between :dateDebut and :dateFin')
+                                ->setParameter('cp', $compte) 
+                                ->setParameter('dateDebut', $exercice->getDateDebut())
+                                ->setParameter('dateFin', $exercice->getDateFin())                     
                                 ->getSingleScalarResult();
-                $credit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteCredit = :cp')
-                                ->setParameter('cp', $compte)                      
+                $credit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteCredit = :cp and a.date between :dateDebut and :dateFin')
+                                ->setParameter('cp', $compte)   
+                                ->setParameter('dateDebut', $exercice->getDateDebut())
+                                ->setParameter('dateFin', $exercice->getDateFin())                   
                                 ->getSingleScalarResult();
 
                 $labelCompte = $compte->getPoste()." ".$compte->getTitre();
@@ -92,6 +96,4 @@ class ArticleRepository extends ServiceEntityRepository
                             ->setParameter('dateFin', $exercice->getDateFin())
                             ->getResult(); 
     }
-    
-
 }

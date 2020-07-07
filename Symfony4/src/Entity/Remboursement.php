@@ -63,6 +63,12 @@ class Remboursement
      */
     private $tresorerie;
 
+    /**
+     * @ORM\OneToOne(targetEntity=Article::class, cascade={"persist", "remove"})
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $article;
+
     public function __construct(Adherent $adherent, Exercice $exercice, $montant)
     {   
         $this->date = new \DateTime();
@@ -176,6 +182,18 @@ class Remboursement
     public function setTresorerie(?Compte $tresorerie): self
     {
         $this->tresorerie = $tresorerie;
+
+        return $this;
+    }
+
+    public function getArticle(): ?article
+    {
+        return $this->article;
+    }
+
+    public function setArticle(article $article): self
+    {
+        $this->article = $article;
 
         return $this;
     }

@@ -2,17 +2,22 @@
 
 namespace App\Controller;
 
+use App\Entity\Compte;
 use App\Entity\Adherent;
 use App\Entity\Exercice;
 use App\Service\ComptaService;
-use App\Entity\HistoriqueCotisation;
 
+use Doctrine\ORM\EntityRepository;
+use App\Entity\HistoriqueCotisation;
 use Symfony\Component\Form\FormError;
 use App\Form\HistoriqueCotisationType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 class CotisationController extends AbstractController
 {
@@ -68,13 +73,6 @@ class CotisationController extends AbstractController
                             /* Tout est en regle alors on peut enregistrer */
                             $compteCotisation->payer($montant);
                             $historiqueCotisation->setCompteCotisation($compteCotisation);
-
-                            $manager = $this->getDoctrine()->getManager();
-                            $manager->persist($compteCotisation);
-                            $manager->persist($historiqueCotisation);
-                            $manager->flush();
-
-                            // enregistrement comptable
                             $comptaService->payCotisation($historiqueCotisation);
 
                             return $this->redirectToRoute('cotisation_show', ['id' => $adherent->getId()]);                   
@@ -95,6 +93,64 @@ class CotisationController extends AbstractController
         return $this->render('cotisation/form.html.twig', [
             'form' => $form->createView(),
             'adherent' => $adherent,
+        ]);
+    }
+
+    /**
+     * @Route("/cotisation/{adherent_id}/edit/{cotisation_id}", name="cotisation_edit")
+     * @ParamConverter("adherent", options={"mapping": {"adherent_id":"id"}})
+     * @ParamConverter("historiqueCotisation", options={"mapping": {"cotisation_id":"id"}})
+     */
+    public function editCotisation(Adherent $adherent, HistoriqueCotisation $historiqueCotisation, Request $request)
+    {
+        $montantPaye = $historiqueCotisation->getMontant();
+        $form = $this->createFormBuilder($historiqueCotisation)
+                    ->add('datePaiement', DateType::class, [
+                        'label' => 'Date de paiement',
+                    ]) 
+                    ->add('montant')
+                     ->add('tresorerie', EntityType::class, [
+                        'label' => 'Mode de paiement',
+                        'class' => Compte::class,
+                        'query_builder' => function (EntityRepository $er) {
+                            return $er->createQueryBuilder('c')
+                                    ->andWhere('c.isTresor = true')
+                                    ->orderBy('c.poste', 'ASC');
+                        },
+                        'choice_label' => 'libelle',
+                    ])
+                     ->add('reference')
+                     ->add('remarque')
+                     ->getForm();       
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            /* Retirer le montant paye dans le compte cotisation */
+            $compteCotisation = $historiqueCotisation->getCompteCotisation();
+            $compteCotisation->payer(-$montantPaye);
+
+            /* Verifier le montant si supérieur au reste */
+            $montant = $historiqueCotisation->getMontant();
+            if ($montant <= $compteCotisation->getReste() ) { 
+                /* Payer le montant enregistrer */
+                $article = $historiqueCotisation->getArticle();
+                $article->setMontant($historiqueCotisation->getMontant());
+                $article->setPiece($historiqueCotisation->getReference());
+                $article->setCompteDebit($historiqueCotisation->getTresorerie());
+
+                $compteCotisation->payer($montant);         
+                
+                $manager = $this->getDoctrine()->getManager();
+                $manager->persist($historiqueCotisation);
+                $manager->flush();
+
+                return $this->redirectToRoute('cotisation_show', ['id' => $adherent->getId()]);                   
+            } else {
+                $form->get('montant')->addError(new FormError("Désolé mais le montant saisie ne doit pas depasser ".$compteCotisation->getReste(). " (Reste à payer)"));
+            }
+        }
+
+        return $this->render('cotisation/editCotisation.html.twig', [
+            'form' => $form->createView()
         ]);
     }
 }

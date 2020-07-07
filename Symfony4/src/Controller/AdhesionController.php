@@ -135,7 +135,6 @@ class AdhesionController extends AbstractController
      */
     public function edit(Adherent $adherent = null, Request $request)
     { 
-        $manager = $this->getDoctrine()->getManager();
         if ($adherent === null) {
             return $this->redirectToRoute('adhesion_new');
         }
@@ -155,6 +154,7 @@ class AdhesionController extends AbstractController
                 }
                 $adherent->setPhoto($this->getParameter('users_img_directory').'/'.$fileName);
             }
+            $manager = $this->getDoctrine()->getManager();
             $manager->persist($adherent);
             $manager->flush();
 

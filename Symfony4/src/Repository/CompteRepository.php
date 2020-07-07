@@ -3,8 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Compte;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Entity\Exercice;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method Compte|null find($id, $lockMode = null, $lockVersion = null)
@@ -74,17 +75,21 @@ class CompteRepository extends ServiceEntityRepository
         return $retour;
     }
 
-    public function findBilanActif()
+    public function findBilanActif(Exercice $exercice)
     {
         $comptesBilan =  $this->_em->createQuery('select c from App\Entity\Compte c where c.type = true and c.categorie = \'COMPTES DE BILAN\' order by c.poste')
                                     ->getResult();
         $retour = [];
         foreach ($comptesBilan as $compte) {
-            $debit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteDebit = :cp')
-                                ->setParameter('cp', $compte)                      
+            $debit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteDebit = :cp and a.date between :dateDebut and :dateFin')
+                                ->setParameter('cp', $compte) 
+                                ->setParameter('dateDebut', $exercice->getDateDebut())
+                                ->setParameter('dateFin', $exercice->getDateFin())                      
                                 ->getSingleScalarResult();
-            $credit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteCredit = :cp')
-                            ->setParameter('cp', $compte)                      
+            $credit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteCredit = :cp and a.date between :dateDebut and :dateFin')
+                            ->setParameter('cp', $compte) 
+                            ->setParameter('dateDebut', $exercice->getDateDebut())
+                            ->setParameter('dateFin', $exercice->getDateFin())                      
                             ->getSingleScalarResult();
             $retour[] = ['poste' => $compte->getPoste(), 'titre' => $compte->getTitre(), 'solde' => ($debit - $credit) ];
         }
@@ -92,35 +97,21 @@ class CompteRepository extends ServiceEntityRepository
         return $retour;
     }
 
-    public function findBilanPassif()
+    public function findBilanPassif(Exercice $exercice)
     {
         $comptesBilan =  $this->_em->createQuery('select c from App\Entity\Compte c where c.type = false and c.categorie = \'COMPTES DE BILAN\' order by c.poste')
                                     ->getResult();
         $retour = [];
         foreach ($comptesBilan as $compte) {
-            $debit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteDebit = :cp')
-                                ->setParameter('cp', $compte)                      
+            $debit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteDebit = :cp and a.date between :dateDebut and :dateFin')
+                                ->setParameter('cp', $compte) 
+                                ->setParameter('dateDebut', $exercice->getDateDebut())
+                                ->setParameter('dateFin', $exercice->getDateFin())                      
                                 ->getSingleScalarResult();
-            $credit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteCredit = :cp')
-                            ->setParameter('cp', $compte)                      
-                            ->getSingleScalarResult();
-            $retour[] = ['poste' => $compte->getPoste(), 'titre' => $compte->getTitre(), 'solde' => ($credit - $debit) ];
-        }
-
-        return $retour;
-    }
-
-    public function findGestionCharge()
-    {
-        $comptesBilan =  $this->_em->createQuery('select c from App\Entity\Compte c where c.type = true and c.categorie = \'COMPTES DE GESTION\' order by c.poste')
-                                    ->getResult();
-        $retour = [];
-        foreach ($comptesBilan as $compte) {
-            $debit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteDebit = :cp')
-                                ->setParameter('cp', $compte)                      
-                                ->getSingleScalarResult();
-            $credit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteCredit = :cp')
-                            ->setParameter('cp', $compte)                      
+            $credit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteCredit = :cp and a.date between :dateDebut and :dateFin')
+                            ->setParameter('cp', $compte) 
+                            ->setParameter('dateDebut', $exercice->getDateDebut())
+                            ->setParameter('dateFin', $exercice->getDateFin())                      
                             ->getSingleScalarResult();
             $retour[] = ['poste' => $compte->getPoste(), 'titre' => $compte->getTitre(), 'solde' => ($debit - $credit) ];
         }
@@ -128,33 +119,47 @@ class CompteRepository extends ServiceEntityRepository
         return $retour;
     }
 
-    public function findGestionProduit()
+    public function findGestionCharge(Exercice $exercice)
     {
-        $comptesBilan =  $this->_em->createQuery('select c from App\Entity\Compte c where c.type = false and c.categorie = \'COMPTES DE GESTION\' order by c.poste')
+        $comptesGestion =  $this->_em->createQuery('select c from App\Entity\Compte c where c.type = true and c.categorie = \'COMPTES DE GESTION\' order by c.poste')
                                     ->getResult();
         $retour = [];
-        foreach ($comptesBilan as $compte) {
-            $debit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteDebit = :cp')
-                                ->setParameter('cp', $compte)                      
+        foreach ($comptesGestion as $compte) {
+            $debit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteDebit = :cp and a.date between :dateDebut and :dateFin')
+                                ->setParameter('cp', $compte) 
+                                ->setParameter('dateDebut', $exercice->getDateDebut())
+                                ->setParameter('dateFin', $exercice->getDateFin())                      
                                 ->getSingleScalarResult();
-            $credit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteCredit = :cp')
-                            ->setParameter('cp', $compte)                      
+            $credit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteCredit = :cp and a.date between :dateDebut and :dateFin')
+                            ->setParameter('cp', $compte) 
+                            ->setParameter('dateDebut', $exercice->getDateDebut())
+                            ->setParameter('dateFin', $exercice->getDateFin())                      
+                            ->getSingleScalarResult();
+            $retour[] = ['poste' => $compte->getPoste(), 'titre' => $compte->getTitre(), 'solde' => ($debit - $credit) ];
+        }
+
+        return $retour;
+    }
+
+    public function findGestionProduit(Exercice $exercice)
+    {
+        $comptesGestion =  $this->_em->createQuery('select c from App\Entity\Compte c where c.type = false and c.categorie = \'COMPTES DE GESTION\' order by c.poste')
+                                    ->getResult();
+        $retour = [];
+        foreach ($comptesGestion as $compte) {
+            $debit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteDebit = :cp and a.date between :dateDebut and :dateFin')
+                                ->setParameter('cp', $compte) 
+                                ->setParameter('dateDebut', $exercice->getDateDebut())
+                                ->setParameter('dateFin', $exercice->getDateFin())                      
+                                ->getSingleScalarResult();
+            $credit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteCredit = :cp and a.date between :dateDebut and :dateFin')
+                            ->setParameter('cp', $compte) 
+                            ->setParameter('dateDebut', $exercice->getDateDebut())
+                            ->setParameter('dateFin', $exercice->getDateFin())                      
                             ->getSingleScalarResult();
             $retour[] = ['poste' => $compte->getPoste(), 'titre' => $compte->getTitre(), 'solde' => ($credit - $debit) ];
         }
 
         return $retour;
     }
-
-    /*
-    public function findOneBySomeField($value): ?Compte
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

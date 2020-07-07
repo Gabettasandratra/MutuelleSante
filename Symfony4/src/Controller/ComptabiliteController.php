@@ -51,10 +51,14 @@ class ComptabiliteController extends AbstractController
 
     /**
      * @Route("/comptabilite/journal/{journal}/saisie", name="comptabilite_saisie")
+     * @Route("/comptabilite/journal/{journal}/modifier/{id}", name="comptabilite_modifier_article")
      */
-    public function saisie($journal, Request $request)
+    public function saisie($journal, Article $article = null, Request $request)
     {
-        $article = new Article();
+        if (!$article) {
+            $article = new Article();
+        }
+    
         $article->setCategorie('Divers');
         $form = $this->createForm(ArticleType::class, $article);
         $form->handleRequest($request);
@@ -68,6 +72,7 @@ class ComptabiliteController extends AbstractController
 
         return $this->render('comptabilite/saisie.html.twig', [
             'form' => $form->createView(),
+            'editMode' => $article->getId() !== null,
         ]);
     }
 
@@ -109,7 +114,11 @@ class ComptabiliteController extends AbstractController
      */
     public function balance()
     {
-        $donnees = $this->getDoctrine()->getRepository(Article::class)->findBalance();
+        $exercice = $this->getDoctrine()
+                         ->getRepository(Exercice::class)
+                         ->findCurrent();
+
+        $donnees = $this->getDoctrine()->getRepository(Article::class)->findBalance($exercice);
         return $this->render('comptabilite/balance.html.twig', [
             'donnees' => $donnees,
         ]);
@@ -212,8 +221,12 @@ class ComptabiliteController extends AbstractController
      */
     public function bilan()
     {
-        $donnees['actif'] = $this->getDoctrine()->getRepository(Compte::class)->findBilanActif();
-        $donnees['passif'] = $this->getDoctrine()->getRepository(Compte::class)->findBilanPassif();
+        $exercice = $this->getDoctrine()
+                         ->getRepository(Exercice::class)
+                         ->findCurrent();
+
+        $donnees['actif'] = $this->getDoctrine()->getRepository(Compte::class)->findBilanActif($exercice);
+        $donnees['passif'] = $this->getDoctrine()->getRepository(Compte::class)->findBilanPassif($exercice);
         return $this->render('comptabilite/bilan.html.twig', [
             'donnees' => $donnees,
         ]);
@@ -224,8 +237,12 @@ class ComptabiliteController extends AbstractController
      */
     public function resultat()
     {
-        $donnees['charge'] = $this->getDoctrine()->getRepository(Compte::class)->findGestionCharge();
-        $donnees['produit'] = $this->getDoctrine()->getRepository(Compte::class)->findGestionProduit();
+        $exercice = $this->getDoctrine()
+                         ->getRepository(Exercice::class)
+                         ->findCurrent();
+
+        $donnees['charge'] = $this->getDoctrine()->getRepository(Compte::class)->findGestionCharge($exercice);
+        $donnees['produit'] = $this->getDoctrine()->getRepository(Compte::class)->findGestionProduit($exercice);
         return $this->render('comptabilite/resultat.html.twig', [
             'donnees' => $donnees,
         ]);

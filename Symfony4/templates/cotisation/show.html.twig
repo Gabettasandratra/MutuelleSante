@@ -189,6 +189,7 @@
                                     <th scope="col">Paiement</th>
                                     <th scope="col">Réference</th>
                                     <th scope="col">Note</th>
+                                    <th scope="col">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -201,6 +202,7 @@
                                         <td>{{ historiqueCotisation.tresorerie.libelle }}</td>
                                         <td>{{ historiqueCotisation.reference }}</td>
                                         <td>{{ historiqueCotisation.remarque }}</td>
+                                        <td><a href="{{ path('cotisation_edit', { 'adherent_id': adherent.id, 'cotisation_id': historiqueCotisation.id }) }}" class="label btn-primary label-primary">Modifier</a></td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

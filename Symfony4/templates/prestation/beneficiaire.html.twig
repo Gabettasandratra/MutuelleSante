@@ -75,6 +75,37 @@
                                 </div>
                             </div>                           
                         </div>
+                        <div class="col-md-6">
+                            <h4 class="card-title">Informations</h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <ul class="list-style-none border-bottom-white">                
+                                        <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark"> Total des montants remboursés</span>
+                                        </li>
+                                        <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark"> Remboursement plafond</span>
+                                        </li>
+                                        <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark"> Reste de remboursement </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul class="list-style-none">
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ info.tRemb }} </span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ info.plafond }} </span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ info.plafond - info.tRemb }} </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="row mt-4">
                         <div class="col-8">
@@ -88,7 +119,7 @@
                     </div>
                     <hr>
                     <div class="table-responsive">
-                        <table class="table" id="zero_config">
+                        <table class="table">
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>

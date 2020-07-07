@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Saisir decompte de prestations{% endblock %}
+{% block title %}Saisir décompte de prestations{% endblock %}
 
 {% block stylesheets %}
     <link href="{{ asset('dist/css/bootstrap-datepicker.css') }}" rel="stylesheet">
@@ -9,7 +9,7 @@
 {% block header %}
     <div class="page-breadcrumb">
         <div class="d-flex align-items-center">
-            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Saisir decompte de prestations</h4>
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Saisie décompte de prestations</h4>
             <div class="ml-auto">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb m-0 p-0">
@@ -27,29 +27,37 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Decompte de prestations <span class="text-right"> | Réference : {{ pac.adherent.numero }} / {{ numero }}</span></h4>
+                    <h4 class="card-title">Décompte de prestations</h4>
                     <hr>
                     <div class="row">
-                        <div class="col-md-8">
-                            <p> Béneficiaire : {{ pac.nom ~ ' ' ~ pac.prenom }} </p>
+                        <div class="col-md-4 p-2">
+                            <h6 class="font-medium">Bénéficiaire</h6> 
+                            <span>N°{{ pac.adherent.numero ~ '/' ~ pac.codeMutuelle }} | {{ pac.nom ~ ' ' ~ pac.prenom }}</span>
                         </div>
-                        <div class="col-md-4 text-right">
-                            <button class="btn btn-info" data-toggle="modal" href="#modal">Ajouter prestation</button>
+                        <div class="col-md-4 border rounded p-2 bg-light text-center" data-toggle="tooltip" title="Veuillez noté ce réference sur le décompte de présatations">
+                            <span class="lead">Référence de décompte</span> 
+                            <span class="pl-3" style="font-size: 1.5rem;">{{ pac.adherent.numero }} / {{ numero }}</span>
+                        </div>
+                        <div class="col-md-4 text-right p-2">
+                            <button class="btn btn-info" data-toggle="modal" href="#modal"><i class="mdi mdi-bookmark-plus-outline"></i> Ajouter prestation</button>
                         </div>
                     </div>
+                    <div class="alert alert-danger p-2 m-4" style="display: none" id="alert">
+                    </div>                   
                     <div class="row mt-4">
                         <div class="table-responsive">
-                            <table class="table table-hover" id="decompte">
-                                <thead>
+                            <table class="table table-hover table-bordered" id="decompte">
+                                <thead class="thead-light">
                                     <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">Date</th>
                                         <th scope="col">Designation</th>
-                                        <th scope="col">Montant des frais</th>
-                                        <th scope="col">Montant de remboursement</th>
+                                        <th scope="col">Frais</th>
+                                        <th scope="col">Remboursés</th>
                                         <th scope="col">%</th>
                                         <th scope="col">Prestataire</th>
                                         <th scope="col">Facture</th>
+                                        <th scope="col">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -60,13 +68,24 @@
                             </table>
                         </div>
                     </div>
-                    <form action="{{ path('prestation_beneficiaire_save_decompte', {'id' : pac.id}) }}" method="post" id="formDecompte">
-                        <button type="submit" class="btn btn-success">Enregistrer</button>
-                    </form>
-                    
+                    <div class="row">
+                        <div class="col-md-10 text-right">
+                            <a href="{{ path('prestation_beneficiaire', {'id': pac.id}) }}" class="btn btn-secondary"><i class="mdi mdi-close-circle-outline"></i> Annuler</a>
+                        </div>
+                        <div class="col-md-2 text-right">
+                            <form action="{{ path('prestation_beneficiaire_save_decompte', {'id' : pac.id}) }}" method="post" id="formDecompte">
+                                <button type="submit" class="btn btn-success disabled" id="save"><i class="mdi mdi-content-save-all"></i> Enregistrer</button>
+                            </form>
+                        </div>
+                    </div>      
                 </div>
             </div>
         </div>
+    </div>
+
+    <div style="visibility: hidden;">
+        <input type="hidden" id="index_del">
+        <button id="del">del</button>
     </div>
 
     <div class="modal fade" id="modal" role="dialog">
@@ -82,49 +101,53 @@
                     <div class="modal-body">
                         <div class="row">                                                  
                             <div class="col-12">
-                                
+                                    <input type="hidden" name="index" id="prestation_index">
+
                                     <div class="form-group row">
-                                        <label for="prestation_date" class="col-form-label col-sm-3 required">Date</label>
+                                        <label for="prestation_date" class="col-form-label col-sm-3 required">Date *</label>
                                         <div class="col-sm-6">
-                                            <input type="text" id="prestation_date" name="prestation[date]" required="required" class="form-control datepicker">
+                                            <input type="text" id="prestation_date" name="prestation[date]" required="required" class="form-control datepicker" autocomplete="false">
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="prestation_designation" class=" col-form-label col-sm-3 required">Designation</label>
+                                        <label for="prestation_designation" class=" col-form-label col-sm-3 required">Désignation *</label>
                                         <div class="col-sm-9">
                                             <input type="text" id="prestation_designation" name="prestation[designation]" required="required" maxlength="255" class="form-control" placeholder="Designation du prestation...">
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="prestation_frais" class="col-form-label col-sm-3 required">Frais</label>
+                                        <label for="prestation_frais" class="col-form-label col-sm-3 required">Frais *</label>
                                         <div class="col-sm-9">
                                             <input type="number" id="prestation_frais" name="prestation[frais]" required="required" class="form-control">
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="prestation_rembourse" class="col-form-label col-sm-3 required">Rembourse</label>
+                                        <label for="prestation_rembourse" class="col-form-label col-sm-3 required">Remboursés *</label>
                                         <div class="col-sm-9">    
                                             <input type="number" id="prestation_rembourse" name="prestation[rembourse]" required="required" class="form-control">
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="prestation_prestataire" class="col-form-label col-sm-3">Prestataire</label>
+                                        <label for="prestation_prestataire" class="col-form-label col-sm-3">Prestataire </label>
                                         <div class="col-sm-9">    
                                             <input type="text" id="prestation_prestataire" name="prestation[prestataire]" maxlength="255" class="form-control">
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="prestation_facture" class="col-form-label col-sm-3">Facture</label>
+                                        <label for="prestation_facture" class="col-form-label col-sm-3">Facture </label>
                                         <div class="col-sm-9">    
                                             <input type="text" id="prestation_facture" name="prestation[facture]" maxlength="255" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-row btn-list">
+                                        <div class="col-12 text-right">
+                                            <button type="reset" class="btn btn-danger mr-3" data-dismiss="modal" id="fermer"><i class="mdi mdi-close-circle-outline"></i> Fermer</button>
+                                            <button type="submit" class="btn btn-info" id="Ajouter"><i class="mdi mdi-login-variant"></i> Ajouter</button>
                                         </div>
                                     </div>
                                 </form>
                             </div>                       
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-primary" id="Ajouter">Ajouter</button>
                     </div>
             </div>
         </div>
@@ -135,12 +158,12 @@
     <script src="{{ asset('dist/js/bootstrap-datepicker.min.js') }}"></script>
     <script src="{{ asset('dist/js/datepicker.js') }}"></script>
     <script>
-        $(document).ready(function() {
-            
+        $(document).ready(function() {            
             var prestations = new Array();
             
-            $('#Ajouter').click(function(e) {
+            $('#prestation').submit(function(e) {
                 e.preventDefault();
+                var index = $('#prestation_index').val();
                 var prestation = {
                     'date'            :   $('#prestation_date').val(),
                     'designation'     :   $('#prestation_designation').val(),
@@ -149,11 +172,31 @@
                     'prestataire'     :   $('#prestation_prestataire').val(),
                     'facture'         :   $('#prestation_facture').val()
                 };
-                prestations.push(prestation);
-
+                if (index) {
+                    console.log(index)
+                    prestations[index] = prestation;
+                } else {                   
+                    prestations.push(prestation);
+                }
                 refreshTable(prestations);
+                $('#prestation_index').val(null);
                 $('#prestation').trigger("reset");
-            });    
+            }); 
+
+            $('#del').click(function(e) {
+                e.preventDefault();
+                console.log('delete'+prestations);             
+                var index = $('#index_del').val();
+                prestations.splice(index, 1);  
+                console.log('delete'+prestations);             
+                refreshTable(prestations);
+            });   
+
+            $('#fermer').click(function(e) {
+                e.preventDefault();
+                $('#prestation').trigger("reset");
+                $('#modal').modal('hide');
+            });   
 
             $("#formDecompte").submit(function(event){
                 event.preventDefault(); 
@@ -167,10 +210,20 @@
                     if (response.hasError == false) {
                         window.location.href = "{{ path('prestation_beneficiaire', {'id' : pac.id}) }}";
                     } else {
-                        console.log(response);
+                        const errors = response.ErrorMessages;
+                        $("#alert").empty();
+                        for (let index = 0; index < errors.length; index++) {
+                            const message = errors[index];
+                            if (index == 0) {
+                                $('#alert').append('<h4>'+ message +'</h4>');                   
+                            } else {
+                                $('#alert').append('<p>'+ message +'</p>');                   
+                            }
+                        }
+                        $("#alert").show("slow");
                     }                   
                 });
-            });    
+            });            
         });
 
         function refreshTable(prestations) {
@@ -189,6 +242,7 @@
                 markup += "<td>" + Math.round((prestation.rembourse / prestation.frais)*100) + " %</td>";
                 markup += "<td>" + prestation.prestataire + "</td>";
                 markup += "<td>" + prestation.facture + "</td>";
+                markup += "<td>" + "<span class='action-icons'><a href='javascript:edit("+index+','+ JSON.stringify(prestation)+")'><i class='ti-pencil-alt'></i></a><a href='javascript:del("+index+")' style='padding-left:7px;color:#f62d51;'><i class='ti-trash'></i></a></span>" + "</td>";      
                 markup += "</tr>";
 
                 totRembourse += parseFloat(prestation.rembourse); 
@@ -196,12 +250,32 @@
 
                 $('#decompte tbody').append(markup);                   
             }
-
-            var totMarkup = "<tr><th scope='row' colspan=3>Total</th>";
-            totMarkup += "<td>" + totFrais + "</td>";
-            totMarkup += "<td>" + totRembourse + "</td>";
-            totMarkup += "<td colspan=3>" + Math.round((totRembourse / totFrais)*100) + " %</td>";
-            $('#decompte tfoot').append(totMarkup);                   
+            if (prestations.length != 0) {
+                var totMarkup = "<tr><th scope='row' colspan=3>Total</th>";
+                totMarkup += "<td>" + totFrais + "</td>";
+                totMarkup += "<td>" + totRembourse + "</td>";
+                totMarkup += "<td>" + Math.round((totRembourse / totFrais)*100) + " %</td><td colspan=3></td>";
+                $('#decompte tfoot').append(totMarkup);  
+                $('#save').removeClass('disabled');
+            } else {
+                $('#save').addClass('disabled');
+            }        
         }
+
+        function edit(index, prestation) {
+            $('#prestation_index').val(index);
+            $('#prestation_date').val(prestation.date);
+            $('#prestation_designation').val(prestation.designation);
+            $('#prestation_frais').val(prestation.frais);
+            $('#prestation_rembourse').val(prestation.rembourse);
+            $('#prestation_prestataire').val(prestation.prestataire);
+            $('#prestation_facture').val(prestation.facture);
+            $('#modal').modal('show');
+        }
+
+        function del(index) {
+            $('#index_del').val(index);
+            $('#del').click();
+        } 
     </script>
 {% endblock %}

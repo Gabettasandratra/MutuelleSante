@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détail de remboursement{% endblock %}
+
+{% block header %}
+    <div class="page-breadcrumb">
+        <div class="d-flex align-items-center">
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Détail de remboursement</h4>
+            <div class="ml-auto">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0 p-0">
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Prestation</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Remboursements</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Détail de remboursement</h4>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table m-t-20">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Béneficiaire</th>
+                                    <th scope="col">Designation</th>
+                                    <th scope="col">Frais</th>
+                                    <th scope="col">Remboursé</th>
+                                    <th scope="col">% Remb</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% set tFrais = 0 %}
+                            {% set  tRembourse = 0 %}
+                            {% for prestation in remboursement.prestations %}
+                                <tr>
+                                    <th>{{ prestation.date |date('d / m / Y') }}</th>
+                                    <td>{{ prestation.pac.codeMutuelle ~ ' - ' ~ prestation.pac.nom ~ ' ' ~ prestation.pac.prenom }}</td>
+                                    <td>{{ prestation.designation }}</td>
+                                    <td>{{ prestation.frais }}</td> {% set tFrais = tFrais + prestation.frais %}
+                                    <td>{{ prestation.rembourse }}</td> {% set tRembourse = tRembourse + prestation.rembourse %}
+                                    <td>{{ (prestation.rembourse / prestation.frais) | round(3, 'floor') * 100 }}%</td>
+                                </tr>
+
+                                {% if loop.last %}
+                                    </tbody>                                    
+                                    <tfoot>
+                                        <tr>
+                                            <th scope="row" colspan=3>Total</th>
+                                            <td>{{ tFrais }}</td>
+                                            <td>{{ tRembourse }}</td>
+                                            <td>{{ (tRembourse / tFrais)| round(3, 'floor') * 100 }}%</td>
+                                        </tr>
+                                    </tfoot>
+                                {% endif %}                                   
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

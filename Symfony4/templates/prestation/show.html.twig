@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Remboursement congrégation {{ adherent.id }}{% endblock %}
+{% block title %}Remboursement congrégation {{ adherent.nom }}{% endblock %}
 
 {% block header %}
     <div class="page-breadcrumb">
@@ -84,10 +84,11 @@
                                         <th scope="col">Montant</th>
                                         <th scope="col">Méthode de paiement</th>
                                         <th scope="col">Reférence</th>
+                                        <th scope="col">Détail</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for remboursement in adherent.remboursements %}
+                                    {% for remboursement in remboursements %}
                                         <tr>
                                             <th scope="row">{{ loop.index }}</th>
                                             <td>{{ remboursement.date |date('d / m / Y') }}</td>
@@ -95,6 +96,11 @@
                                             <td>{{ remboursement.montant }}</td>
                                             <td>{{ remboursement.tresorerie.libelle }}</td>
                                             <td>{{ remboursement.reference }}</td>
+                                            <td><a href="{{ path('prestation_adherent_remboursement', { 'id': remboursement.id }) }}" class="label btn-primary label-primary">Voir</a></td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan=7>Pas de remboursement enrgistrés durant cet exercice</td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
@@ -108,7 +114,6 @@
                             <h4 class="card-title">Présations en attente de remboursement</h4>
                         </div>
                     </div>
-                    {% if prestationNotPayed|length != 0 %} {# Si on possede des prestations non paye #}
                         <div class="row">
                             <div class="col-md-12">
                                 <table class="table m-t-20">
@@ -134,34 +139,36 @@
                                                 <td>{{ prestation.rembourse }}</td> {% set tRembourse = tRembourse + prestation.rembourse %}
                                                 <td>{{ (prestation.rembourse / prestation.frais) | round(3, 'floor') * 100 }}%</td>
                                             </tr>
+
+                                            {% if loop.last %}
+                                                </tbody>                                    
+                                                <tfoot>
+                                                    <tr>
+                                                        <th scope="row" colspan=3>Total</th>
+                                                        <td>{{ tFrais }}</td>
+                                                        <td>{{ tRembourse }}</td>
+                                                        <td>{{ (tRembourse / tFrais)| round(3, 'floor') * 100 }}%</td>
+                                                    </tr>
+                                                </tfoot>
+                                            {% endif %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan=6>Aucun prestation en attente de remboursement </td>
+                                            </tr>
+                                        </tbody>                                    
                                         {% endfor %}
-                                    </tbody>
-                                    
-                                    <tfoot>
-                                        <tr>
-                                            <th scope="row" colspan=3>Total</th>
-                                            <td>{{ tFrais }}</td>
-                                            <td>{{ tRembourse }}</td>
-                                            <td>{{ (tRembourse / tFrais)| round(3, 'floor') * 100 }}%</td>
-                                        </tr>
-                                    </tfoot>
                         
                                 </table>
                             
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-12 text-right">
-                                <a href="{{ path('prestation_adherent_rembourser', {'id': adherent.id}) }}" class="btn btn-info"><i class="mdi mdi-credit-card"></i> Enregistrer paiement</a>
-                            </div>
-                        </div>
-                    {% else %}
-                        <div class="row">
-                            <div class="col-12 text-center">
-                                <h5> Aucun prestation en attente de remboursement </h5> 
-                            </div>
-                        </div>
-                    {% endif %}                    
+                        {% if tFrais != 0 %}
+                            <div class="row">
+                                <div class="col-12 text-right">
+                                    <a href="{{ path('prestation_adherent_rembourser', {'id': adherent.id}) }}" class="btn btn-info"><i class="mdi mdi-credit-card"></i> Enregistrer paiement</a>
+                                </div>
+                            </div>      
+                        {% endif %}             
                 </div>
             </div>
         </div>

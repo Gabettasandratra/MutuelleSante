@@ -46,9 +46,19 @@ class PrestationController extends AbstractController
         $prestations = $this->getDoctrine()
                           ->getRepository(Prestation::class)
                           ->findPrestation($exercice, $pac);   
+        $totalRembourse = 0;
+        foreach ($prestations as $prestation) {
+            $totalRembourse += $prestation->getRembourse();
+        }
+
+        $info = [
+            'tRemb' => $totalRembourse,
+            'plafond' => $exercice->getCotAncien()*2,
+        ];
 
         return $this->render('prestation/beneficiaire.html.twig', [
             'pac' => $pac,
+            'info' => $info,
             'prestations' => $prestations,
         ]);
     }
@@ -76,7 +86,13 @@ class PrestationController extends AbstractController
         $manager = $this->getDoctrine()->getManager();
         $data = json_decode( $request->getContent(), true);
         $prestations = $data['prestations'];
-        foreach ($prestations as $prestationJs) {
+        if (!$prestations) {
+            return new JsonResponse([
+                'hasError' => false,
+                'ErrorMessages' => [ 'Le décompte de prestation est invalide' ]
+            ]);
+        }
+        foreach ($prestations as $key => $prestationJs) {
             $prestation = new Prestation($pac);
             $prestation->setDate(\DateTime::createFromFormat('d/m/Y', $prestationJs['date']));
             $prestation->setDesignation($prestationJs['designation']);
@@ -90,7 +106,7 @@ class PrestationController extends AbstractController
                 $manager->persist($prestation);
             } else {    
                 $retour['hasError'] = true;
-                $retour['ErrorMessages'][] = "Les informations sont invalide"; 
+                $retour['ErrorMessages'][] = "Les données de la prestation #". ($key+1) ." est invalide"; 
                 foreach ($errors as $error) {
                     $retour['ErrorMessages'][] = $error->getMessage();
                 }
@@ -122,10 +138,26 @@ class PrestationController extends AbstractController
      */
     public function prestationAdherent(Adherent $adherent)
     {
+        $exercice = $this->getDoctrine()
+                         ->getRepository(Exercice::class)
+                         ->findCurrent();
+
+        $remboursements = $this->getDoctrine()->getRepository(Remboursement::class)->findRemboursement($exercice, $adherent);
         $prestationNotPayed = $this->getDoctrine()->getRepository(Prestation::class)->findNotPayed($adherent);
         return $this->render('prestation/show.html.twig', [
             'adherent' => $adherent,
+            'remboursements' => $remboursements,
             'prestationNotPayed' => $prestationNotPayed,
+        ]);
+    }
+
+    /**
+     * @Route("/prestation/adherent/remboursement/{id}", name="prestation_adherent_remboursement", requirements={"id"="\d+"})
+     */
+    public function detailRemboursement(Remboursement $remboursement)
+    {
+        return $this->render('prestation/detailRemboursement.html.twig', [
+            'remboursement' => $remboursement,
         ]);
     }
 

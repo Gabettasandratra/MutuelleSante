@@ -44,7 +44,7 @@ class HistoriqueCotisation
     private $reference;
 
     /**
-     * @ORM\ManyToOne(targetEntity=CompteCotisation::class, inversedBy="historiqueCotisations")
+     * @ORM\ManyToOne(targetEntity=CompteCotisation::class, inversedBy="historiqueCotisations", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $compteCotisation;
@@ -59,6 +59,12 @@ class HistoriqueCotisation
      * @ORM\JoinColumn(nullable=false)
      */
     private $tresorerie;
+
+    /**
+     * @ORM\OneToOne(targetEntity=Article::class, cascade={"persist", "remove"})
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $article;
 
     public function __construct()
     {
@@ -151,6 +157,18 @@ class HistoriqueCotisation
     public function setTresorerie(?Compte $tresorerie): self
     {
         $this->tresorerie = $tresorerie;
+
+        return $this;
+    }
+
+    public function getArticle(): ?Article
+    {
+        return $this->article;
+    }
+
+    public function setArticle(Article $article): self
+    {
+        $this->article = $article;
 
         return $this;
     }

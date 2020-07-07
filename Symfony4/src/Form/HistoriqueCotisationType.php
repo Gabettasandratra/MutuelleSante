@@ -26,7 +26,6 @@ class HistoriqueCotisationType extends AbstractType
                 'mapped' => false,
             ])
             ->add('datePaiement', DateType::class, [
-                'format' => 'ddMMMMyyyy',
                 'label' => 'Date de paiement',
             ])
             ->add('montant')

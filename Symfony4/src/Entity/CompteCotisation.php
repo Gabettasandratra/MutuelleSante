@@ -195,7 +195,6 @@ class CompteCotisation
         }
     }
 
-    // Get cotisation due
     public function payer($montant)
     {
         $this->paye = $this->paye + $montant;

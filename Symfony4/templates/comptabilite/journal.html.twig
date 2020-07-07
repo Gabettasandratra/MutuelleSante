@@ -32,42 +32,50 @@
                 <div class="card-body">
                     <h4 class="card-title">Journal {{ journal }}</h4>
                     <hr>                           
-                    <div class="table-responsive-lg">
-                        <table class="table" id="zero_config">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Date</th>
-                                    <th scope="col">N° article</th>
-                                    <th scope="col">Libellé écriture</th>
-                                    <th scope="col">Montant</th>
-                                    <th scope="col">Réference</th>
-                                    <th scope="col">Compte débité</th>
-                                    <th scope="col">Compte crédité</th>
-                                    <th scope="col">Compte analytique</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for article in articles %}                                
+                    <div class="row">
+                        <div class="col-md-12 table-responsive">
+                            <table class="table" id="zero_config">
+                                <thead class="thead-light">
                                     <tr>
-                                        <th scope="col">{{ loop.index }}</th>
-                                        <td>{{ article.date |date('d/m/Y') }}</td>
-                                        <td>{{ article.id }}</td>
-                                        <td>{{ article.libelle }}</td>
-                                        <td>{{ article.montant }}</td>
-                                        <td>{{ article.piece }}</td>
-                                        <td title="{{ article.compteDebit.titre }}" data-toggle="tooltip">{{ article.compteDebit.poste }}</td>
-                                        <td title="{{ article.compteCredit.titre }}" data-toggle="tooltip">{{ article.compteCredit.poste }}</td>
-                                        <td>{{ article.analytique }}</td>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Date</th>
+                                        <th scope="col">N° article</th>
+                                        <th scope="col">Libellé écriture</th>
+                                        <th scope="col">Montant</th>
+                                        <th scope="col">Réference</th>
+                                        <th scope="col">Compte débité</th>
+                                        <th scope="col">Compte crédité</th>
+                                        <th scope="col">Compte analytique</th>
+                                        {% if journal == 'divers' %}           
+                                        <th scope="col">Action</th>
+                                        {% endif %}
                                     </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {% for article in articles %}                                
+                                        <tr>
+                                            <th scope="col">{{ loop.index }}</th>
+                                            <td>{{ article.date |date('d/m/Y') }}</td>
+                                            <td>{{ article.id }}</td>
+                                            <td>{{ article.libelle }}</td>
+                                            <td>{{ article.montant }}</td>
+                                            <td>{{ article.piece }}</td>
+                                            <td title="{{ article.compteDebit.titre }}" data-toggle="tooltip">{{ article.compteDebit.poste }}</td>
+                                            <td title="{{ article.compteCredit.titre }}" data-toggle="tooltip">{{ article.compteCredit.poste }}</td>
+                                            <td>{{ article.analytique }}</td>
+                                            {% if journal == 'divers' %}           
+                                            <td>{% if article.isFerme %}<span class="label label-rounded btn-secondary label-secondary disabled">Modifier</span>{% else %}<a href="{{ path('comptabilite_modifier_article', {'id': article.id, 'journal': article.categorie}) }}" class="label btn-primary label-primary">Modifier</a>{% endif %}</td>
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     {% if journal == 'divers' %}           
-                        <div class="row">
+                        <div class="row mt-4">
                             <div class="col-md-12 text-right">
-                                <a href="{{ path('comptabilite_saisie', { 'journal': journal }) }}" class="btn btn-success">Saisie</a>
+                                <a href="{{ path('comptabilite_saisie', { 'journal': journal }) }}" class="btn btn-success">Saisie écriture comptable</a>
                             </div>
                         </div>
                     {% endif %}

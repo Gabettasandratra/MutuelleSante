@@ -43,7 +43,9 @@ class ComptaService
         $article->setDate($cotisation->getDatePaiement());
         $article->setPiece($cotisation->getReference());
 
-        $this->manager->persist($article);
+        $cotisation->setArticle($article);
+
+        $this->manager->persist($cotisation); // seul persist suffit
         $this->manager->flush();    
     }
 

@@ -17,6 +17,7 @@ $(function() {
     $('.datepicker').datepicker({
         language: 'fr',
         format: "dd/mm/yyyy",
-        orientation: "bottom"
+        orientation: "bottom",
+        autoclose: true
     });
 });

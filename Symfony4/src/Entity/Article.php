@@ -66,6 +66,16 @@ class Article
      */
     private $compteCredit;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isFerme;
+
+    public function __construct()
+    {   
+        $this->isFerme = false;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -163,6 +173,18 @@ class Article
     public function setCompteCredit(?Compte $compteCredit): self
     {
         $this->compteCredit = $compteCredit;
+
+        return $this;
+    }
+
+    public function getIsFerme(): ?bool
+    {
+        return $this->isFerme;
+    }
+
+    public function setIsFerme(bool $isFerme): self
+    {
+        $this->isFerme = $isFerme;
 
         return $this;
     }

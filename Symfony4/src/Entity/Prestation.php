@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\PrestationRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=PrestationRepository::class)
@@ -19,21 +20,25 @@ class Prestation
 
     /**
      * @ORM\Column(type="datetime")
+     * @Assert\LessThan("+1 day", message="La date est supérieur à la date d'aujourdhui!")
      */
     private $date;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
      */
     private $designation;
 
     /**
      * @ORM\Column(type="float")
+     * @Assert\Positive
      */
     private $frais;
 
     /**
      * @ORM\Column(type="float")
+     * @Assert\Positive
      */
     private $rembourse;
 

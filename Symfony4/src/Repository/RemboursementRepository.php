@@ -2,9 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\Adherent;
+use App\Entity\Exercice;
 use App\Entity\Remboursement;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method Remboursement|null find($id, $lockMode = null, $lockVersion = null)
@@ -19,22 +21,19 @@ class RemboursementRepository extends ServiceEntityRepository
         parent::__construct($registry, Remboursement::class);
     }
 
-    // /**
-    //  * @return Remboursement[] Returns an array of Remboursement objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('r')
-            ->andWhere('r.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('r.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
+    /**
+    * @return Remboursement[] Returns an array of Remboursement objects
     */
+    public function findRemboursement(Exercice $exercice, Adherent $adherent)
+    {
+        return $this->_em->createQuery('select r from App\Entity\Remboursement r where r.adherent = :ad and r.date between :dateDebut and :dateFin order by r.date DESC')
+                        ->setParameter('ad', $adherent)    
+                        ->setParameter('dateDebut', $exercice->getDateDebut())
+                        ->setParameter('dateFin', $exercice->getDateFin())                  
+                        ->getResult()
+        ; 
+    
+    }
 
     /*
     public function findOneBySomeField($value): ?Remboursement
