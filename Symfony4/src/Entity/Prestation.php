@@ -39,6 +39,7 @@ class Prestation
     /**
      * @ORM\Column(type="float")
      * @Assert\Positive
+     * @Assert\LessThan(propertyPath="frais", message="Le montant remboursé ne doit pas depasser le frais")
      */
     private $rembourse;
 

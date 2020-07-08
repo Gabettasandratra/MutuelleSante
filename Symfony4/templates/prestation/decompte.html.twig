@@ -83,7 +83,7 @@
         </div>
     </div>
 
-    <div style="visibility: hidden;">
+    <div style="display: none;">
         <input type="hidden" id="index_del">
         <button id="del">del</button>
     </div>
@@ -112,7 +112,11 @@
                                     <div class="form-group row">
                                         <label for="prestation_designation" class=" col-form-label col-sm-3 required">Désignation *</label>
                                         <div class="col-sm-9">
-                                            <input type="text" id="prestation_designation" name="prestation[designation]" required="required" maxlength="255" class="form-control" placeholder="Designation du prestation...">
+                                            <select name="prestation[designation]" id="prestation_designation" required="required" class="form-control">
+                                                {% for code, designation in soins %}
+                                                    <option value="{{ code }}">{{ designation }}</option>
+                                                {% endfor %}
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="form-group row">

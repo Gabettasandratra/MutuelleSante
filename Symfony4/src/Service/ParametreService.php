@@ -26,7 +26,18 @@ class ParametreService
         $parametres = [];
         
         $parametres[] = new Parametre('compte_cotisation');
+        $parametres[] = new Parametre('label_cotisation', 'Cotisation {a} | {c}');
         $parametres[] = new Parametre('compte_prestation');
+        $parametres[] = new Parametre('label_prestation', 'Remboursement {a} | {c}');
+        $parametres[] = new Parametre('percent_prestation', 1);
+        $parametres[] = new Parametre('plafond_prestation', 2);
+        $soins = new Parametre('soins_prestation');
+        $soins->setList([
+            'DENTAIRE' => 'Soins dentaires',
+            'AUTRES' => 'Autres soins'
+        ]); 
+        $parametres[] = $soins;
+
 
         foreach ($parametres as $parametre) {
             $this->manager->persist($parametre);  

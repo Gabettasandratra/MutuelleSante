@@ -238,9 +238,9 @@ class Adherent
         return $this;
     }
 
-    public function getNumero(): ?int
+    public function getNumero()
     {
-        return $this->numero;
+        return str_pad((string)$this->numero, 3, "0", 0);
     }
 
     public function setNumero(int $numero): self
@@ -317,11 +317,18 @@ class Adherent
         return $this;
     }  
 
-    // get if adherent est en cours de droit ou non
-    public function getPossedeDroit()
+    public function getIsPaye()
     {
         $compteCotisation = $this->getCurrentCompteCotisation();
+
         return $compteCotisation->getIsPaye();
+    }
+
+    public function getPourcentagePaye()
+    {
+        $compteCotisation = $this->getCurrentCompteCotisation();
+
+        return $compteCotisation->getPaye() / $compteCotisation->getDue();
     }
 
     /**

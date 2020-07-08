@@ -33,14 +33,14 @@ class Parametre
     private $description;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="json", nullable=true)
      */
-    private $defaut;
+    private $list = [];
 
     public function __construct($nom, $value = null)
     {
         $this->nom = $nom;
-        $this->value = $value;
+        $this->value = (string) $value;
     }
 
     public function getId(): ?int
@@ -84,14 +84,14 @@ class Parametre
         return $this;
     }
 
-    public function getDefaut(): ?string
+    public function getList(): ?array
     {
-        return $this->defaut;
+        return $this->list;
     }
 
-    public function setDefaut(?string $defaut): self
+    public function setList(?array $list): self
     {
-        $this->defaut = $defaut;
+        $this->list = $list;
 
         return $this;
     }

@@ -2,6 +2,10 @@
 
 {% block title %}Remboursement congrégation {{ adherent.nom }}{% endblock %}
 
+{% block stylesheets %}
+    <link href="{{ asset('assets/libs/datatable/dist/dataTables.bootstrap4.css') }}" rel="stylesheet">
+{% endblock %}
+
 {% block header %}
     <div class="page-breadcrumb">
         <div class="d-flex align-items-center">
@@ -66,6 +70,49 @@
                             </div>
                             
                         </div>
+                        <div class="col-md-6">
+                            <h4 class="card-title">Informations</h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <ul class="list-style-none border-bottom-white">                
+                                        <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark">Cotisation due</span>
+                                        </li>
+                                        <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark">Cotisation percue</span>
+                                        </li>
+                                        <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark">Total des montants remboursés</span>
+                                        </li>
+                                        <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark"> Remboursement plafond</span>
+                                        </li>
+                                        <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark"> Reste de remboursement </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul class="list-style-none">
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ info.due }} </span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ info.percue }} </span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ info.tRemb }} </span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ info.plafond }} </span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ info.reste }} </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="row mt-4">
@@ -75,7 +122,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12">
-                            <table class="table m-t-20">
+                            <table class="table table-bordered m-t-20">
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
@@ -91,12 +138,12 @@
                                     {% for remboursement in remboursements %}
                                         <tr>
                                             <th scope="row">{{ loop.index }}</th>
-                                            <td>{{ remboursement.date |date('d / m / Y') }}</td>
+                                            <td>{{ remboursement.date |date('d/m/Y') }}</td>
                                             <td>{{ remboursement.exercice.annee }}</td>
                                             <td>{{ remboursement.montant }}</td>
                                             <td>{{ remboursement.tresorerie.libelle }}</td>
                                             <td>{{ remboursement.reference }}</td>
-                                            <td><a href="{{ path('prestation_adherent_remboursement', { 'id': remboursement.id }) }}" class="label btn-primary label-primary">Voir</a></td>
+                                            <td><a href="{{ path('prestation_adherent_remboursement', { 'adh_id': adherent.id, 'remb_id': remboursement.id }) }}" class="label btn-primary label-primary">Voir</a></td>
                                         </tr>
                                     {% else %}
                                         <tr>
@@ -107,7 +154,6 @@
                             </table>                     
                         </div>
                     </div>
-
                     
                     <div class="row mt-4">
                         <div class="col-5">
@@ -116,9 +162,10 @@
                     </div>
                         <div class="row">
                             <div class="col-md-12">
-                                <table class="table m-t-20">
-                                    <thead>
+                                <table class="table table-bordered m-t-20" id="zero_config">
+                                    <thead class="thead-light">
                                         <tr>
+                                            <th scope="col">#</th>
                                             <th scope="col">Date</th>
                                             <th scope="col">Béneficiaire</th>
                                             <th scope="col">Designation</th>
@@ -132,7 +179,8 @@
                                         {% set  tRembourse = 0 %}
                                         {% for prestation in prestationNotPayed %}
                                             <tr>
-                                                <th>{{ prestation.date |date('d / m / Y') }}</th>
+                                                <th>{{ loop.index }}</th>
+                                                <td>{{ prestation.date |date('d/m /Y') }}</td>
                                                 <td>{{ prestation.pac.codeMutuelle ~ ' - ' ~ prestation.pac.nom ~ ' ' ~ prestation.pac.prenom }}</td>
                                                 <td>{{ prestation.designation }}</td>
                                                 <td>{{ prestation.frais }}</td> {% set tFrais = tFrais + prestation.frais %}
@@ -144,7 +192,7 @@
                                                 </tbody>                                    
                                                 <tfoot>
                                                     <tr>
-                                                        <th scope="row" colspan=3>Total</th>
+                                                        <th scope="row" colspan=4>Total</th>
                                                         <td>{{ tFrais }}</td>
                                                         <td>{{ tRembourse }}</td>
                                                         <td>{{ (tRembourse / tFrais)| round(3, 'floor') * 100 }}%</td>
@@ -163,7 +211,7 @@
                             </div>
                         </div>
                         {% if tFrais != 0 %}
-                            <div class="row">
+                            <div class="row mt-1">
                                 <div class="col-12 text-right">
                                     <a href="{{ path('prestation_adherent_rembourser', {'id': adherent.id}) }}" class="btn btn-info"><i class="mdi mdi-credit-card"></i> Enregistrer paiement</a>
                                 </div>
@@ -173,4 +221,9 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="{{ asset('assets/libs/datatable/dist/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('dist/js/pages/datatable/datatable-basic.init.js') }}"></script>
 {% endblock %}

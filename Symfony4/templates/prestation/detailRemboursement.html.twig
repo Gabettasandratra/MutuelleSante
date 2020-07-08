@@ -26,9 +26,10 @@
                     <h4 class="card-title">Détail de remboursement</h4>
                     <hr>
                     <div class="table-responsive">
-                        <table class="table m-t-20">
-                            <thead>
+                        <table class="table table-bordered m-t-20">
+                            <thead class="thead-light">
                                 <tr>
+                                    <th scope="col">#</th>
                                     <th scope="col">Date</th>
                                     <th scope="col">Béneficiaire</th>
                                     <th scope="col">Designation</th>
@@ -42,7 +43,8 @@
                             {% set  tRembourse = 0 %}
                             {% for prestation in remboursement.prestations %}
                                 <tr>
-                                    <th>{{ prestation.date |date('d / m / Y') }}</th>
+                                    <th scope="row">{{ loop.index }}</th>
+                                    <td>{{ prestation.date |date('d/m/Y') }}</td>
                                     <td>{{ prestation.pac.codeMutuelle ~ ' - ' ~ prestation.pac.nom ~ ' ' ~ prestation.pac.prenom }}</td>
                                     <td>{{ prestation.designation }}</td>
                                     <td>{{ prestation.frais }}</td> {% set tFrais = tFrais + prestation.frais %}
@@ -54,7 +56,7 @@
                                     </tbody>                                    
                                     <tfoot>
                                         <tr>
-                                            <th scope="row" colspan=3>Total</th>
+                                            <th scope="row" colspan=4>Total</th>
                                             <td>{{ tFrais }}</td>
                                             <td>{{ tRembourse }}</td>
                                             <td>{{ (tRembourse / tFrais)| round(3, 'floor') * 100 }}%</td>
@@ -64,6 +66,11 @@
                             {% endfor %}
                         </table>
                     </div>
+                    <div class="row">
+                        <div class="col-md-12 text-right">
+                            <a href="{{ path('prestation_adherent_show', {'id': adherent.id}) }}" class="btn btn-info"><i class="mdi mdi-close-circle-outline"></i> Fermer</a>
+                        </div>
+                    </div>  
                 </div>
             </div>
         </div>

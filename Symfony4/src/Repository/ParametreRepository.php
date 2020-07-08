@@ -19,32 +19,17 @@ class ParametreRepository extends ServiceEntityRepository
         parent::__construct($registry, Parametre::class);
     }
 
-    // /**
-    //  * @return Parametres[] Returns an array of Parametres objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
+    /**
+    * @return Parametres[] Returns an array of Parametres objects
     */
-
-    /*
-    public function findOneBySomeField($value): ?Parametres
+    public function getParameters()
     {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        $parameters = $this->_em->createQuery('select p from App\Entity\Parametre p')
+                                ->getResult(); 
+        $retour = [];
+        foreach ($parameters as $parameter) {
+            $retour[$parameter->getNom()] = $parameter;
+        }
+        return $retour;
     }
-    */
 }

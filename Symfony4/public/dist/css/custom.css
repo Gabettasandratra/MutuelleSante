@@ -1,3 +1,16 @@
 ul.border-bottom-white li {
     border-bottom: 1px solid #fff!important;
 }
+
+.table.no-padding td,
+.table.no-padding th {
+    padding: 0.5rem;
+}
+
+.table-hover tbody tr .actions {
+    visibility: hidden;
+}
+
+.table-hover tbody tr:hover .actions {
+    visibility: visible;
+}

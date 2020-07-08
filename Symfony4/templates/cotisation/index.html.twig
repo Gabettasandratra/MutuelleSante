@@ -45,7 +45,7 @@
                                         <th scope="row">{{ loop.index }}</th>
                                         <th>{{ adherent.numero }}</th>
                                         <td>{{ adherent.nom }}</td>
-                                        {% if adherent.possedeDroit %}
+                                        {% if adherent.isPaye %}
                                                 <td><span class="label label-rounded label-success">Payé</span></td>
                                             {% else %}
                                                 <td><span class="label label-rounded label-warning">Non payé</span></td>

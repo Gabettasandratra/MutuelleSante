@@ -50,7 +50,7 @@
                                             <span class="font-weight-medium text-dark"> Nom et prénom:</span>
                                         </li>
                                         <li class="my-3">
-                                            <span class="font-weight-medium text-dark"> N° Matricule:</span>
+                                            <span class="font-weight-medium text-dark"> N° matricule:</span>
                                         </li>
                                         <li class="my-3">
                                             <span class="font-weight-medium text-dark"> Date d'entrée:</span>
@@ -66,7 +66,7 @@
                                             <span> {{ pac.nom ~ ' ' ~ pac.prenom }} </span>
                                         </li>
                                         <li class="my-3 border-bottom">
-                                            <span> {{ pac.adherent.numero ~ ' / ' ~ pac.codeMutuelle }}</span>
+                                            <span> {{ pac.matricule }}</span>
                                         </li>
                                         <li class="my-3 border-bottom">
                                             <span> {{ pac.dateEntrer | date('d / m / Y') }}</span>
@@ -119,14 +119,14 @@
                     </div>
                     <hr>
                     <div class="table-responsive">
-                        <table class="table">
-                            <thead>
+                        <table class="table table-bordered">
+                            <thead class="thead-light">
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Date</th>
-                                    <th scope="col">Designation</th>
-                                    <th scope="col">Montant des frais</th>
-                                    <th scope="col">Montant de remboursement</th>
+                                    <th scope="col">Soin</th>
+                                    <th scope="col">Frais</th>
+                                    <th scope="col">Remboursés</th>
                                     <th scope="col">%</th>
                                     <th scope="col">Réf décompte</th>
                                     <th scope="col">Paiement</th>
@@ -137,7 +137,11 @@
                                 {% set tRemb = 0 %}
 
                                 {% for prestation in prestations %}
-                                    <tr data-toggle="tooltip" title="Prestataire : {{ prestation.prestataire }} | Facture : {{ prestation.facture }}">
+                                {% set title = "" %}
+                                {% if prestation.prestataire %}{% set title = 'Prestataire : ' ~ prestation.prestataire %}{% endif %}
+                                {% if prestation.facture %}{% set title = title ~ ' | Facture : ' ~ prestation.facture %}{% endif %}
+
+                                    <tr {% if title != "" %} data-toggle="tooltip" title="{{ title }}"{% endif %}>
                                         <th scope="row">{{ loop.index }}</th>
                                         <td>{{ prestation.date | date('d/m/Y') }}</td>
                                         <td>{{ prestation.designation }}</td>
@@ -155,18 +159,18 @@
                                     </tr>
                                     
                                     {% if loop.last %}
+                                        </tbody>
                                         <tfoot>
                                             <tr>
                                                 <th scope="row" colspan=3>Total</th>
                                                 <td>{{ tFrais }}</td>
                                                 <td>{{ tRemb }}</td>
-                                                <td colspan=3>{{ (tRemb / tFrais)| round(3, 'floor') * 100 }}%</td>
+                                                <td>{{ (tRemb / tFrais)| round(3, 'floor') * 100 }}%</td>
+                                                <td colspan=2></td>
                                             </tr>
                                         </tfoot>
                                     {% endif %}
-                                {% endfor %}
-                            </tbody>
-                            
+                                {% endfor %}                                                        
                         </table>
                     </div>
                 </div>

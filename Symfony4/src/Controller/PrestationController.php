@@ -6,6 +6,7 @@ use App\Entity\Pac;
 use App\Entity\Adherent;
 
 use App\Entity\Exercice;
+use App\Entity\Parametre;
 use App\Entity\Prestation;
 use App\Form\PrestationType;
 use App\Entity\Remboursement;
@@ -18,6 +19,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 class PrestationController extends AbstractController
 {
@@ -26,11 +28,11 @@ class PrestationController extends AbstractController
      */
     public function index()
     {
-        $pacs = $this->getDoctrine()
-                          ->getRepository(Pac::class)
-                          ->findAll();
+        $pacs = $this->getDoctrine()->getRepository(Pac::class)->findAll();
+        $pourcentagePaye = $this->getDoctrine()->getRepository(Parametre::class)->findOneByNom('percent_prestation');
         return $this->render('prestation/index.html.twig', [
-            'pacs' => $pacs
+            'pacs' => $pacs,
+            'percent' => (float) $pourcentagePaye->getValue()
         ]);
     }
 
@@ -68,12 +70,12 @@ class PrestationController extends AbstractController
      */
     public function addDecompte(Pac $pac)
     {
-        $generatedNumero = $this->getDoctrine()
-                                ->getRepository(Prestation::class)
-                                ->generateNumero($pac);
+        $generatedNumero = $this->getDoctrine()->getRepository(Prestation::class)->generateNumero($pac);
+        $soins = $this->getDoctrine()->getRepository(Parametre::class)->findOneByNom('soins_prestation');
         return $this->render('prestation/decompte.html.twig', [
             'pac' => $pac,
             'numero' => $generatedNumero,
+            'soins' => $soins->getList(),
         ]);
     }
 
@@ -128,8 +130,10 @@ class PrestationController extends AbstractController
         $adherents = $this->getDoctrine()
                           ->getRepository(Adherent::class)
                           ->findAll();
+        $pourcentagePaye = $this->getDoctrine()->getRepository(Parametre::class)->findOneByNom('percent_prestation');
         return $this->render('prestation/adherent.html.twig', [
-            'adherents' => $adherents
+            'adherents' => $adherents,
+            'percent' => (float) $pourcentagePaye->getValue()
         ]);
     }
     
@@ -138,25 +142,44 @@ class PrestationController extends AbstractController
      */
     public function prestationAdherent(Adherent $adherent)
     {
-        $exercice = $this->getDoctrine()
-                         ->getRepository(Exercice::class)
-                         ->findCurrent();
+        $exercice = $this->getDoctrine()->getRepository(Exercice::class)->findCurrent();
+        $plafondPrestation = $this->getDoctrine()->getRepository(Parametre::class)->findOneByNom('plafond_prestation');
 
         $remboursements = $this->getDoctrine()->getRepository(Remboursement::class)->findRemboursement($exercice, $adherent);
+        $totalRembourse = 0;
+        foreach ($remboursements as $remboursement) {
+            $totalRembourse += $remboursement->getMontant();
+        }
+        $compteCotisation = $adherent->getCompteCotisation($exercice);
+        
+        $plafond = $compteCotisation->getPaye() * ((float) $plafondPrestation->getValue());
+        $info = [
+            'tRemb' => $totalRembourse,
+            'percue' => $compteCotisation->getPaye(),
+            'due' => $compteCotisation->getDue(),
+            'plafond' => $plafond,
+            'reste' => $plafond - $totalRembourse,
+        ];
+
         $prestationNotPayed = $this->getDoctrine()->getRepository(Prestation::class)->findNotPayed($adherent);
+
         return $this->render('prestation/show.html.twig', [
             'adherent' => $adherent,
+            'info' => $info,
             'remboursements' => $remboursements,
             'prestationNotPayed' => $prestationNotPayed,
         ]);
     }
 
     /**
-     * @Route("/prestation/adherent/remboursement/{id}", name="prestation_adherent_remboursement", requirements={"id"="\d+"})
+     * @Route("/prestation/adherent/{adh_id}/remboursement/{remb_id}", name="prestation_adherent_remboursement", requirements={"id"="\d+"})
+     * @ParamConverter("adherent", options={"mapping": {"adh_id":"id"}})
+     * @ParamConverter("remboursement", options={"mapping": {"remb_id":"id"}})
      */
-    public function detailRemboursement(Remboursement $remboursement)
+    public function detailRemboursement(Adherent $adherent, Remboursement $remboursement)
     {
         return $this->render('prestation/detailRemboursement.html.twig', [
+            'adherent' => $adherent,
             'remboursement' => $remboursement,
         ]);
     }
@@ -172,22 +195,15 @@ class PrestationController extends AbstractController
         $form = $this->createForm(RemboursementType::class, $remboursement);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-
-            $manager = $this->getDoctrine()->getManager();
-            $manager->persist($remboursement); 
-            // A chaque prestation non payer, on paye
+            $remboursement = $comptaService->payRemboursement($remboursement);
             $prestationNotPayed = $this->getDoctrine()->getRepository(Prestation::class)->findNotPayed($adherent);
+            $manager = $this->getDoctrine()->getManager();
             foreach ($prestationNotPayed as $prestation) {
                 $prestation->setIsPaye(true);
                 $prestation->setRemboursement($remboursement);
                 $manager->persist($prestation); 
             }
-
             $manager->flush();
-
-            // Enregistrement comptable
-            $comptaService->payRemboursement($remboursement);
-
             return $this->redirectToRoute('prestation_adherent_show', ['id' => $adherent->getId()]);
         }
 

@@ -119,7 +119,13 @@ class Pac
 
     public function getCodeMutuelle(): ?string
     {
-        return $this->codeMutuelle;
+        
+        return str_pad($this->codeMutuelle, 5, "0", 0);
+    }
+
+    public function getMatricule(): ?string
+    {
+        return $this->adherent->getNumero().'/'.$this->getCodeMutuelle();
     }
 
     public function setCodeMutuelle(string $codeMutuelle): self

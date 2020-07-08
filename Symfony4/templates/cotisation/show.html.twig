@@ -132,7 +132,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12">
-                            <table class="table m-t-20">
+                            <table class="table table-bordered m-t-20">
                                 <thead>
                                     <tr>
                                         <th scope="col">Année</th>
@@ -180,32 +180,42 @@
                     </div>
                     <hr>
                     <div class="table-responsive">
-                        <table class="table">
-                            <thead>
+                        <table class="table table-bordered">
+                            <thead class="thead-light">
                                 <tr>
+                                    <th scope="col">#</th>
                                     <th scope="col">Date</th>
-                                    <th scope="col">Cotisation année</th>
+                                    <th scope="col">Année</th>
                                     <th scope="col">Montant</th>
                                     <th scope="col">Paiement</th>
                                     <th scope="col">Réference</th>
-                                    <th scope="col">Note</th>
                                     <th scope="col">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                {% set t = 0 %}
                                 {% set compteCotisation = adherent.compteCotisation(exercice) %}
                                 {% for historiqueCotisation in compteCotisation.historiqueCotisations %}                                                               
-                                    <tr>
-                                        <th scope="row">{{ historiqueCotisation.datePaiement |date('d/m/Y') }}</th>
+                                    <tr {% if historiqueCotisation.remarque %} data-toggle="tooltip" title="{{ historiqueCotisation.remarque }}"{% endif %}>
+                                        <th scope="row">{{ loop.index }}</th>
+                                        <td>{{ historiqueCotisation.datePaiement |date('d/m/Y') }}</td>
                                         <td>{{ compteCotisation.exercice.annee }}</td>
-                                        <td>{{ historiqueCotisation.montant }}</td>
+                                        <td>{{ historiqueCotisation.montant }}</td> {% set t = t + historiqueCotisation.montant %}
                                         <td>{{ historiqueCotisation.tresorerie.libelle }}</td>
                                         <td>{{ historiqueCotisation.reference }}</td>
-                                        <td>{{ historiqueCotisation.remarque }}</td>
-                                        <td><a href="{{ path('cotisation_edit', { 'adherent_id': adherent.id, 'cotisation_id': historiqueCotisation.id }) }}" class="label btn-primary label-primary">Modifier</a></td>
+                                        <td class="text-center"><a href="{{ path('cotisation_edit', { 'adherent_id': adherent.id, 'cotisation_id': historiqueCotisation.id }) }}" class="label label-primary">Modifier</a></span></td>
                                     </tr>
+                                    {% if loop.last %}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th scope="row" colspan=3>Total</th>
+                                                <td>{{ t }}</td>
+                                                <td colspan=4></td>
+                                            </tr>
+                                        </tfoot>
+                                    {% endif %}                                    
                                 {% endfor %}
-                            </tbody>
                         </table>
                     </div>
                 </div>

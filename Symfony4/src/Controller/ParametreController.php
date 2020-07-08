@@ -6,13 +6,12 @@ use App\Entity\Compte;
 use App\Entity\Exercice;
 use App\Entity\Parametre;
 use App\Form\ExerciceType;
+use App\Form\ParametersType;
 use App\Service\ExerciceService;
 use App\Service\ParametreService;
-use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ParametreController extends AbstractController
@@ -20,49 +19,48 @@ class ParametreController extends AbstractController
     /**
      * @Route("/parametre/mutuelle", name="parametre_mutuelle")
      */
-    public function compta(ParametreService $paramService, Request $request)
+    public function mutuelle(ParametreService $paramService, Request $request)
     {
-        $test = $this->getDoctrine()->getRepository(Parametre::class)->findByNom('compte_cotisation'); // Test si initalize
-        if (!$test) {
+        $allParameters = $this->getDoctrine()->getRepository(Parametre::class)->getParameters();
+        if (!$allParameters) {
             $paramService->initialize();
+            $allParameters = $this->getDoctrine()->getRepository(Parametre::class)->getParameters();
         }
 
-        $pCotisation = $this->getDoctrine()->getRepository(Parametre::class)->findOneByNom('compte_cotisation');
-        $pPrestation = $this->getDoctrine()->getRepository(Parametre::class)->findOneByNom('compte_prestation');
+        $pCotisation = $allParameters['compte_cotisation'];
+        $pLabelCotisation = $allParameters['label_cotisation'];
+        $pPrestation = $allParameters['compte_prestation'];
+        $pLabelPrestation = $allParameters['label_prestation'];
+        $pSoins = $allParameters['soins_prestation'];
+        $pPercent = $allParameters['percent_prestation'];
+        $pPlafond = $allParameters['plafond_prestation'];
 
-        $form = $this->createFormBuilder()
-                     ->add('compteCotisation', EntityType::class, [
-                        'class' => Compte::class,
-                        'query_builder' => function (EntityRepository $er) {
-                            return $er->createQueryBuilder('c')
-                                    ->andWhere('c.classe = \'7-COMPTES DE PRODUITS\'')
-                                    ->orderBy('c.poste', 'ASC');
-                        },
-                        'choice_label' => function ($c) {
-                            return $c->getPoste().' | '.$c->getTitre();
-                        },
-                     ])
-                     ->add('comptePrestation', EntityType::class, [
-                        'class' => Compte::class,
-                        'query_builder' => function (EntityRepository $er) {
-                            return $er->createQueryBuilder('c')
-                                    ->andWhere('c.classe = \'6-COMPTES DE CHARGES\'')
-                                    ->orderBy('c.poste', 'ASC');
-                        },
-                        'choice_label' => function ($c) {
-                            return $c->getPoste().' | '.$c->getTitre();
-                        },
-                     ])
-                     ->getForm();          
+        /* Pour bien afficher le formulaire avec les données */
+        $compteCot = $this->getDoctrine()->getRepository(Compte::class)->findOneByPoste($pCotisation->getValue());        
+        $comptePre = $this->getDoctrine()->getRepository(Compte::class)->findOneByPoste($pPrestation->getValue());        
+        $data['compte_cotisation'] = $compteCot;
+        $data['label_cotisation'] = $pLabelCotisation->getValue();
+        $data['compte_prestation'] = $comptePre;
+        $data['label_prestation'] = $pLabelPrestation->getValue();
+        $data['percent_prestation'] = $pPercent->getValue();
+        $data['plafond_prestation'] = $pPlafond->getValue();
+        $data['soins_prestation'] = json_encode($pSoins->getList());
+        /* Le data est uniquement pour afficher le données dans le formulaire */
+
+        $form = $this->createForm(ParametersType::class, $data) ;        
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $pCotisation->setValue($form->get('compteCotisation')->getData()->getPoste());
-            $pPrestation->setValue($form->get('comptePrestation')->getData()->getPoste());
+            /* Enregistrer tous les parametres données */
+            $pCotisation->setValue($form->get('compte_cotisation')->getData()->getPoste());
+            $pLabelCotisation->setValue($form->get('label_cotisation')->getData());
 
-            $manager = $this->getDoctrine()->getManager();
-            $manager->persist($pCotisation);
-            $manager->persist($pPrestation);
-            $manager->flush();
+            $pPrestation->setValue($form->get('compte_prestation')->getData()->getPoste());
+            $pLabelPrestation->setValue($form->get('label_prestation')->getData());
+            $pPercent->setValue($form->get('percent_prestation')->getData());
+            $pPlafond->setValue($form->get('plafond_prestation')->getData());
+            $pSoins->setList(json_decode($form->get('soins_prestation')->getData(), true));
+
+            $this->getDoctrine()->getManager()->flush(); // flush suffit
         }
 
         return $this->render('parametre/index.html.twig', [

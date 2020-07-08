@@ -32,11 +32,15 @@ class ComptaService
         // Charger le compte depuis le parametre
         $posteCotisation = $this->paramService->getParametre('compte_cotisation');
         $compteCotisation = $this->comptaRepo->findOneByPoste($posteCotisation);
+        $label = $this->paramService->getParametre('label_cotisation');
+        
+        $label = str_ireplace('{a}', $cotisation->getCompteCotisation()->getExercice()->getAnnee(), $label);
+        $label = str_ireplace('{c}', $cotisation->getCompteCotisation()->getAdherent()->getNom(), $label);
 
         $article = new Article();
         $article->setCompteDebit($cotisation->getTresorerie());
         $article->setCompteCredit($compteCotisation);
-        $article->setLibelle('Cotisation '. $cotisation->getCompteCotisation()->getExercice()->getAnnee() .' | '. $cotisation->getCompteCotisation()->getAdherent()->getNom());
+        $article->setLibelle($label);
         $article->setCategorie('Cotisation'); // journal
         $article->setAnalytique('Cotisation');
         $article->setMontant($cotisation->getMontant());
@@ -47,6 +51,8 @@ class ComptaService
 
         $this->manager->persist($cotisation); // seul persist suffit
         $this->manager->flush();    
+
+        return $cotisation;
     }
 
     /*
@@ -56,18 +62,26 @@ class ComptaService
     {
         $posteRemboursement = $this->paramService->getParametre('compte_prestation');
         $compteRemboursement = $this->comptaRepo->findOneByPoste($posteRemboursement);
+        $label = $this->paramService->getParametre('label_prestation');
+        
+        $label = str_replace('{a}', $remboursement->getExercice()->getAnnee(), $label);
+        $label = str_replace('{c}', $remboursement->getAdherent()->getNom(), $label);
 
         $article = new Article();
         $article->setCompteDebit($compteRemboursement);        
         $article->setCompteCredit($remboursement->getTresorerie());        
-        $article->setLibelle('Remboursement prestation '. $remboursement->getAdherent()->getNom());
+        $article->setLibelle($label);
         $article->setCategorie('Remboursement'); // journal
         $article->setAnalytique('Remboursement');
         $article->setMontant($remboursement->getMontant());
         $article->setDate($remboursement->getDate());
         $article->setPiece($remboursement->getReference());
 
-        $this->manager->persist($article);
+        $remboursement->setArticle($article);
+
+        $this->manager->persist($remboursement);
         $this->manager->flush();    
+
+        return $remboursement;
     }
 }

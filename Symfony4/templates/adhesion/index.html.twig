@@ -33,8 +33,8 @@
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
+                                    <th scope="col">Code</th>
                                     <th scope="col">Nom de la congrégation</th>
-                                    <th scope="col">Status</th>
                                     <th scope="col">Actions</th>
                                 </tr>
                             </thead>
@@ -42,8 +42,8 @@
                                 {% for adherent in adherents %}
                                     <tr>
                                         <th scope="row">{{ adherent.id }}</th>
+                                        <td>{{ adherent.numero }}</td>
                                         <td>{{ adherent.nom }}</td>
-                                        <td><span class="label label-rounded label-success">En cours de droit</span></td>
                                         <td>
                                             <a href="{{ path('adhesion_show', {'id': adherent.id}) }}"class="label btn-primary label-primary">Voir</a>
                                         </td>

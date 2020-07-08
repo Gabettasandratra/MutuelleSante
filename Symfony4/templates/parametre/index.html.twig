@@ -23,13 +23,20 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Comptes associées au opération de la Mutuelle</h4>
+                    <h4 class="card-title">Paramètres de la gestion de la mutuelle</h4>
                     <hr>
                     <div class="row">
-                        <div class="col-6">
+                        <div class="col-md-6">
                             {{ form_start(form) }}
-                                {{ form_row(form.compteCotisation, { 'label' : 'Compte génerale associé au cotisation des membres'}) }}
-                                {{ form_row(form.comptePrestation, { 'label' : 'Compte génerale associé au remboursement des membres'}) }}
+                                {{ form_row(form.compte_cotisation, { 'label' : 'Compte associé au cotisation'}) }}
+                                {{ form_row(form.label_cotisation, { 'label' : 'Libellé des cotisations dans le journal comptable'}) }}
+                                <hr>
+                                {{ form_row(form.compte_prestation, { 'label' : 'Compte associé au remboursement'}) }}
+                                {{ form_row(form.label_prestation, { 'label' : 'Libellé des cotisations dans le journal comptable'}) }}
+                                {{ form_row(form.percent_prestation, { 'label' : 'Pourcentage de cotisation versé pour avoir accès au prestation'}) }}
+                                {{ form_row(form.plafond_prestation, { 'label' : 'Plafond de prestation (ex: 2 x cotisation)'}) }}
+                                {{ form_row(form.soins_prestation, { 'label' : ' '}) }}
+                                <hr>
                                 <div class="form-row">
                                     <div class="col-12 text-right">
                                         <button type="submit" class="btn btn-success">Enregistrer <i class="mdi mdi-keyboard-return"></i></button>
@@ -37,9 +44,94 @@
                                 </div>                                                     
                             {{ form_end(form) }}
                         </div>
+                        <div class="col-md-6">
+                            <table class="table table-hover table-bordered mini-table m-t-20 no-padding" id="soins">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col">Code de soin</th>
+                                        <th scope="col">Designation de soin</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                            
+                            <div class="row">
+                                <div class="col-md-12"><label>Ajouter nouveau acte de soin</label> </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <form id="addsoin" class="form-inline">
+                                        <div class="row">           
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" id="add_code" required="required" placeholder="Code de soin">
+                                            </div>
+                                            <div class="offset-1 col-sm-7 input-group">
+                                                <input type="text" class="form-control" id="add_soin" required="required" placeholder="Designation de soin">
+                                                <span class="input-group-btn"><button type="submit" class="btn btn-info"><i class="mdi mdi-library-plus"></i></button></span>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>                                                       
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $(document).ready(function() { 
+            String.prototype.capitalize = function() {
+                return this.charAt(0).toUpperCase() + this.slice(1);
+            };
+
+            var soins = JSON.parse($('#parameters_soins_prestation').val());
+            for (const [key, value] of Object.entries(soins)) {
+                var markup = "<tr><td class='code'>"+ key +"</td>";
+                markup += "<td class='soin'>" + value + " <span class='float-right actions'><a class='edit mr-1'><i class='ti-pencil-alt'></i></a><a class='remove' style='color:#f62d51;'><i class='ti-trash'></i></a></span></td></tr>";
+                $('#soins tbody').append(markup);                   
+            }
+
+            $('#addsoin').submit(function(e) {
+                e.preventDefault();
+                var code = $('#add_code').val().toUpperCase();
+                var designation = $('#add_soin').val().capitalize();
+                soins[code] = designation;
+                $('#parameters_soins_prestation').val(JSON.stringify(soins));
+                var row = $('#soins tbody tr').find('.code:contains('+code+')');
+                if (row.length != 0) {
+                    row.parent().find('.soin').text(designation);
+                } else {
+                    var markup = "<tr><td class='code'>"+ code +"</td>";
+                    markup += "<td class='soin'>" + designation + " <span class='float-right actions'><a class='edit mr-1'><i class='ti-pencil-alt'></i></a><a class='remove' style='color:#f62d51;'><i class='ti-trash'></i></a></span></td></tr>";
+                    $('#soins tbody').append(markup);
+                } 
+                $('#add_code').removeAttr('readonly');
+                $(this).trigger("reset");
+            }); 
+
+            $(document).on("click", ".edit", function(e) {
+                var row = $(this).parent().parent().parent();
+                var code = row.find('.code').text();
+                var soin = row.find('.soin').text();
+                $('#add_code').val(code);
+                $('#add_code').attr('readonly', 'readonly');
+                $('#add_soin').val(soin);
+            });
+
+            $(document).on("click", ".remove", function(e) {
+                var row = $(this).parent().parent().parent();
+                var code = row.find('.code').text();
+                var soin = row.find('.soin').text();
+                row.remove();
+                delete soins[code];
+                $('#parameters_soins_prestation').val(JSON.stringify(soins));
+            });
+        });
+    </script>
 {% endblock %}

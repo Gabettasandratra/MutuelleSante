@@ -34,7 +34,7 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Congrégation</th>
-                                    <th scope="col">N°code</th>
+                                    <th scope="col">N°matricule</th>
                                     <th scope="col">Nom et prénom</th>
                                     <th scope="col">Status</th>
                                     <th scope="col">Actions</th>
@@ -47,10 +47,10 @@
                                         <tr>
                                             <th scope="row">{{ row }} {% set row = row + 1 %}</th>
                                             <td>{{ pac.adherent.nom }}</td>
-                                            <td>{{ pac.codeMutuelle }}</td>
+                                            <td>{{ pac.matricule }}</td>
                                             <td>{{ pac.nom }} {{ pac.prenom }}</td>
 
-                                            {% if pac.adherent.possedeDroit %}
+                                            {% if pac.adherent.pourcentagePaye >= percent %}
                                                 <td><span class="label label-rounded label-success">Droit au préstation</span></td>
                                                 <td>
                                                     <a href="{{ path('prestation_beneficiaire', {'id': pac.id}) }}"class="label  label-rounded btn-primary label-primary">Selectionner</a>
