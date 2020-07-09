@@ -291,7 +291,7 @@ class AdhesionController extends AbstractController
                 }
                 $pac->setPhoto($this->getParameter('users_img_directory').'/'.$fileName);
             } else {
-                $pac->setPhoto('http://placehold.it/100x100');
+                $pac->setPhoto('assets/images/users/profile.png');
             }
 
             $pac->setCreatedAt(new \DateTime());

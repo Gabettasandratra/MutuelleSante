@@ -85,7 +85,7 @@ class ExcelReader
 
             $pac->setCreatedAt(new \DateTime());
             $pac->setIsSortie(false);
-            $pac->setPhoto("http://placehold.it/100x100");
+            $pac->setPhoto("assets/images/users/profile.png");
 
             $errors = $this->validator->validate($pac);
 

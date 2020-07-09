@@ -47,6 +47,9 @@
                                             <span class="font-weight-medium text-dark"> Nom congrégation:</span>
                                         </li>
                                         <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark"> N° code:</span>
+                                        </li>
+                                        <li class="my-3 ">
                                             <span class="font-weight-medium text-dark"> Adresse:</span>
                                         </li>
                                         <li class="my-3 ">
@@ -64,6 +67,9 @@
                                     <ul class="list-style-none">
                                         <li class="my-3 border-bottom">
                                             <span> {{ adherent.nom }} </span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ adherent.numero }}</span>
                                         </li>
                                         <li class="my-3 border-bottom">
                                             <span> {{ adherent.adresse }}</span>
@@ -158,8 +164,8 @@
                     </div>
                     <hr>
                     <div class="table-responsive">
-                        <table class="table" id="order_2_desc">
-                            <thead>
+                        <table class="table table-bordered" id="order_2_desc">
+                            <thead class="thead-light">
                                 <tr>
                                     <th scope="col">N° Matricule</th>
                                     <th scope="col">Date d'entrée</th>

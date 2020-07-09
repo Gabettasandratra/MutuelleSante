@@ -1,0 +1,102 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tous les utilisateurs{% endblock %}
+
+{% block header %}
+    <div class="page-breadcrumb">
+        <div class="d-flex align-items-center">
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Tous les utilisateurs</h4>
+            <div class="ml-auto">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0 p-0">
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Utilisateur</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Tous</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% form_theme form 'bootstrap_4_layout.html.twig' %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Liste de tous les utilisateurs</h4>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table table-hover m-t-20">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Profile</th>
+                                    <th scope="col">Utilisateur</th>
+                                    <th scope="col">Nom et prénoms</th>
+                                    <th scope="col">Rôle</th>
+                                    <th scope="col">Date insertion</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for user in users %}
+                                <tr>
+                                    <th scope="row">{{ loop.index }}</th>
+                                    <td>
+                                        <img src="{{ asset(user.photo) }}" alt="user" width="30" class="rounded-circle">
+                                    </td>
+                                    <td>{{ user.username }}</td>
+                                    <td>{{ user.nom ~ ' ' ~ user.prenom }}</td>
+                                    <td>{{ user.fonction |title }}</td>
+                                    <td>
+                                        {{ user.date |date('d/m/Y') }}
+                                        {% if user.lost %}
+                                        <span class="float-right actions">
+                                            <a class="edit mr-1" data-toggle="tooltip" title="Changer mot de passe"><i class="mdi mdi-key-change"></i></a></a>
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>                            
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div> 
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Nouveau utilisateur</h4>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-12">
+                            {{ form_start(form) }}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form_row(form.username, { label: "Login" }) }}
+                                    {{ form_row(form.nom, { label: "Nom" }) }}
+                                    {{ form_row(form.prenom, { label: "Prénom" }) }}
+                                    {{ form_row(form.fonction, { label: "Rôle dans la Mutuelle" }) }}
+                                    {{ form_row(form.photo, { label: "Photo de profile" }) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.password, { label: "Mot de passe" }) }}
+                                    {{ form_row(form.confirm_password, { label: "Confirmation mot de passe" }) }}
+                                    
+                                </div>
+                            </div>                      
+                            <div class="form-row">
+                                <div class="col-12 text-right">
+                                    <button type="submit" class="btn btn-success"><i class="ti-save"></i> Enregistrer</button>
+                                </div>
+                            </div>                                                     
+                            {{ form_end(form) }}
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -22,6 +23,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
+     * @Assert\NotBlank()
      */
     private $username;
 
@@ -33,8 +35,14 @@ class User implements UserInterface
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     * @Assert\Length(min="6", minMessage="Votre mot de passe doit faire minimum 6 caractères")
      */
     private $password;
+
+    /**
+     * @Assert\EqualTo(propertyPath="password", message="Votre confirmation de mot de passe est incorrect")
+     */
+    public $confirm_password;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -50,6 +58,27 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255)
      */
     private $photo;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $fonction;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $date;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $lost;
+
+    public function __construct()
+    {
+        $this->date = new \DateTime();
+        $this->lost = false;
+    }
 
     public function getId(): ?int
     {
@@ -156,6 +185,42 @@ class User implements UserInterface
     public function setPhoto(string $photo): self
     {
         $this->photo = $photo;
+
+        return $this;
+    }
+
+    public function getFonction(): ?string
+    {
+        return $this->fonction;
+    }
+
+    public function setFonction(string $fonction): self
+    {
+        $this->fonction = $fonction;
+
+        return $this;
+    }
+
+    public function getDate(): ?\DateTimeInterface
+    {
+        return $this->date;
+    }
+
+    public function setDate(\DateTimeInterface $date): self
+    {
+        $this->date = $date;
+
+        return $this;
+    }
+
+    public function getLost(): ?bool
+    {
+        return $this->lost;
+    }
+
+    public function setLost(bool $lost): self
+    {
+        $this->lost = $lost;
 
         return $this;
     }

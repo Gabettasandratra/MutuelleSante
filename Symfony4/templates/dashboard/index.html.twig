@@ -2,10 +2,6 @@
 
 {% block title %}Tableau de bord{% endblock %}
 
-{% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('assets/libs/chartist/dist/chartist.min.css') }}">
-{% endblock %}
-
 {% block body %}
     <div class="row">
         <!---div class="col-md-8">
@@ -60,8 +56,3 @@
     </div>
 {% endblock %}
 
-{% block javascripts %}
-    <script src="{{ asset('assets/libs/chartist/dist/chartist.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js') }}"></script>
-    <script src="{{ asset('dist/js/pages/dashboards/dashboard1.js') }}"></script>
-{% endblock %}

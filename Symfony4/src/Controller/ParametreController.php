@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Entity\Compte;
+use App\Form\UserType;
 use App\Entity\Exercice;
 use App\Entity\Parametre;
 use App\Form\ExerciceType;
@@ -13,6 +15,8 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class ParametreController extends AbstractController
 {
@@ -114,6 +118,63 @@ class ParametreController extends AbstractController
         }
         return $this->render('parametre/configureExercice.html.twig', [
             'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/parametre/user/all", name="user_all")
+     */
+    public function allUser(Request $request, UserPasswordEncoderInterface $passwordEncoder)
+    {
+        $users = $this->getDoctrine()->getRepository(User::class)->findAll();
+        
+        $user = new User();
+        $form = $this->createForm(UserType::class, $user);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            // encode the plain password
+            $user->setPassword(
+                $passwordEncoder->encodePassword(
+                    $user,
+                    $form->get('password')->getData()
+                )
+            );
+
+            $photoFile = $form->get('photo')->getData();           
+            if ($photoFile) {
+                $fileName = uniqid().'.'.$photoFile->guessExtension();
+                try {
+                    $photoFile->move($this->getParameter('users_img_root_directory'), $fileName);
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
+                $user->setPhoto($this->getParameter('users_img_directory').'/'.$fileName);
+            } else {
+                $user->setPhoto('assets/images/users/profile.png');
+            }
+
+            switch ($form->get('fonction')->getData()) {
+                case 'administrateur':
+                    $user->setRoles(['ROLE_ADMIN']);
+                    break;
+                case 'comptable':
+                    $user->setRoles(['ROLE_COMPTABLE']);
+                    break;
+                case 'gestionnaire':
+                    $user->setRoles(['ROLE_GESTIONNAIRE']);
+                    break;
+            }
+            
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('user_all');
+        }
+
+        return $this->render('security/users.html.twig', [
+            'users' => $users,
+            'form' => $form->createView()
         ]);
     }
 }
