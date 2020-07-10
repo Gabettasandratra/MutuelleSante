@@ -10,8 +10,11 @@ use App\Form\AdherentType;
 use App\Service\ExcelReader;
 
 use App\Entity\CompteCotisation;
+use App\Repository\PacRepository;
 use Symfony\Component\Form\FormError;
 use App\Repository\AdherentRepository;
+use App\Repository\ExerciceRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Constraints\File;
@@ -22,17 +25,16 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 class AdhesionController extends AbstractController
 {
     /**
      * @Route("/adhesion", name="adhesion")
      */
-    public function index()
+    public function index(AdherentRepository $repository)
     {
-        $adherents = $this->getDoctrine()
-                         ->getRepository(Adherent::class)
-                         ->findAll();
+        $adherents = $repository->findAll();
         return $this->render('adhesion/index.html.twig', [
             'adherents' => $adherents
         ]);
@@ -41,11 +43,9 @@ class AdhesionController extends AbstractController
     /**
      * @Route("/adhesion/beneficiaires", name="adhesion_beneficiaires")
      */
-    public function beneficiaires()
+    public function beneficiaires(AdherentRepository $repository)
     {
-        $adherents = $this->getDoctrine()
-                         ->getRepository(Adherent::class)
-                         ->findAll();
+        $adherents = $repository->findAll();
         return $this->render('adhesion/beneficiaires.html.twig', [
             'adherents' => $adherents
         ]);
@@ -54,11 +54,9 @@ class AdhesionController extends AbstractController
     /**
      * @Route("/adhesion/beneficiaires/retires", name="adhesion_beneficiaires_retires")
      */
-    public function beneficiairesRetires()
+    public function beneficiairesRetires(PacRepository $repository)
     {
-        $pacs = $this->getDoctrine()
-                         ->getRepository(Pac::class)
-                         ->findPacRetirer();
+        $pacs = $repository->findPacRetirer();
         return $this->render('adhesion/beneficiairesRetires.html.twig', [
             'pacs' => $pacs
         ]);
@@ -67,16 +65,14 @@ class AdhesionController extends AbstractController
     /**
      * @Route("/adhesion/beneficiaires/retires/{id}", name="adhesion_beneficiaires_integre")
      */
-    public function beneficiairesIntegrer(Pac $pac)
+    public function beneficiairesIntegrer(Pac $pac, EntityManagerInterface $manager)
     {
-        $manager = $this->getDoctrine()->getManager();
         $pac->setIsSortie(false);
         $pac->setRemarque(null);
         $pac->setDateSortie(null);
 
         $manager->persist($pac);
         $manager->flush();
-
         return $this->redirectToRoute('adhesion_show', ['id' => $pac->getAdherent()->getId()]);
 
     }
@@ -84,12 +80,10 @@ class AdhesionController extends AbstractController
     /**
      * @Route("/adhesion/inscrire", name="adhesion_new")
      */
-    public function create(Request $request)
+    public function create(Request $request, AdherentRepository $repository, EntityManagerInterface $manager)
     { 
         $adherent = new Adherent();
-        $generatedNumero = $this->getDoctrine()
-                         ->getRepository(Adherent::class)
-                         ->generateNumero();
+        $generatedNumero = $repository->generateNumero();
         $adherent->setNumero($generatedNumero);
         $formAdherent = $this->createForm(AdherentType::class, $adherent);
         $formAdherent->handleRequest($request);
@@ -118,7 +112,6 @@ class AdhesionController extends AbstractController
                                     ->findCurrent();
             $newCompteCotisation = new CompteCotisation($currentExercice, $adherent);
 
-            $manager = $this->getDoctrine()->getManager();
             $manager->persist($adherent);
             $manager->persist($newCompteCotisation);
             $manager->flush();
@@ -133,11 +126,12 @@ class AdhesionController extends AbstractController
     /**
      * @Route("/adhesion/{id}/edit", name="adhesion_edit")
      */
-    public function edit(Adherent $adherent = null, Request $request)
+    public function edit(Adherent $adherent = null, Request $request, EntityManagerInterface $manager)
     { 
         if ($adherent === null) {
             return $this->redirectToRoute('adhesion_new');
         }
+
         $formAdherent = $this->createForm(AdherentType::class, $adherent);
         $formAdherent->handleRequest($request);
         if ($formAdherent->isSubmitted() && $formAdherent->isValid()) {
@@ -154,8 +148,7 @@ class AdhesionController extends AbstractController
                 }
                 $adherent->setPhoto($this->getParameter('users_img_directory').'/'.$fileName);
             }
-            $manager = $this->getDoctrine()->getManager();
-            $manager->persist($adherent);
+    
             $manager->flush();
 
             return $this->redirectToRoute('adhesion_show', ['id' => $adherent->getId()]);
@@ -168,14 +161,10 @@ class AdhesionController extends AbstractController
 
     /**
      * @Route("/adhesion/{id}", name="adhesion_show")
-     * @Entity("adherent", expr="repository.findOneById(id)")
      */
-    public function show(Adherent $adherent, AdherentRepository $adherentRepo)
+    public function show(Adherent $adherent, ExerciceRepository $repository)
     {
-        $exercice = $this->getDoctrine()
-                         ->getRepository(Exercice::class)
-                         ->findCurrent();
-        
+        $exercice = $repository->findCurrent();  
         return $this->render('adhesion/show.html.twig', [
             'adherent' => $adherent,
             'exercice' => $exercice,
@@ -184,10 +173,11 @@ class AdhesionController extends AbstractController
 
     /**
      * @Route("/adhesion/{id}/pac/{idPac}/retirer", name="adhesion_remove_pac")
+     * @ParamConverter("adherent", options={"mapping": {"id":"id"}})
+     * @ParamConverter("pac", options={"mapping":{"idPac": "id"}})
      */
-    public function retirerPac(Adherent $adherent, $idPac, Request $request)
+    public function retirerPac(Adherent $adherent, Pac $pac, Request $request, EntityManagerInterface $manager)
     { 
-        $manager = $this->getDoctrine()->getManager();
         $pac = $this->getDoctrine()
                     ->getRepository(Pac::class)
                     ->find($idPac);
@@ -267,12 +257,10 @@ class AdhesionController extends AbstractController
     /**
      * @Route("/adhesion/{id}/pac", name="adhesion_add_pac")
      */
-    public function addPac(Adherent $adherent, Request $request)
+    public function addPac(Adherent $adherent, PacRepository $repository, Request $request, EntityManagerInterface $manager)
     { 
         $pac = new Pac();
-        $generatedCode = $this->getDoctrine()
-                         ->getRepository(Pac::class)
-                         ->generateCode($adherent);
+        $generatedCode = $repository->generateCode($adherent);
         $pac->setCodeMutuelle($generatedCode);
 
         $formPac = $this->createForm(PacType::class, $pac);
@@ -309,10 +297,8 @@ class AdhesionController extends AbstractController
             } else {
                 $currentCompteCotisation->incrementAncien();
             }
-
             $adherent->addPac($pac);
             
-            $manager = $this->getDoctrine()->getManager();
             $manager->persist($adherent);
             $manager->persist($pac);
             $manager->persist($currentCompteCotisation);
@@ -328,14 +314,11 @@ class AdhesionController extends AbstractController
 
     /**
      * @Route("/adhesion/{id}/pac/{idPac}", name="adhesion_edit_pac")
+     * @ParamConverter("adherent", options={"mapping": {"id":"id"}})
+     * @ParamConverter("pac", options={"mapping":{"idPac": "id"}})
      */
-    public function editPac(Adherent $adherent, $idPac, Request $request)
+    public function editPac(Adherent $adherent, Pac $pac, Request $request, EntityManagerInterface $manager)
     { 
-        $manager = $this->getDoctrine()->getManager();
-        $pac = $this->getDoctrine()
-                         ->getRepository(Pac::class)
-                         ->find($idPac);
-
         $formPac = $this->createForm(PacType::class, $pac);
         $formPac->handleRequest($request);
         if ($formPac->isSubmitted() && $formPac->isValid()) {

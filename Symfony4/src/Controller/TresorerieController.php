@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Compte;
 use App\Form\CompteType;
+use App\Repository\CompteRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,21 +15,17 @@ class TresorerieController extends AbstractController
     /**
      * @Route("/tresorerie", name="tresorerie")
      */
-    public function index()
+    public function index(CompteRepository $repositoryCompte)
     {
-        $compteTresoreries = $this->getDoctrine()
-                                 ->getRepository(Compte::class)
-                                 ->findTresorerie();
-
         return $this->render('tresorerie/index.html.twig', [
-            'comptes' => $compteTresoreries,
+            'comptes' => $repositoryCompte->findTresorerie()
         ]);
     }
 
     /**
      * @Route("/tresorerie/ajout", name="tresorerie_add")
      */
-    public function add(Request $request)
+    public function add(Request $request, EntityManagerInterface $manager)
     {
         $compteTresorerie = new Compte();
         $compteTresorerie->setIsTresor(true);
@@ -44,7 +42,6 @@ class TresorerieController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $manager = $this->getDoctrine()->getManager();
             $manager->persist($compteTresorerie);
             $manager->flush();
             return $this->redirectToRoute('tresorerie');

@@ -7,6 +7,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 
@@ -18,6 +19,8 @@ class UserType extends AbstractType
             ->add('username')            
             ->add('nom')
             ->add('prenom')
+            ->add('email', EmailType::class)
+            ->add('phone')
             ->add('password', PasswordType::class)
             ->add('confirm_password', PasswordType::class)
             ->add('fonction', ChoiceType::class, [

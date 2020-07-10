@@ -51,11 +51,11 @@
                                     <td>{{ user.fonction |title }}</td>
                                     <td>
                                         {{ user.date |date('d/m/Y') }}
-                                        {% if user.lost %}
+                                   
                                         <span class="float-right actions">
-                                            <a class="edit mr-1" data-toggle="tooltip" title="Changer mot de passe"><i class="mdi mdi-key-change"></i></a></a>
+                                            <a href="{{ path('user_profile', {id: user.id}) }}" class="mr-1" data-toggle="tooltip" title="Voir profil"><i class="mdi mdi-eye"></i></a>
                                         </span>
-                                        {% endif %}
+                                        
                                     </td>
                                 </tr>                            
                             {% endfor %}
@@ -74,16 +74,17 @@
                             {{ form_start(form) }}
                             <div class="row">
                                 <div class="col-md-6">
-                                    {{ form_row(form.username, { label: "Login" }) }}
-                                    {{ form_row(form.nom, { label: "Nom" }) }}
-                                    {{ form_row(form.prenom, { label: "Prénom" }) }}
-                                    {{ form_row(form.fonction, { label: "Rôle dans la Mutuelle" }) }}
-                                    {{ form_row(form.photo, { label: "Photo de profile" }) }}
+                                    {{ form_row(form.username, { label: "Login *" }) }}
+                                    {{ form_row(form.nom, { label: "Nom *" }) }}
+                                    {{ form_row(form.prenom, { label: "Prénom *" }) }}
+                                    {{ form_row(form.email, { label: "Email" }) }}
+                                    {{ form_row(form.phone, { label: "Numero téléphone *" }) }}
                                 </div>
                                 <div class="col-md-6">
-                                    {{ form_row(form.password, { label: "Mot de passe" }) }}
-                                    {{ form_row(form.confirm_password, { label: "Confirmation mot de passe" }) }}
-                                    
+                                    {{ form_row(form.password, { label: "Mot de passe *" }) }}
+                                    {{ form_row(form.confirm_password, { label: "Confirmation mot de passe *" }) }}
+                                    {{ form_row(form.fonction, { label: "Rôle dans la Mutuelle" }) }}
+                                    {{ form_row(form.photo, { label: "Photo de profil" }) }}
                                 </div>
                             </div>                      
                             <div class="form-row">

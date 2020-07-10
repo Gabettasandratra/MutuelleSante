@@ -7,6 +7,9 @@ use App\Entity\Article;
 use App\Entity\Exercice;
 use App\Form\CompteType;
 use App\Form\ArticleType;
+use App\Repository\CompteRepository;
+use App\Repository\ArticleRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\Extension\Core\Type\RadioType;
@@ -27,18 +30,18 @@ class ComptabiliteController extends AbstractController
     /**
      * @Route("/comptabilite/journal/{journal}", name="comptabilite_journal")
      */
-    public function journal($journal)
+    public function journal($journal, ArticleRepository $repositoryArticle)
     {
         $exercice = $this->getDoctrine()
                          ->getRepository(Exercice::class)
                          ->findCurrent();
 
         if ($journal == 'cotisation') {
-            $articles = $this->getDoctrine()->getRepository(Article::class)->findJournal($exercice, 'Cotisation');
+            $articles = $repositoryArticle->findJournal($exercice, 'Cotisation');
         } else if ($journal == 'remboursement') {
-            $articles = $this->getDoctrine()->getRepository(Article::class)->findJournal($exercice, 'Remboursement');
+            $articles = $repositoryArticle->findJournal($exercice, 'Remboursement');
         } else if ($journal == 'divers') {
-            $articles = $this->getDoctrine()->getRepository(Article::class)->findJournal($exercice, 'Divers');
+            $articles = $repositoryArticle->findJournal($exercice, 'Divers');
         } else {
             throw $this->createNotFoundException('Ce journal comptable n\'existe pas');
         }
@@ -53,7 +56,7 @@ class ComptabiliteController extends AbstractController
      * @Route("/comptabilite/journal/{journal}/saisie", name="comptabilite_saisie")
      * @Route("/comptabilite/journal/{journal}/modifier/{id}", name="comptabilite_modifier_article")
      */
-    public function saisie($journal, Article $article = null, Request $request)
+    public function saisie($journal, Article $article = null, Request $request, EntityManagerInterface $manager)
     {
         if (!$article) {
             $article = new Article();
@@ -63,7 +66,6 @@ class ComptabiliteController extends AbstractController
         $form = $this->createForm(ArticleType::class, $article);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $manager = $this->getDoctrine()->getManager();
             $manager->persist($article);
             $manager->flush();
 
@@ -80,18 +82,18 @@ class ComptabiliteController extends AbstractController
      * @Route("/comptabilite/grandlivre", name="comptabilite_livre")
      * @Route("/comptabilite/grandlivre/{poste}", name="comptabilite_livre_aux")
      */
-    public function livre($poste = null)
+    public function livre($poste = null, ArticleRepository $repositoryArticle, CompteRepository $repositoryCompte)
     {
         $exercice = $this->getDoctrine()
                          ->getRepository(Exercice::class)
                          ->findCurrent();
 
         if ($poste === null) {
-            $donnees = $this->getDoctrine()->getRepository(Article::class)->findGrandLivre($exercice);
+            $donnees = $repositoryArticle->findGrandLivre($exercice);
         } else {
-            $compte = $this->getDoctrine()->getRepository(Compte::class)->findOneByPoste($poste);
+            $compte = $repositoryCompte->findOneByPoste($poste);
             if ($compte) {
-                $articles = $this->getDoctrine()->getRepository(Article::class)->findGrandLivreCompte($exercice, $compte);
+                $articles = $repositoryArticle->findGrandLivreCompte($exercice, $compte);
                 $donnees['compte'] = $compte;
                 $donnees['articles'] = $articles;
             } else {
@@ -99,7 +101,7 @@ class ComptabiliteController extends AbstractController
             }
         }
     
-        $labelcomptes = $this->getDoctrine()->getRepository(Compte::class)->findPosteTitre();
+        $labelcomptes = $repositoryCompte->findPosteTitre();
 
         return $this->render('comptabilite/livre.html.twig', [
             'labelComptes' => $labelcomptes,
@@ -112,29 +114,26 @@ class ComptabiliteController extends AbstractController
     /**
      * @Route("/comptabilite/balance", name="comptabilite_balance")
      */
-    public function balance()
+    public function balance(ArticleRepository $repositoryArticle)
     {
         $exercice = $this->getDoctrine()
                          ->getRepository(Exercice::class)
                          ->findCurrent();
 
-        $donnees = $this->getDoctrine()->getRepository(Article::class)->findBalance($exercice);
         return $this->render('comptabilite/balance.html.twig', [
-            'donnees' => $donnees,
+            'donnees' => $repositoryArticle->findBalance($exercice)
         ]);
     }
 
     /**
      * @Route("/comptabilite/plan", name="comptabilite_plan")
      */
-    public function plan(Request $request)
+    public function plan(Request $request, CompteRepository $repositoryCompte)
     {
-        $classesBilan = $this->getDoctrine()->getRepository(Compte::class)->findBilanGroupByClass();
-        $classesGestion = $this->getDoctrine()->getRepository(Compte::class)->findGestionGroupByClass();
         return $this->render('comptabilite/plan.html.twig',[
             'classes' => [
-                'bilan' => $classesBilan,
-                'gestion' => $classesGestion
+                'bilan' => $repositoryCompte->findBilanGroupByClass(),
+                'gestion' => $repositoryCompte->findGestionGroupByClass()
             ]
         ]);
     }
@@ -142,7 +141,7 @@ class ComptabiliteController extends AbstractController
     /**
      * @Route("/comptabilite/plan/bilan", name="comptabilite_plan_bilan")
      */
-    public function addCompteBilan(Request $request)
+    public function addCompteBilan(Request $request, EntityManagerInterface $manager)
     {
         $compte = new Compte();
         $compte->setIsTresor(false);
@@ -166,7 +165,6 @@ class ComptabiliteController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $manager = $this->getDoctrine()->getManager();
             $manager->persist($compte);
             $manager->flush();
             return $this->redirectToRoute('comptabilite_plan');
@@ -180,7 +178,7 @@ class ComptabiliteController extends AbstractController
     /**
      * @Route("/comptabilite/plan/gestion", name="comptabilite_plan_gestion")
      */
-    public function addCompteGestion(Request $request)
+    public function addCompteGestion(Request $request, EntityManagerInterface $manager)
     {
         $compte = new Compte();
         $compte->setIsTresor(false);
@@ -205,7 +203,6 @@ class ComptabiliteController extends AbstractController
                 $compte->setType(false);
             }
 
-            $manager = $this->getDoctrine()->getManager();
             $manager->persist($compte);
             $manager->flush();
             return $this->redirectToRoute('comptabilite_plan');
@@ -219,14 +216,14 @@ class ComptabiliteController extends AbstractController
     /**
      * @Route("/comptabilite/bilan", name="comptabilite_bilan")
      */
-    public function bilan()
+    public function bilan(CompteRepository $repositoryCompte)
     {
         $exercice = $this->getDoctrine()
                          ->getRepository(Exercice::class)
                          ->findCurrent();
 
-        $donnees['actif'] = $this->getDoctrine()->getRepository(Compte::class)->findBilanActif($exercice);
-        $donnees['passif'] = $this->getDoctrine()->getRepository(Compte::class)->findBilanPassif($exercice);
+        $donnees['actif'] = $repositoryCompte->findBilanActif($exercice);
+        $donnees['passif'] = $repositoryCompte->findBilanPassif($exercice);
         return $this->render('comptabilite/bilan.html.twig', [
             'donnees' => $donnees,
         ]);
@@ -235,14 +232,14 @@ class ComptabiliteController extends AbstractController
     /**
      * @Route("/comptabilite/resultat", name="comptabilite_resultat")
      */
-    public function resultat()
+    public function resultat(CompteRepository $repositoryCompte)
     {
         $exercice = $this->getDoctrine()
                          ->getRepository(Exercice::class)
                          ->findCurrent();
 
-        $donnees['charge'] = $this->getDoctrine()->getRepository(Compte::class)->findGestionCharge($exercice);
-        $donnees['produit'] = $this->getDoctrine()->getRepository(Compte::class)->findGestionProduit($exercice);
+        $donnees['charge'] = $repositoryCompte->findGestionCharge($exercice);
+        $donnees['produit'] = $repositoryCompte->findGestionProduit($exercice);
         return $this->render('comptabilite/resultat.html.twig', [
             'donnees' => $donnees,
         ]);

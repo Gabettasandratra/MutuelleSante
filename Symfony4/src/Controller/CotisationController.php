@@ -11,6 +11,8 @@ use Doctrine\ORM\EntityRepository;
 use App\Entity\HistoriqueCotisation;
 use Symfony\Component\Form\FormError;
 use App\Form\HistoriqueCotisationType;
+use App\Repository\AdherentRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -24,19 +26,15 @@ class CotisationController extends AbstractController
     /**
      * @Route("/cotisation", name="cotisation")
      */
-    public function index()
+    public function index(AdherentRepository $repository)
     {
-        $adherents = $this->getDoctrine()
-                          ->getRepository(Adherent::class)
-                          ->findAll();
         return $this->render('cotisation/index.html.twig', [
-            'adherents' => $adherents
+            'adherents' => $repository->findAll()
         ]);
     }
 
     /**
      * @Route("/cotisation/{id}", name="cotisation_show")
-     * @Entity("adherent", expr="repository.findOneById(id)")
      */
     public function show(Adherent $adherent)
     {
@@ -52,7 +50,6 @@ class CotisationController extends AbstractController
 
     /**
      * @Route("/cotisation/{id}/pay", name="cotisation_pay")
-     * @Entity("adherent", expr="repository.findOneById(id)")
      */
     public function pay(Adherent $adherent, Request $request, ComptaService $comptaService)
     {
@@ -101,7 +98,7 @@ class CotisationController extends AbstractController
      * @ParamConverter("adherent", options={"mapping": {"adherent_id":"id"}})
      * @ParamConverter("historiqueCotisation", options={"mapping": {"cotisation_id":"id"}})
      */
-    public function editCotisation(Adherent $adherent, HistoriqueCotisation $historiqueCotisation, Request $request)
+    public function editCotisation(Adherent $adherent, HistoriqueCotisation $historiqueCotisation, Request $request, EntityManagerInterface $manager)
     {
         $montantPaye = $historiqueCotisation->getMontant();
         $form = $this->createFormBuilder($historiqueCotisation)
@@ -137,9 +134,8 @@ class CotisationController extends AbstractController
                 $article->setPiece($historiqueCotisation->getReference());
                 $article->setCompteDebit($historiqueCotisation->getTresorerie());
 
-                $compteCotisation->payer($montant);         
-                
-                $manager = $this->getDoctrine()->getManager();
+                $compteCotisation->payer($montant); 
+                        
                 $manager->persist($historiqueCotisation);
                 $manager->flush();
 

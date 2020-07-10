@@ -78,9 +78,9 @@
                         <ul class="navbar-nav float-right">
                             {% if app.user %} 
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark pro-pic" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="{{ asset(app.user.photo) }}" alt="user" class="rounded-circle" width="31"></a>
+                                    <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark pro-pic" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="{{ asset(app.user.photo) }}" alt="user" class="rounded-circle" width="35" style="background-color: white;"></a>
                                     <div class="dropdown-menu dropdown-menu-right user-dd animated">
-                                        <a class="dropdown-item" href="javascript:void(0)"><i class="fa fa-user m-r-5 m-l-5"></i> Profile</a>
+                                        <a class="dropdown-item" href="{{ path('user_profile', {id: app.user.id}) }}"><i class="fa fa-user m-r-5 m-l-5"></i> Mon Profil</a>
                                         <a class="dropdown-item" href="{{ path('app_logout') }}"><i class="fa fa-power-off m-r-5 m-l-5"></i> Se deconnecter</a>
                                     </div>
                                 </li>     
@@ -115,9 +115,8 @@
                                         <span class="op-5 user-email">{{ app.user.fonction|title }}</span>
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="Userdd">
-                                        <a class="dropdown-item" href="javascript:void(0)"><i class="ti-user m-r-5 m-l-5"></i> My Profile</a>
+                                        <a class="dropdown-item" href="{{ path('user_profile', {id: app.user.id}) }}"><i class="ti-user m-r-5 m-l-5"></i> Mon Profil</a>
                                         <a class="dropdown-item" href="javascript:void(0)"><i class="ti-wallet m-r-5 m-l-5"></i> My Balance</a>
-                                        <a class="dropdown-item" href="javascript:void(0)"><i class="ti-email m-r-5 m-l-5"></i> Inbox</a>
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item" href="javascript:void(0)"><i class="ti-settings m-r-5 m-l-5"></i> Account Setting</a>
                                         <div class="dropdown-divider"></div>
@@ -135,23 +134,23 @@
                             <li class="sidebar-item"> 
                                 <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-account-multiple"></i><span class="hide-menu"> Adhesion </span></a>
                                 <ul aria-expanded="false" class="collapse first-level">
-                                    <li class="sidebar-item"><a href="{{ path('adhesion_new') }}" class="sidebar-link"><i class="mdi mdi-account-plus"></i><span class="hide-menu"> Inscrire congrégation </span></a></li>
-                                    <li class="sidebar-item"><a href="{{ path('adhesion') }}" class="sidebar-link"><i class="mdi mdi-account-search"></i><span class="hide-menu"> Liste des congrégations </span></a></li>
-                                    <li class="sidebar-item"><a href="{{ path('adhesion_beneficiaires') }}" class="sidebar-link"><i class="mdi mdi-format-list-bulleted"></i><span class="hide-menu"> Liste béneficiaires </span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('adhesion_new') }}" class="sidebar-link"><i class="mdi mdi-account-plus"></i><span class="hide-menu"> Inscrire congrégation </span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('adhesion') }}" class="sidebar-link"><i class="mdi mdi-account-search"></i><span class="hide-menu"> Liste des congrégations </span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('adhesion_beneficiaires') }}" class="sidebar-link"><i class="mdi mdi-format-list-bulleted"></i><span class="hide-menu"> Liste béneficiaires </span></a></li>
                                 </ul>
                             </li>
                         
                             <li class="sidebar-item"> 
                                 <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-calculator"></i><span class="hide-menu"> Cotisation </span></a>
                                 <ul aria-expanded="false" class="collapse first-level">
-                                    <li class="sidebar-item"><a href="{{ path('cotisation') }}" class="sidebar-link"><i class="mdi mdi-calendar-check"></i><span class="hide-menu"> Fiche de cotistation </span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('cotisation') }}" class="sidebar-link"><i class="mdi mdi-calendar-check"></i><span class="hide-menu"> Fiche de cotistation </span></a></li>
                                 </ul>
                             </li>
                             <li class="sidebar-item"> 
                                 <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-security-home"></i><span class="hide-menu"> Prestation </span></a>
                                 <ul aria-expanded="false" class="collapse first-level">
-                                    <li class="sidebar-item"><a href="{{ path('prestation') }}" class="sidebar-link"><i class="mdi mdi-verified"></i><span class="hide-menu"> Prestation béneficiaire </span></a></li>
-                                    <li class="sidebar-item"><a href="{{ path('prestation_adherent') }}" class="sidebar-link"><i class="mdi mdi-clipboard-outline"></i><span class="hide-menu"> Prestation congrégation</span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('prestation') }}" class="sidebar-link"><i class="mdi mdi-verified"></i><span class="hide-menu"> Prestation béneficiaire </span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('prestation_adherent') }}" class="sidebar-link"><i class="mdi mdi-clipboard-outline"></i><span class="hide-menu"> Prestation congrégation</span></a></li>
                                 </ul>
                             </li>
                         {% endif %}
@@ -160,23 +159,23 @@
                             <li class="sidebar-item"> 
                                 <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-scale-balance"></i><span class="hide-menu"> Comptabilité </span></a>
                                 <ul aria-expanded="false" class="collapse first-level">
-                                    <li class="sidebar-item"><a href="{{ path('comptabilite_select_journal') }}" class="sidebar-link"><i class="mdi mdi-clipboard-outline"></i><span class="hide-menu"> Journal </span></a></li>
-                                    <li class="sidebar-item"><a href="{{ path('comptabilite_livre') }}" class="sidebar-link"><i class="mdi mdi-book-open-page-variant"></i><span class="hide-menu"> Grand livre </span></a></li>
-                                    <li class="sidebar-item"><a href="{{ path('comptabilite_balance') }}" class="sidebar-link"><i class="mdi mdi-scale-balance"></i><span class="hide-menu"> Balance </span></a></li>
-                                    <li class="sidebar-item"><a href="{{ path('comptabilite_plan') }}" class="sidebar-link"><i class="mdi mdi-view-list"></i><span class="hide-menu"> Plan comptable </span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('comptabilite_select_journal') }}" class="sidebar-link"><i class="mdi mdi-clipboard-outline"></i><span class="hide-menu"> Journal </span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('comptabilite_livre') }}" class="sidebar-link"><i class="mdi mdi-book-open-page-variant"></i><span class="hide-menu"> Grand livre </span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('comptabilite_balance') }}" class="sidebar-link"><i class="mdi mdi-scale-balance"></i><span class="hide-menu"> Balance </span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('comptabilite_plan') }}" class="sidebar-link"><i class="mdi mdi-view-list"></i><span class="hide-menu"> Plan comptable </span></a></li>
                                 </ul>
                             </li>
                             <li class="sidebar-item"> 
                                 <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-cash-multiple"></i><span class="hide-menu"> Etats financiers </span></a>
                                 <ul aria-expanded="false" class="collapse first-level">
-                                    <li class="sidebar-item"><a href="{{ path('comptabilite_bilan') }}" class="sidebar-link"><i class="mdi mdi-chart-arc"></i><span class="hide-menu"> Bilan comptable</span></a></li>
-                                    <li class="sidebar-item"><a href="{{ path('comptabilite_resultat') }}" class="sidebar-link"><i class="mdi mdi-chart-bar"></i><span class="hide-menu"> Compte de résultat </span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('comptabilite_bilan') }}" class="sidebar-link"><i class="mdi mdi-chart-arc"></i><span class="hide-menu"> Bilan comptable</span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('comptabilite_resultat') }}" class="sidebar-link"><i class="mdi mdi-chart-bar"></i><span class="hide-menu"> Compte de résultat </span></a></li>
                                 </ul>
                             </li>
                             <li class="sidebar-item"> 
                                 <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-bank"></i><span class="hide-menu"> Trésorerie </span></a>
                                 <ul aria-expanded="false" class="collapse first-level">
-                                    <li class="sidebar-item"><a href="{{ path('tresorerie') }}" class="sidebar-link"><i class="mdi mdi-cube"></i><span class="hide-menu"> Gestion </span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('tresorerie') }}" class="sidebar-link"><i class="mdi mdi-cube"></i><span class="hide-menu"> Gestion </span></a></li>
                                     
                                 </ul>
                             </li>
@@ -186,15 +185,15 @@
                             <li class="sidebar-item"> 
                                 <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-account-box"></i><span class="hide-menu"> Utilisateur </span></a>
                                 <ul aria-expanded="false" class="collapse first-level">
-                                    <li class="sidebar-item"><a href="#" class="sidebar-link"><i class="mdi mdi-account"></i><span class="hide-menu"> Profile utilisateur </span></a></li>
-                                    <li class="sidebar-item"><a href="{{ path('user_all') }}" class="sidebar-link"><i class="mdi mdi-account-multiple"></i><span class="hide-menu"> Tous les utilisateurs </span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('user_profile', {id: app.user.id}) }}" class="sidebar-link"><i class="mdi mdi-account"></i><span class="hide-menu"> Profile utilisateur </span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('user_all') }}" class="sidebar-link"><i class="mdi mdi-account-multiple"></i><span class="hide-menu"> Tous les utilisateurs </span></a></li>
                                 </ul>
                             </li>
                             <li class="sidebar-item  mb-5"> 
                                 <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-settings"></i><span class="hide-menu"> Configuration </span></a>
                                 <ul aria-expanded="false" class="collapse first-level">
-                                    <li class="sidebar-item"><a href="{{ path('parametre_mutuelle') }}" class="sidebar-link"><i class="mdi mdi-settings"></i><span class="hide-menu"> Configurations mutuelle</span></a></li>
-                                    <li class="sidebar-item"><a href="{{ path('parametre_exercice') }}" class="sidebar-link"><i class="mdi mdi-settings"></i><span class="hide-menu"> Configurations exercice</span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('parametre_mutuelle') }}" class="sidebar-link"><i class="mdi mdi-settings"></i><span class="hide-menu"> Configurations mutuelle</span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('parametre_exercice') }}" class="sidebar-link"><i class="mdi mdi-settings"></i><span class="hide-menu"> Configurations exercice</span></a></li>
                                 </ul>
                             </li>
                         {% endif %}

@@ -46,11 +46,13 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
      */
     private $nom;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
      */
     private $prenom;
 
@@ -61,6 +63,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
      */
     private $fonction;
 
@@ -73,6 +76,19 @@ class User implements UserInterface
      * @ORM\Column(type="boolean")
      */
     private $lost;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\Email
+     */
+    private $email;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
+     * @Assert\Regex("/^(\+261|0)3[2,3,4,9][0-9]{7}$/")
+     */
+    private $phone;
 
     public function __construct()
     {
@@ -221,6 +237,30 @@ class User implements UserInterface
     public function setLost(bool $lost): self
     {
         $this->lost = $lost;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): self
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(string $phone): self
+    {
+        $this->phone = $phone;
 
         return $this;
     }

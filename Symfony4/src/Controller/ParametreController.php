@@ -11,9 +11,19 @@ use App\Form\ExerciceType;
 use App\Form\ParametersType;
 use App\Service\ExerciceService;
 use App\Service\ParametreService;
+use App\Repository\UserRepository;
+use App\Repository\CompteRepository;
 use Symfony\Component\Form\FormError;
+use App\Repository\ExerciceRepository;
+use App\Repository\ParametreRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -23,12 +33,12 @@ class ParametreController extends AbstractController
     /**
      * @Route("/parametre/mutuelle", name="parametre_mutuelle")
      */
-    public function mutuelle(ParametreService $paramService, Request $request)
+    public function mutuelle(ParametreRepository $repository,CompteRepository $repositoryCompte, ParametreService $paramService, Request $request, EntityManagerInterface $manager)
     {
-        $allParameters = $this->getDoctrine()->getRepository(Parametre::class)->getParameters();
+        $allParameters = $repository->getParameters();
         if (!$allParameters) {
             $paramService->initialize();
-            $allParameters = $this->getDoctrine()->getRepository(Parametre::class)->getParameters();
+            $allParameters = $repository->getParameters();
         }
 
         $pCotisation = $allParameters['compte_cotisation'];
@@ -40,8 +50,8 @@ class ParametreController extends AbstractController
         $pPlafond = $allParameters['plafond_prestation'];
 
         /* Pour bien afficher le formulaire avec les données */
-        $compteCot = $this->getDoctrine()->getRepository(Compte::class)->findOneByPoste($pCotisation->getValue());        
-        $comptePre = $this->getDoctrine()->getRepository(Compte::class)->findOneByPoste($pPrestation->getValue());        
+        $compteCot = $repositoryCompte->findOneByPoste($pCotisation->getValue());        
+        $comptePre = $repositoryCompte->findOneByPoste($pPrestation->getValue());        
         $data['compte_cotisation'] = $compteCot;
         $data['label_cotisation'] = $pLabelCotisation->getValue();
         $data['compte_prestation'] = $comptePre;
@@ -64,7 +74,7 @@ class ParametreController extends AbstractController
             $pPlafond->setValue($form->get('plafond_prestation')->getData());
             $pSoins->setList(json_decode($form->get('soins_prestation')->getData(), true));
 
-            $this->getDoctrine()->getManager()->flush(); // flush suffit
+            $manager->flush(); // flush suffit
         }
 
         return $this->render('parametre/index.html.twig', [
@@ -75,22 +85,21 @@ class ParametreController extends AbstractController
     /**
      * @Route("/parametre/exercice", name="parametre_exercice")
      */
-    public function exercice(Request $request)
+    public function exercice(ExerciceRepository $repository)
     {        
-        $exercices = $this->getDoctrine()->getRepository(Exercice::class)->findAll();
         return $this->render('parametre/exercice.html.twig', [
-            'exercices' => $exercices
+            'exercices' => $repository->findAll()
         ]);
     }
 
     /**
      * @Route("/parametre/exercice/configurer", name="parametre_exercice_configurer")
      */
-    public function addExercice(Request $request, ExerciceService $exerciceService)
+    public function addExercice(ExerciceRepository $repository, Request $request, ExerciceService $exerciceService)
     {      
         $exercice = new Exercice();  
         
-        $dateDernier = $this->getDoctrine()->getRepository(Exercice::class)->findFinExercice();        
+        $dateDernier = $repository->findFinExercice();        
         if ($dateDernier) {
             $exercice->setDateDebut($dateDernier->add(new \DateInterval('P1D') ));
             $exercice->setDateFin( $dateDernier->add(new \DateInterval('P1Y') ));
@@ -116,6 +125,7 @@ class ParametreController extends AbstractController
                 $form->get('dateDebut')->addError(new FormError('Ce date appartient à d\'autre exercice'));
             }
         }
+
         return $this->render('parametre/configureExercice.html.twig', [
             'form' => $form->createView(),
         ]);
@@ -124,10 +134,9 @@ class ParametreController extends AbstractController
     /**
      * @Route("/parametre/user/all", name="user_all")
      */
-    public function allUser(Request $request, UserPasswordEncoderInterface $passwordEncoder)
+    public function allUser(UserRepository $repository, Request $request, UserPasswordEncoderInterface $passwordEncoder, EntityManagerInterface $manager)
     {
-        $users = $this->getDoctrine()->getRepository(User::class)->findAll();
-        
+        $users = $repository->findAll();
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
@@ -163,9 +172,8 @@ class ParametreController extends AbstractController
                 case 'gestionnaire':
                     $user->setRoles(['ROLE_GESTIONNAIRE']);
                     break;
-            }
-            
-            $entityManager = $this->getDoctrine()->getManager();
+            }  
+
             $entityManager->persist($user);
             $entityManager->flush();
 
@@ -174,6 +182,114 @@ class ParametreController extends AbstractController
 
         return $this->render('security/users.html.twig', [
             'users' => $users,
+            'form' => $form->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/parametre/user/{id}/reset", name="user_reset", requirements={"id"="\d+"}, methods={"POST"})
+     */
+    public function resetPassword(User $user, Request $request, EntityManagerInterface $manager, UserPasswordEncoderInterface $passwordEncoder)
+    {
+        $reset = $request->request->get('reset');
+        if ($reset) {
+            $user->setPassword(
+                $passwordEncoder->encodePassword($user, $reset)
+            );
+            $user->setLost(false);
+            $manager->flush();
+        }      
+        return $this->redirectToRoute('user_profile', ['id' => $user->getId()]);
+    }
+
+    /**
+     * @Route("/user/profile/{id}", name="user_profile", requirements={"id"="\d+"})
+     */
+    public function profile(User $user)
+    {
+        return $this->render('parametre/profile.html.twig', [
+            'user' => $user,
+            'iscurrent' => $user === $this->getUser()
+        ]);
+    }
+
+    /**
+     * @Route("/user/profile/edit", name="user_profile_edit")
+     */
+    public function editProfile(Request $request, EntityManagerInterface $manager)
+    {
+        $user = $this->getUser();
+        $form = $this->createFormBuilder($user)
+                        ->add('username')            
+                        ->add('nom')
+                        ->add('prenom')
+                        ->add('email', EmailType::class)
+                        ->add('phone')
+                        ->add('photo', FileType::class, [
+                            'mapped' => false,
+                            'required' => false
+                        ])
+                        ->getForm();       
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $photoFile = $form->get('photo')->getData();           
+            if ($photoFile) {
+                $fileName = uniqid().'.'.$photoFile->guessExtension();
+                try {
+                    $photoFile->move($this->getParameter('users_img_root_directory'), $fileName);
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
+                $user->setPhoto($this->getParameter('users_img_directory').'/'.$fileName);
+            }
+            $manager->flush();
+
+            return $this->redirectToRoute('user_profile', ['id' => $user->getId()]);
+        }
+
+        return $this->render('parametre/editProfile.html.twig', [
+            'form' => $form->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/user/profile/password", name="user_profile_password")
+     */
+    public function editPassword(Request $request, EntityManagerInterface $manager, UserPasswordEncoderInterface $passwordEncoder)
+    {
+        $form = $this->createFormBuilder()
+                        ->add('old_password', PasswordType::class)            
+                        ->add('new_password', PasswordType::class, [
+                            'constraints' => [
+                                new NotBlank(['message' => 'Veillez entrez le mot de passe']),
+                                new Length(['min' => '6', 'minMessage' => "Votre mot de passe doit faire minimum 6 caractères"])
+                            ],
+                        ])            
+                        ->add('confirm_password', PasswordType::class)
+                        ->getForm();       
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user = $this->getUser();         
+            if ($passwordEncoder->isPasswordValid($user, $form->get('old_password')->getData())) {
+                $new = $form->get('new_password')->getData();
+                $confirm = $form->get('confirm_password')->getData();
+                if ($new === $confirm) {
+                    $user->setPassword(
+                        $passwordEncoder->encodePassword($user, $new)
+                    );
+                    $manager->flush();
+                    return $this->redirectToRoute('user_profile', ['id' => $user->getId()]);
+                } else {
+                    $form->get('confirm_password')->addError(new FormError('Votre confirmation de mot de passe est incorrect'));
+                }       
+            } else {
+                $form->get('old_password')->addError(new FormError('Mot de passe incorrect'));
+            }
+        }
+
+        return $this->render('parametre/editPassword.html.twig', [
             'form' => $form->createView()
         ]);
     }

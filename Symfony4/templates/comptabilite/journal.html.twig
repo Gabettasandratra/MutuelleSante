@@ -37,7 +37,6 @@
                             <table class="table" id="zero_config">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th scope="col">#</th>
                                         <th scope="col">Date</th>
                                         <th scope="col">N° article</th>
                                         <th scope="col">Libellé écriture</th>
@@ -54,7 +53,6 @@
                                 <tbody>
                                     {% for article in articles %}                                
                                         <tr>
-                                            <th scope="col">{{ loop.index }}</th>
                                             <td>{{ article.date |date('d/m/Y') }}</td>
                                             <td>{{ article.id }}</td>
                                             <td>{{ article.libelle }}</td>

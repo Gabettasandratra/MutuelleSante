@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil utilisateur{% endblock %}
+
+{% block header %}
+    <div class="page-breadcrumb">
+        <div class="d-flex align-items-center">
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Profil utilisateur</h4>
+            <div class="ml-auto">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0 p-0">
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Utilisateur</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Profil</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <center class="m-t-30"> <img src="{{ asset(user.photo) }}" class="rounded-circle" width="150">
+                                <h4 class="card-title m-t-10">{{ user.nom|upper }} {{ user.prenom }}</h4>
+                                <h6 class="card-subtitle">{{ user.fonction|title }}</h6>
+                            </center>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="card-body"> 
+                                <small class="text-muted p-t-30 db">Login</small>
+                                <h6>{{ user.username }}</h6>
+                                <small class="text-muted p-t-30 db">Nom et prénom</small>
+                                <h6>{{ user.nom|upper }} {{ user.prenom }}</h6>
+                                <small class="text-muted">Adresse email </small>
+                                <h6>{{ user.email }}</h6> 
+                                <small class="text-muted p-t-30 db">Téléphone</small>
+                                <h6>{{ user.phone }}</h6>
+                                <small class="text-muted p-t-30 db">Date d'insertion</small>
+                                <h6>{{ user.date|date('d M Y') }}</h6> 
+                                <br>
+                                {% if iscurrent %}
+                                    <a href="{{ path('user_profile_edit') }}" class="btn btn-sm btn-success"><i class="mdi mdi-account-settings-variant"></i> Modifier</a>
+                                    <a href="{{ path('user_profile_password') }}" class="btn btn-sm btn-info"><i class="mdi mdi-key"></i> Changer mot de passe</a>
+                                {% else %}
+                                    {% if user.lost %}
+                                        <a href="#infos" class="btn btn-sm btn-danger" data-backdrop="static" data-toggle="modal"><i class="mdi mdi-key"></i> Reinitiliser mot de passe</a>
+                                        <div class="modal" id="infos">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h4 class="modal-title text-dark font-medium">Reinitialiser mot de passe</h4>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="container-fluid">
+                                                            <div class="row">
+                                                                <div class="col-12">
+                                                                    <form action="{{ path('user_reset',{id: user.id}) }}" method="post">
+                                                                        <div class="form-group">
+                                                                            <label for="pass_reset" class="required">Mot de passe pour <span class="font-medium">{{ user.username }}</span></label>
+                                                                            <input type="text" id="pass_reset" name="reset" required="required" class="form-control" value="reset">
+                                                                        </div>
+                                                                        <div><hr></div>
+                                                                        <button type="submit" class="btn btn-danger float-right"><i class="mdi mdi-account-key"></i> Réinitialiser</button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div><hr></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+    <script>
+        $(document).ready(function() { 
+
+        });
+    </script>
+{% endblock %}

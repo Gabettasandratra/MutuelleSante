@@ -22,8 +22,8 @@
 <![endif]-->
 </head>
 
-<body class="bg-dark">
-    <div class="main-wrapper">
+<body>
+    <div class="page-wrapper">
         <!-- ============================================================== -->
         <!-- Preloader - style you can find in spinners.css -->
         <!-- ============================================================== -->
@@ -39,11 +39,11 @@
         <div class="container-fluid">
             <div class="col-md-4 m-auto" style="padding-top: 6.5rem!important;">
                 <div class="card border">
-                    <div class="card-body">
-                        <h4 class="card-title">Authentification utilisateur</h4>
-                        <hr>
+                    <div class="card-body">                       
                         <div class="row">
                             <div class="col-md-12">
+                                <h4 class="card-title">Authentification utilisateur</h4>
+                                <hr>
                                 <form method="post">
                                     {% if error %}
                                         <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
