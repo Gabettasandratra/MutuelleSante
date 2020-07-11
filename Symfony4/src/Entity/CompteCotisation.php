@@ -259,4 +259,9 @@ class CompteCotisation
         return $this;
     }
 
+    public function getPourcentagePaye()
+    {
+        return $this->paye / $this->due;
+    }
+
 }

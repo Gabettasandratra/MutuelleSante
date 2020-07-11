@@ -19,49 +19,60 @@ use App\Repository\PrestationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\RemboursementRepository;
 use Symfony\Component\HttpFoundation\Request;
+use App\Repository\CompteCotisationRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 class PrestationController extends AbstractController
 {
     /**
-     * @Route("/prestation", name="prestation")
+     * @Route("/prestation/beneficiaire", name="prestation")
      */
-    public function index(PacRepository $repositoryPac, ParametreRepository $repositoryParametre)
+    public function index(PacRepository $repositoryPac)
     {
         return $this->render('prestation/index.html.twig', [
-            'pacs' => $repositoryPac->findAll(),
-            'percent' => (float) $repositoryParametre->findOneByNom('percent_prestation')->getValue()
+            'pacs' => $repositoryPac->findBy(['isSortie' => false]),
         ]);
     }
 
     /**
      * @Route("/prestation/beneficiaire/{id}", name="prestation_beneficiaire", requirements={"id"="\d+"})
      */
-    public function show(Pac $pac, PrestationRepository $repositoryPrestation)
+    public function show(Pac $pac, PrestationRepository $repositoryPrestation, ParametreRepository $repositoryParametre, CompteCotisationRepository $repositoryCompteCotisation, SessionInterface $session)
     {
-        $exercice = $this->getDoctrine()
-                         ->getRepository(Exercice::class)
-                         ->findCurrent();
+        $exercice = $session->get('exercice');
+        $prestations = $repositoryPrestation->findPrestation($exercice, $pac);  
 
-        $prestations = $repositoryPrestation->findPrestation($exercice, $pac);   
+        $percentPrestation = (float) $repositoryParametre->findOneByNom('percent_prestation')->getValue();
+        $plafondPrestation = (float) $repositoryParametre->findOneByNom('plafond_prestation')->getValue();
+
+        /* Verifie si le béneficiaire possede le droit */
+        $adherent = $pac->getAdherent();
+        $compteCotisation = $repositoryCompteCotisation->findCompteCotisation($adherent, $exercice);
+        if ($compteCotisation->getPourcentagePaye() >= $percentPrestation) {
+            
+        }
+
         $totalRembourse = 0;
         foreach ($prestations as $prestation) {
             $totalRembourse += $prestation->getRembourse();
         }
 
         $info = [
+            'possedeDroit' => $compteCotisation->getPourcentagePaye() >= $percentPrestation,
             'tRemb' => $totalRembourse,
-            'plafond' => $exercice->getCotAncien()*2,
+            'plafond' => $exercice->getCotAncien() * $plafondPrestation
         ];
 
         return $this->render('prestation/beneficiaire.html.twig', [
             'pac' => $pac,
             'info' => $info,
+            'exercice' => $exercice,
             'prestations' => $prestations,
         ]);
     }
@@ -125,20 +136,33 @@ class PrestationController extends AbstractController
     /**
      * @Route("/prestation/adherent", name="prestation_adherent")
      */
-    public function adherent(AdherentRepository $repositoryAdherent, ParametreRepository $repositoryParametre)
+    public function adherent(AdherentRepository $repositoryAdherent, SessionInterface $session)
     {
+        $exercice = $session->get('exercice');
+        $adherents = $repositoryAdherent->findAll();
+        $retour = [];
+        foreach ($adherents as $adherent) {
+            $retour[] = [
+                'id' => $adherent->getId(),
+                'numero' => $adherent->getNumero(),
+                'nom' => $adherent->getNom(),
+                'attente' => $repositoryAdherent->findSommePrestationAttente($exercice, $adherent),
+            ];
+        }       
+
+        dump($repositoryAdherent->findJoinPrestationAttente($exercice));
+        
         return $this->render('prestation/adherent.html.twig', [
-            'adherents' => $repositoryAdherent->findAll(),
-            'percent' => (float) $repositoryParametre->findOneByNom('percent_prestation')->getValue()
+            'adherents' => $retour
         ]);
     }
     
     /**
      * @Route("/prestation/adherent/{id}", name="prestation_adherent_show", requirements={"id"="\d+"})
      */
-    public function prestationAdherent(Adherent $adherent, ParametreRepository $repositoryParametre, RemboursementRepository $repositoryRemboursement, PrestationRepository $repositoryPrestation)
+    public function prestationAdherent(Adherent $adherent, CompteCotisationRepository $repository, ParametreRepository $repositoryParametre, RemboursementRepository $repositoryRemboursement, PrestationRepository $repositoryPrestation, SessionInterface $session)
     {
-        $exercice = $this->getDoctrine()->getRepository(Exercice::class)->findCurrent();
+        $exercice = $session->get('exercice');
         $plafondPrestation = $repositoryParametre->findOneByNom('plafond_prestation');
 
         $remboursements = $repositoryRemboursement->findRemboursement($exercice, $adherent);
@@ -146,8 +170,10 @@ class PrestationController extends AbstractController
         foreach ($remboursements as $remboursement) {
             $totalRembourse += $remboursement->getMontant();
         }
-        $compteCotisation = $adherent->getCompteCotisation($exercice);
+
+        $compteCotisation = $repository->findCompteCotisation($adherent, $exercice);
         
+        /* A DEMANDER  */
         $plafond = $compteCotisation->getPaye() * ((float) $plafondPrestation->getValue());
         $info = [
             'tRemb' => $totalRembourse,

@@ -24,6 +24,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -129,6 +130,15 @@ class ParametreController extends AbstractController
         return $this->render('parametre/configureExercice.html.twig', [
             'form' => $form->createView(),
         ]);
+    }
+
+    /**
+     * @Route("/parametre/exercice/select/{id}", name="parametre_exercice_select")
+     */
+    public function selectExercice(Exercice $exercice, SessionInterface $session)
+    {      
+        $session->set('exercice', $exercice);
+        return $this->redirectToRoute('parametre_exercice');
     }
 
     /**

@@ -14,10 +14,12 @@ use App\Form\HistoriqueCotisationType;
 use App\Repository\AdherentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use App\Repository\CompteCotisationRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
@@ -26,25 +28,25 @@ class CotisationController extends AbstractController
     /**
      * @Route("/cotisation", name="cotisation")
      */
-    public function index(AdherentRepository $repository)
+    public function index(AdherentRepository $repository, SessionInterface $session)
     {
+        $exercice = $session->get('exercice');
         return $this->render('cotisation/index.html.twig', [
-            'adherents' => $repository->findAll()
+            'adherents' => $repository->findJoinCompteCotisation($exercice)
         ]);
     }
 
     /**
      * @Route("/cotisation/{id}", name="cotisation_show")
      */
-    public function show(Adherent $adherent)
+    public function show(Adherent $adherent, CompteCotisationRepository $repository, SessionInterface $session)
     {
-        $exercice = $this->getDoctrine()
-                         ->getRepository(Exercice::class)
-                         ->findCurrent();
-
+        $exercice = $session->get('exercice');
+        $compteCotisation = $repository->findCompteCotisation($adherent, $exercice);
         return $this->render('cotisation/show.html.twig', [
             'adherent' => $adherent,
-            'exercice' => $exercice
+            'exercice' => $exercice,
+            'compteCotisation' => $compteCotisation
         ]);
     }
 

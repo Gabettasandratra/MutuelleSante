@@ -38,13 +38,17 @@
         <!-- ============================================================== -->
         <div class="container-fluid">
             <div class="col-md-4 m-auto" style="padding-top: 6.5rem!important;">
-                <div class="card border">
+                <div class="card border border-rounded">
                     <div class="card-body">                       
                         <div class="row">
                             <div class="col-md-12">
-                                <h4 class="card-title">Authentification utilisateur</h4>
-                                <hr>
+                                
                                 <form method="post">
+                                    <div class="form-group">
+                                        <h4 class="card-title">Authentification utilisateur</h4>
+                                        <hr>
+                                    </div>
+                                    
                                     {% if error %}
                                         <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                                     {% endif %}
@@ -64,8 +68,8 @@
                                     
                                     <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-                                    <div class="form-row">
-                                        <div class="col-12 text-right">
+                                    <div class="form-group">
+                                        <div class="col-md-12 text-right">
                                             <button type="submit" class="btn btn-info">Se connecter</button>
                                         </div>
                                     </div>

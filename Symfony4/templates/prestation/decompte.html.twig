@@ -70,9 +70,11 @@
                     </div>
                     <div class="row">                       
                         <div class="col-md-10 text-right">
+                            {% if app.session.get('exercice').isCurrent %}
                             <form action="{{ path('prestation_beneficiaire_save_decompte', {'id' : pac.id}) }}" method="post" id="formDecompte">
                                 <button type="submit" class="btn btn-success disabled" id="save"><i class="mdi mdi-content-save-all"></i> Enregistrer</button>
                             </form>
+                            {% endif %}
                         </div>
                         <div class="col-md-2 text-right">
                             <a href="{{ path('prestation_beneficiaire', {'id': pac.id}) }}" class="btn btn-secondary"><i class="mdi mdi-close-circle-outline"></i> Annuler</a>

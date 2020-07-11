@@ -31,11 +31,10 @@
                                     <th scope="col">Année</th>
                                     <th scope="col">Début</th>
                                     <th scope="col">Fin</th>
-                                    <th scope="col">Droit d'adhésion</th>
-                                    <th scope="col">Nouveau membre</th>
-                                    <th scope="col">Ancien membre</th>
-                                    <th scope="col">Clôturer</th>
-                                    <th scope="col"></th>
+                                    <th scope="col">Nouveau</th>
+                                    <th scope="col">Ancien</th>
+                                    <th scope="col">Etat</th>
+                                    <th scope="col">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -44,11 +43,19 @@
                                         <th>{{ exercice.annee }}</th>
                                         <td>{{ exercice.dateDebut |date('d/m/Y') }}</td>
                                         <td>{{ exercice.dateFin |date('d/m/Y') }}</td>
-                                        <td>{{ exercice.droitAdhesion }}</td>
                                         <td>{{ exercice.cotNouveau }}</td>
                                         <td>{{ exercice.cotAncien }}</td>
-                                        <td>{% if not exercice.isCloture %}<span class="label label-rounded label-primary">Non</span>{% else %}<span class="label label-rounded label-danger">Clôturé</span>{% endif %}</td>
-                                        <td>{% if exercice.isCurrent %}<span class="label label-rounded label-success">Courant</span>{% endif %}</td>
+                                        <td>
+                                            {% if not exercice.isCloture %}<span class="label label-rounded label-primary">Ouvert</span>{% else %}<span class="label label-rounded label-danger">Clôturé</span>{% endif %}
+                                            {% if exercice.isCurrent %}<span class="label label-rounded label-success">Courant</span>{% endif %}
+                                        </td>
+                                        <td>
+                                            {% if exercice.id != app.session.get('exercice').id %}
+                                            <a href="{{ path('parametre_exercice_select', {'id': exercice.id}) }}" class="label btn-primary label-info">Selectionner</a>
+                                            {% else %}
+                                            <span class="label label-danger">En cours</span>   
+                                            {% endif %}
+                                        </td>
                                     </tr>                                        
                                 {% endfor %}        
                             </tbody>

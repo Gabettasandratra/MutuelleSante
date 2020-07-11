@@ -82,7 +82,7 @@ class Adherent
     private $numero;
 
     /**
-     * @ORM\OneToMany(targetEntity=CompteCotisation::class, mappedBy="adherent")
+     * @ORM\OneToMany(targetEntity=CompteCotisation::class, mappedBy="adherent", fetch="EAGER")
      */
     private $compteCotisations;
 
@@ -316,20 +316,6 @@ class Adherent
 
         return $this;
     }  
-
-    public function getIsPaye()
-    {
-        $compteCotisation = $this->getCurrentCompteCotisation();
-
-        return $compteCotisation->getIsPaye();
-    }
-
-    public function getPourcentagePaye()
-    {
-        $compteCotisation = $this->getCurrentCompteCotisation();
-
-        return $compteCotisation->getPaye() / $compteCotisation->getDue();
-    }
 
     /**
      * @return Collection|Prestation[]

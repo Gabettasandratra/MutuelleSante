@@ -155,12 +155,12 @@ class Exercice
         return $this;
     }
 
-    public function isCurrent()
+    public function getIsCurrent()
     {       
         $now = new \DateTime();
         if ( $this->dateDebut <= $now && $this->dateFin >= $now) {
             return true;
         }
-        return null;
+        return false;
     }
 }

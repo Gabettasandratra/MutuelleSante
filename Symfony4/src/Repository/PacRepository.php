@@ -3,9 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Pac;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\Adherent;
+use App\Entity\Exercice;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method Pac|null find($id, $lockMode = null, $lockVersion = null)

@@ -76,7 +76,7 @@
                             </div>                           
                         </div>
                         <div class="col-md-6">
-                            <h4 class="card-title">Informations</h4>
+                            <h4 class="card-title">Informations année {{ exercice.annee }}</h4>
                             <div class="row">
                                 <div class="col-md-6">
                                     <ul class="list-style-none border-bottom-white">                
@@ -105,17 +105,34 @@
                                     </ul>
                                 </div>
                             </div>
+                            {% if info.possedeDroit %}
+                                <div class="alert alert-success">
+                                    Ce personne peut bénéficier de prestation
+                                </div>
+                            {% else %}
+                                <div class="alert alert-danger">
+                                    Ce personne  ne peut pas bénéficier de prestation 
+                                </div>
+                            {% endif %}
+
+                            {% if info.plafond <= info.tRemb %}
+                                <div class="alert alert-warning">
+                                    Les remboursements de ce bénéficiaire dépasse le plafond définie
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="row mt-4">
                         <div class="col-8">
                             <h4 class="card-title">Liste des prestations consommées</h4>
                         </div>
+                        {% if info.possedeDroit and exercice.isCurrent %}
                         <div class="col-4">
                             <div class="text-right">
                                 <a href="{{ path('prestation_beneficiaire_decompte', {'id' : pac.id}) }}" class="btn btn-sm btn-info"><i class="mdi mdi-hospital"></i> Saisir decompte de prestations</a>
                             </div> 
                         </div>
+                        {% endif %}
                     </div>
                     <hr>
                     <div class="table-responsive">

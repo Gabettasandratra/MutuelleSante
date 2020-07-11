@@ -16,6 +16,7 @@ use App\Repository\AdherentRepository;
 use App\Repository\ExerciceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use App\Repository\CompteCotisationRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -23,6 +24,7 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -34,9 +36,8 @@ class AdhesionController extends AbstractController
      */
     public function index(AdherentRepository $repository)
     {
-        $adherents = $repository->findAll();
         return $this->render('adhesion/index.html.twig', [
-            'adherents' => $adherents
+            'adherents' => $repository->findAll()
         ]);
     }
 
@@ -45,9 +46,8 @@ class AdhesionController extends AbstractController
      */
     public function beneficiaires(AdherentRepository $repository)
     {
-        $adherents = $repository->findAll();
         return $this->render('adhesion/beneficiaires.html.twig', [
-            'adherents' => $adherents
+            'adherents' => $repository->findAll()
         ]);
     }
 
@@ -56,9 +56,8 @@ class AdhesionController extends AbstractController
      */
     public function beneficiairesRetires(PacRepository $repository)
     {
-        $pacs = $repository->findPacRetirer();
         return $this->render('adhesion/beneficiairesRetires.html.twig', [
-            'pacs' => $pacs
+            'pacs' => $repository->findPacRetirer()
         ]);
     }
 
@@ -162,12 +161,14 @@ class AdhesionController extends AbstractController
     /**
      * @Route("/adhesion/{id}", name="adhesion_show")
      */
-    public function show(Adherent $adherent, ExerciceRepository $repository)
+    public function show(Adherent $adherent, CompteCotisationRepository $repository, SessionInterface $session)
     {
-        $exercice = $repository->findCurrent();  
+        $exercice = $session->get('exercice');
+        $compteCotisation = $repository->findCompteCotisation($adherent, $exercice);
         return $this->render('adhesion/show.html.twig', [
             'adherent' => $adherent,
             'exercice' => $exercice,
+            'compteCotisation' => $compteCotisation
         ]);
     }
 

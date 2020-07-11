@@ -36,34 +36,18 @@
                                     <th scope="col">Congrégation</th>
                                     <th scope="col">N°matricule</th>
                                     <th scope="col">Nom et prénom</th>
-                                    <th scope="col">Status</th>
                                     <th scope="col">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% set row = 1 %}
                                 {% for pac in pacs %}
-                                    {% if not pac.isSortie %}
-                                        <tr>
-                                            <th scope="row">{{ row }} {% set row = row + 1 %}</th>
-                                            <td>{{ pac.adherent.nom }}</td>
-                                            <td>{{ pac.matricule }}</td>
-                                            <td>{{ pac.nom }} {{ pac.prenom }}</td>
-
-                                            {% if pac.adherent.pourcentagePaye >= percent %}
-                                                <td><span class="label label-rounded label-success">Droit au préstation</span></td>
-                                                <td>
-                                                    <a href="{{ path('prestation_beneficiaire', {'id': pac.id}) }}"class="label  label-rounded btn-primary label-primary">Selectionner</a>
-                                                </td>
-                                            {% else %}
-                                                <td><span class="label label-rounded label-warning">Pas de droit au préstation</span></td>
-                                                <td>
-                                                    <span class="label label-rounded btn-secondary label-secondary disabled">Selectionner</span>
-                                                </td>
-                                            {% endif %}
-                                        </tr> 
-                                    {% endif %}                                       
-                                 
+                                <tr>
+                                    <th scope="row">{{ loop.index }}</th>
+                                    <td>{{ pac.adherent.nom }}</td>
+                                    <td>{{ pac.matricule }}</td>
+                                    <td>{{ pac.nom }} {{ pac.prenom }}</td>
+                                    <td><a href="{{ path('prestation_beneficiaire', {'id': pac.id}) }}"class="label  label-rounded btn-primary label-primary">Selectionner</a></td>           
+                                </tr>                                                                                    
                                 {% endfor %}
                             </tbody>
                         </table>

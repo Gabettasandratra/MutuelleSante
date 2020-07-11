@@ -94,9 +94,6 @@
                                 <div class="col-md-4">
                                     <ul class="list-style-none border-bottom-white">                
                                         <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Droit d'ahésion payé</span>
-                                        </li>
-                                        <li class="my-3 ">
                                             <span class="font-weight-medium text-dark"> Cotisation ancien </span>
                                         </li>
                                         <li class="my-3 ">
@@ -114,19 +111,14 @@
                                     </ul>
                                 </div>
                                 <div class="col-md-8">
-                                    {# Some logic : get the compte cotisation of the exercice given #}
-                                    {% set compteCotisation = adherent.compteCotisation(exercice) %}
-
                                     <ul class="list-style-none">
-                                        <li class="my-3 border-bottom">
-                                            <span> {{ exercice.droitAdhesion }} </span>
-                                        </li>
                                         <li class="my-3 border-bottom">
                                             <span> {{ exercice.cotAncien }} / bénéficiaire / ans</span>
                                         </li>
                                         <li class="my-3 border-bottom">
                                             <span> {{ exercice.cotNouveau }} / bénéficiaire / ans</span>
                                         </li>
+                                        
                                         <li class="my-3 border-bottom">               
                                             <span> {{ compteCotisation.ancien }}</span>
                                         </li>
@@ -141,8 +133,11 @@
                             </div>
                             <ul class="list-style-none">
                                 <div class="btn-list">
+                                    {% if exercice.isCurrent %}
                                     <a href="{{ path('adhesion_edit', {'id': adherent.id}) }}"class="btn btn-sm btn-success"><i class="mdi mdi-border-color"></i> Modifier</a>
+                                    {% endif %}
                                     <a href="{{ path('cotisation_show', {'id': adherent.id}) }}"class="btn btn-sm btn-primary"><i class="mdi mdi-calendar-check"></i> Voir fiche de cotisation</a>
+                                    <a href="{{ path('prestation_adherent_show', {'id': adherent.id}) }}"class="btn btn-sm btn-info"><i class="mdi mdi-home-map-marker"></i> Voir fiche de prestation</a>
                                 </div>
                             </ul>
                         </div>
@@ -151,6 +146,7 @@
                         <div class="col-5">
                             <h4 class="card-title">Bénéficiaire</h4>
                         </div>
+                        {% if exercice.isCurrent %}
                         <div class="col-4">
                             <div class="text-right">
                                 <a href="{{ path('adhesion_add_pac_xlsx', {'id': adherent.id}) }}" class="btn btn-sm btn-success"><i class="mdi mdi-upload"></i>  Importer depuis Excel</a>
@@ -161,6 +157,7 @@
                                 <a href="{{ path('adhesion_add_pac', {'id': adherent.id}) }}" class="btn btn-sm btn-info"><i class="mdi mdi-account-plus"></i> Ajouter</a>
                             </div> 
                         </div>
+                        {% endif %}
                     </div>
                     <hr>
                     <div class="table-responsive">
@@ -172,7 +169,9 @@
                                     <th scope="col">Nom et prénom</th>
                                     <th scope="col">Date naissance</th>
                                     <th scope="col">Fonction</th>
-                                    <th scope="col">Actions</th>
+                                    {% if exercice.isCurrent %}
+                                    <th scope="col">Action</th>
+                                    {% endif %}
                                 </tr>
                             </thead>
                             <tbody>
@@ -184,10 +183,12 @@
                                             <td>{{ pac.nom }} {{ pac.prenom }}</td>
                                             <td>{{ pac.dateNaissance | date('d / m / Y') }}</td>
                                             <td>{{ pac.parente }}</td>
+                                            {% if exercice.isCurrent  %}
                                             <td>
                                                 <a href="{{ path('adhesion_edit_pac', { 'id': adherent.id, 'idPac': pac.id }) }}" class="label btn-warning label-warning">Modifier</a>
                                                 <a href="{{ path('adhesion_remove_pac', { 'id': adherent.id, 'idPac': pac.id }) }}" class="label btn-danger label-danger">Retirer</button>
                                             </td>
+                                            {% endif %}
                                         </tr>
                                     {% endif %}                                
                                 {% endfor %}                                

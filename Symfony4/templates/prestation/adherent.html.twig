@@ -35,7 +35,7 @@
                                     <th scope="col">#</th>
                                     <th scope="col">Code</th>
                                     <th scope="col">Nom de la congrégation</th>
-                                    <th scope="col">Status</th>
+                                    <th scope="col">Paiement en attente</th>
                                     <th scope="col">Actions</th>
                                 </tr>
                             </thead>
@@ -44,15 +44,9 @@
                                     <tr>
                                         <th scope="row">{{ loop.index }}</th>
                                         <th>{{ adherent.numero }}</th>
-                                        <td>{{ adherent.nom }}</td>
-                                        {% if adherent.pourcentagePaye >= percent %}
-                                            <td><span class="label label-success">Droit au prestation</span></td>
-                                            <td><a href="{{ path('prestation_adherent_show', {'id': adherent.id}) }}"class="label label-rounded btn-primary label-primary">Selectionner</a></td>
-                                        {% else %}
-                                            <td><span class="label label-warning">Pas de droit au préstation</span></td>
-                                            <td><span class="label label-rounded btn-secondary label-secondary disabled">Selectionner</span></td>
-                                        {% endif %}       
-                                        
+                                        <td>{{ adherent.nom }}</td>                                            
+                                        <td>{{ adherent.attente }}</td>
+                                        <td><a href="{{ path('prestation_adherent_show', {'id': adherent.id}) }}"class="label label-rounded btn-primary label-primary">Selectionner</a></td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

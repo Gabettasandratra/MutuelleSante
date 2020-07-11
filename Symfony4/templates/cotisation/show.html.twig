@@ -72,9 +72,6 @@
                                 <div class="col-md-4">
                                     <ul class="list-style-none border-bottom-white">                
                                         <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Droit d'ahésion payé</span>
-                                        </li>
-                                        <li class="my-3 ">
                                             <span class="font-weight-medium text-dark"> Cotisation ancien</span>
                                         </li>
                                         <li class="my-3 ">
@@ -92,13 +89,7 @@
                                     </ul>
                                 </div>
                                 <div class="col-md-8">
-                                    {# Some logic : get the compte cotisation of the exercice given #}
-                                    {% set compteCotisation = adherent.compteCotisation(exercice) %}
-
                                     <ul class="list-style-none">
-                                        <li class="my-3 border-bottom">
-                                            <span> {{ exercice.droitAdhesion }} </span>
-                                        </li>
                                         <li class="my-3 border-bottom">
                                             <span> {{ exercice.cotAncien }} / bénéficiaire / ans</span>
                                         </li>
@@ -119,7 +110,8 @@
                             </div>
                             <ul class="list-style-none">
                                 <div class="btn-list">
-                                    <a href="{{ path('adhesion_show', {'id': adherent.id}) }}"class="btn btn-sm btn-primary"><i class="mdi mdi-calendar-check"></i> Voir fiche d'adhésion</a>
+                                    <a href="{{ path('adhesion_show', {'id': adherent.id}) }}"class="btn btn-sm btn-success"><i class="mdi mdi-account-multiple"></i> Voir fiche d'adhésion</a>
+                                    <a href="{{ path('prestation_adherent_show', {'id': adherent.id}) }}"class="btn btn-sm btn-info"><i class="mdi mdi-home-map-marker"></i> Voir fiche de prestation</a>
                                 </div>
                             </ul>
                         </div>
@@ -172,11 +164,13 @@
                         <div class="col-5">
                             <h4 class="card-title">Versement de cotisation</h4>
                         </div>
-                        <div class="col-7">
-                            <div class="text-right">
-                                <a href="{{ path('cotisation_pay', {'id': adherent.id}) }}" class="btn btn-sm btn-info"><i class="mdi mdi-plus-circle-outline"></i> Enregistrer nouveau paiement</a>
-                            </div> 
-                        </div>
+                        {% if not compteCotisation.isPaye and not exercice.isCloture %}
+                            <div class="col-7">
+                                <div class="text-right">
+                                    <a href="{{ path('cotisation_pay', {'id': adherent.id}) }}" class="btn btn-sm btn-info"><i class="mdi mdi-plus-circle-outline"></i> Enregistrer nouveau paiement</a>
+                                </div> 
+                            </div>
+                        {% endif %}
                     </div>
                     <hr>
                     <div class="table-responsive">
@@ -189,12 +183,13 @@
                                     <th scope="col">Montant</th>
                                     <th scope="col">Paiement</th>
                                     <th scope="col">Réference</th>
+                                    {% if not exercice.isCloture %}
                                     <th scope="col">Action</th>
+                                    {% endif %}
                                 </tr>
                             </thead>
                             <tbody>
                                 {% set t = 0 %}
-                                {% set compteCotisation = adherent.compteCotisation(exercice) %}
                                 {% for historiqueCotisation in compteCotisation.historiqueCotisations %}                                                               
                                     <tr {% if historiqueCotisation.remarque %} data-toggle="tooltip" title="{{ historiqueCotisation.remarque }}"{% endif %}>
                                         <th scope="row">{{ loop.index }}</th>
@@ -203,7 +198,9 @@
                                         <td>{{ historiqueCotisation.montant }}</td> {% set t = t + historiqueCotisation.montant %}
                                         <td>{{ historiqueCotisation.tresorerie.libelle }}</td>
                                         <td>{{ historiqueCotisation.reference }}</td>
+                                        {% if not exercice.isCloture %}                                                                        
                                         <td class="text-center"><a href="{{ path('cotisation_edit', { 'adherent_id': adherent.id, 'cotisation_id': historiqueCotisation.id }) }}" class="label label-primary">Modifier</a></span></td>
+                                        {% endif %}
                                     </tr>
                                     {% if loop.last %}
                                         </tbody>
@@ -211,7 +208,7 @@
                                             <tr>
                                                 <th scope="row" colspan=3>Total</th>
                                                 <td>{{ t }}</td>
-                                                <td colspan=4></td>
+                                                <td colspan=3></td>
                                             </tr>
                                         </tfoot>
                                     {% endif %}                                    
