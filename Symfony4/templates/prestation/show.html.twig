@@ -95,19 +95,19 @@
                                 <div class="col-md-6">
                                     <ul class="list-style-none">
                                         <li class="my-3 border-bottom">
-                                            <span> {{ info.due }} </span>
+                                            <span> {{ info.due|number_format(0,',',' ') }} </span>
                                         </li>
                                         <li class="my-3 border-bottom">
-                                            <span> {{ info.percue }} </span>
+                                            <span> {{ info.percue|number_format(0,',',' ') }} </span>
                                         </li>
                                         <li class="my-3 border-bottom">
-                                            <span> {{ info.tRemb }} </span>
+                                            <span> {{ info.tRemb|number_format(0,',',' ') }} </span>
                                         </li>
                                         <li class="my-3 border-bottom">
-                                            <span> {{ info.plafond }} </span>
+                                            <span> {{ info.plafond|number_format(0,',',' ') }} </span>
                                         </li>
                                         <li class="my-3 border-bottom">
-                                            <span> {{ info.reste }} </span>
+                                            <span> {{ info.reste|number_format(0,',',' ') }} </span>
                                         </li>
                                     </ul>
                                 </div>
@@ -135,19 +135,19 @@
                                         <th scope="col">Date</th>
                                         <th scope="col">Exercice</th>
                                         <th scope="col">Montant</th>
-                                        <th scope="col">Méthode de paiement</th>
+                                        <th scope="col">Mode de paiement</th>
                                         <th scope="col">Reférence</th>
                                         <th scope="col">Détail</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for remboursement in remboursements %}
-                                        <tr>
+                                        <tr {% if remboursement.remarque %} data-toggle="tooltip" title="{{ remboursement.remarque }}"{% endif %}>
                                             <th scope="row">{{ loop.index }}</th>
                                             <td>{{ remboursement.date |date('d/m/Y') }}</td>
                                             <td>{{ remboursement.exercice.annee }}</td>
-                                            <td>{{ remboursement.montant }}</td>
-                                            <td>{{ remboursement.tresorerie.libelle }}</td>
+                                            <td>{{ remboursement.montant|number_format(2,',',' ') }}</td>
+                                            <td>{{ remboursement.tresorerie.titre }}</td>
                                             <td>{{ remboursement.reference }}</td>
                                             <td><a href="{{ path('prestation_adherent_remboursement', { 'adh_id': adherent.id, 'remb_id': remboursement.id }) }}" class="label btn-primary label-primary">Voir</a></td>
                                         </tr>
@@ -189,8 +189,8 @@
                                                 <td>{{ prestation.date |date('d/m /Y') }}</td>
                                                 <td>{{ prestation.pac.codeMutuelle ~ ' - ' ~ prestation.pac.nom ~ ' ' ~ prestation.pac.prenom }}</td>
                                                 <td>{{ prestation.designation }}</td>
-                                                <td>{{ prestation.frais }}</td> {% set tFrais = tFrais + prestation.frais %}
-                                                <td>{{ prestation.rembourse }}</td> {% set tRembourse = tRembourse + prestation.rembourse %}
+                                                <td>{{ prestation.frais|number_format(2,',',' ') }}</td> {% set tFrais = tFrais + prestation.frais %}
+                                                <td>{{ prestation.rembourse|number_format(2,',',' ') }}</td> {% set tRembourse = tRembourse + prestation.rembourse %}
                                                 <td>{{ (prestation.rembourse / prestation.frais) | round(3, 'floor') * 100 }}%</td>
                                             </tr>
 
@@ -199,8 +199,8 @@
                                                 <tfoot>
                                                     <tr>
                                                         <th scope="row" colspan=4>Total</th>
-                                                        <td>{{ tFrais }}</td>
-                                                        <td>{{ tRembourse }}</td>
+                                                        <td>{{ tFrais|number_format(2,',',' ') }}</td>
+                                                        <td>{{ tRembourse|number_format(2,',',' ') }}</td>
                                                         <td>{{ (tRembourse / tFrais)| round(3, 'floor') * 100 }}%</td>
                                                     </tr>
                                                 </tfoot>
@@ -216,7 +216,7 @@
                             
                             </div>
                         </div>
-                        {% if tFrais != 0 %}
+                        {% if tFrais != 0 and app.session.get('exercice').isCurrent and not app.session.get('exercice').isCloture %}
                             <div class="row mt-1">
                                 <div class="col-12 text-right">
                                     <a href="{{ path('prestation_adherent_rembourser', {'id': adherent.id}) }}" class="btn btn-info"><i class="mdi mdi-credit-card"></i> Enregistrer paiement</a>

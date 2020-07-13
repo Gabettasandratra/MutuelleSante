@@ -69,10 +69,29 @@ class CompteRepository extends ServiceEntityRepository
             $credit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteCredit = :cp')
                             ->setParameter('cp', $compte)                      
                             ->getSingleScalarResult();
-            $retour[] = ['poste' => $compte->getPoste(), 'titre' => $compte->getTitre(), 'solde' => ($debit - $credit) ];
+            $retour[] = ['id' => $compte->getId(), 'poste' => $compte->getPoste(), 'titre' => $compte->getTitre(), 'solde' => ($debit - $credit), 'codeJournal' => $compte->getCodeJournal() ];
         }
 
         return $retour;
+    }
+
+    public function findSolde(Compte $compte)
+    {
+        $debit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteDebit = :cp')
+                                ->setParameter('cp', $compte)                      
+                                ->getSingleScalarResult();
+        $credit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteCredit = :cp')
+                            ->setParameter('cp', $compte)                      
+                            ->getSingleScalarResult();
+        return ($debit - $credit);
+    }
+
+    public function findCodeJournaux()
+    {
+        $codes =  $this->_em->createQuery('select c.titre, c.codeJournal from App\Entity\Compte c where c.isTresor =  true order by c.codeJournal')
+                            ->getResult();
+        $codes[] = [ 'titre' => 'Opération divers', 'codeJournal' => 'OD'];
+        return $codes;
     }
 
     public function findBilanActif(Exercice $exercice)

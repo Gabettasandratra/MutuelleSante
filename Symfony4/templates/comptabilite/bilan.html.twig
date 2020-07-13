@@ -38,7 +38,7 @@
                                     {% for compte in donnees.actif %}
                                         <tr>
                                             <td title="{{ compte.poste }}" data-toggle="tooltip">{{ compte.titre }}</td>
-                                            <td>{{ compte.solde }}</td> {% set totalA = totalA + compte.solde %}
+                                            <td>{{ compte.solde|number_format(2,',',' ') }}</td> {% set totalA = totalA + compte.solde %}
                                         </tr>
                                     {% endfor %}
                                     
@@ -46,7 +46,7 @@
                                 <tfoot>
                                     <tr class="table-active">
                                         <th>TOTAL ACTIF</th>
-                                        <td>{{ totalA }}</td>
+                                        <td>{{ totalA|number_format(2,',',' ') }}</td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -63,20 +63,20 @@
                                     {% for compte in donnees.passif %}
                                         <tr>
                                             <td title="{{ compte.poste }}" data-toggle="tooltip">{{ compte.titre }}</td>
-                                            <td>{{ compte.solde }}</td> {% set totalP = totalP + compte.solde %}
+                                            <td>{{ compte.solde|number_format(2,',',' ') }}</td> {% set totalP = totalP + compte.solde %}
                                         </tr>
                                     {% endfor %}
                                     {% set resultat = totalA - totalP %}
                                     <tr>
                                         <td><strong>Résultat de l'exercice {% if resultat >= 0 %}(Bénéfice){% else %}(Perte){% endif %}</strong></td>
-                                        <td></strong>{{ resultat }}</strong></td>
+                                        <td></strong>{{ resultat|number_format(2,',',' ') }}</strong></td>
                                     </tr>
                                     
                                 </tbody>
                                 <tfoot>
                                     <tr class="table-active">
                                         <th>TOTAL CAPITAUX PROPRES ET PASSIFS</th>
-                                        <td>{{ totalP + resultat }}</td>
+                                        <td>{{ (totalP + resultat)|number_format(2,',',' ') }}</td>
                                     </tr>
                                 </tfoot>
                             </table>

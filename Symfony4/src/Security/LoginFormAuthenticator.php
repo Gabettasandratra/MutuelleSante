@@ -93,6 +93,10 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator implements P
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
+        $allParameters = $repository->getParameters();
+        if (!$allParameters) {
+            return new RedirectResponse($this->urlGenerator->generate('parametre_mutuelle'));
+        }
         /* Set the exercice session */
         $exercice = $this->entityManager->getRepository(Exercice::class)->findCurrent();
         $session = $request->getSession();

@@ -16,13 +16,13 @@ class ArticleType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('montant', NumberType::class)
-            ->add('libelle')
-            ->add('piece')
-            ->add('analytique')
             ->add('date', DateType::class, [
                 'data' => new \DateTime()
             ])
+            ->add('montant', NumberType::class)
+            ->add('libelle')
+            ->add('piece')
+            ->add('analytique')            
             ->add('compteDebit', EntityType::class, [
                 'class' => Compte::class,
                 'choice_label' => function ($c) {

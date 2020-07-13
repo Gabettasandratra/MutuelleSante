@@ -13,6 +13,8 @@ use App\Entity\Remboursement;
 use App\Service\ComptaService;
 use App\Form\RemboursementType;
 use App\Repository\PacRepository;
+use App\Repository\CompteRepository;
+use Symfony\Component\Form\FormError;
 use App\Repository\AdherentRepository;
 use App\Repository\ParametreRepository;
 use App\Repository\PrestationRepository;
@@ -209,7 +211,7 @@ class PrestationController extends AbstractController
     /**
      * @Route("/prestation/adherent/{id}/rembourser", name="prestation_adherent_rembourser", requirements={"id"="\d+"})
      */
-    public function rembourserAdherent(Adherent $adherent, Request $request, ComptaService $comptaService, PrestationRepository $repositoryPrestation)
+    public function rembourserAdherent(Adherent $adherent, Request $request, ComptaService $comptaService, CompteRepository $repositoryCompte, PrestationRepository $repositoryPrestation)
     {
         $exercice = $this->getDoctrine()->getRepository(Exercice::class)->findCurrent();
         $montantNoPayed = $repositoryPrestation->getMontantNotPayed($adherent);
@@ -217,16 +219,27 @@ class PrestationController extends AbstractController
         $form = $this->createForm(RemboursementType::class, $remboursement);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $remboursement = $comptaService->payRemboursement($remboursement);
-            $prestationNotPayed = $this->getDoctrine()->getRepository(Prestation::class)->findNotPayed($adherent);
-            $manager = $this->getDoctrine()->getManager();
-            foreach ($prestationNotPayed as $prestation) {
-                $prestation->setIsPaye(true);
-                $prestation->setRemboursement($remboursement);
-                $manager->persist($prestation); 
+
+            $montant = $form->get('montant')->getData();
+            $tresorerie = $form->get('tresorerie')->getData();
+            $solde = $repositoryCompte->findSolde($tresorerie);
+
+            if ($montant <= $solde) {
+                
+                $remboursement = $comptaService->payRemboursement($remboursement);
+                $prestationNotPayed = $this->getDoctrine()->getRepository(Prestation::class)->findNotPayed($adherent);
+                $manager = $this->getDoctrine()->getManager();
+                foreach ($prestationNotPayed as $prestation) {
+                    $prestation->setIsPaye(true);
+                    $prestation->setRemboursement($remboursement);
+                    $manager->persist($prestation); 
+                }
+                $manager->flush();
+                return $this->redirectToRoute('prestation_adherent_show', ['id' => $adherent->getId()]);
+
+            } else {
+                $form->get('tresorerie')->addError(new FormError("Le solde negatif est interdit pour les trésoreries. Solde actuelle $solde"));
             }
-            $manager->flush();
-            return $this->redirectToRoute('prestation_adherent_show', ['id' => $adherent->getId()]);
         }
 
         return $this->render('prestation/rembourser.html.twig', [

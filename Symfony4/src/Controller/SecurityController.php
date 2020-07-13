@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\UserType;
 use App\Form\RegistrationFormType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -48,11 +49,11 @@ class SecurityController extends AbstractController
                          ->getRepository(User::class)
                          ->hasUser();
         if ($hasUser) {
-            return $this->redirectToRoute('dashboard'); // On retourne vers le page d'auth si existe
+            return $this->redirectToRoute('app_login'); // On retourne vers le page d'auth si existe
         }
 
         $user = new User();
-        $form = $this->createForm(RegistrationFormType::class, $user);
+        $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -60,20 +61,31 @@ class SecurityController extends AbstractController
             $user->setPassword(
                 $passwordEncoder->encodePassword(
                     $user,
-                    $form->get('plainPassword')->getData()
+                    $form->get('password')->getData()
                 )
             );
-            $user->setNom('Admin');
-            $user->setPrenom('Admin'); 
-            $user->setFonction('administrateur'); 
-            $user->setPhoto('assets/images/users/profile.png');
+
+            $photoFile = $form->get('photo')->getData();           
+            if ($photoFile) {
+                $fileName = uniqid().'.'.$photoFile->guessExtension();
+                try {
+                    $photoFile->move($this->getParameter('users_img_root_directory'), $fileName);
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
+                $user->setPhoto($this->getParameter('users_img_directory').'/'.$fileName);
+            } else {
+                $user->setPhoto('/assets/images/users/profile.png');
+            }
+
+            $user->setRoles(['ROLE_ADMIN']);
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($user);
             $entityManager->flush();
             // do anything else you need here, like send an email
 
-            return $this->redirectToRoute('dashboard');
+            return $this->redirectToRoute('app_login');
         }
 
         return $this->render('security/register.html.twig', [

@@ -30,13 +30,20 @@
                     <div class="row">
                         <div class="col-6">
                             {{ form_start(form) }}
-                                {{ form_row(form.poste, { 'label': 'N° du compte :', 'attr' : { 'placeholder' : '5...' } }) }} 
-                                {{ form_row(form.titre, { 'label': 'Intitulé du compte :' }) }}
-                                {{ form_row(form.libelle, { 'label': 'Libellé en mode de paiement :' }) }}
-                                {{ form_row(form.note, { 'label': 'Notes :' }) }}
+                            {% if editMode %}
+                                {{ form_row(form.poste, { 'label': 'N° du compte ', 'attr' : { 'placeholder' : '5...', readonly:'readonly' } }) }} 
+                            {% else %}
+                                {{ form_row(form.poste, { 'label': 'N° du compte ', 'attr' : { placeholder : '5...'} }) }} 
+                            {% endif %}
+                                
+                                {{ form_row(form.titre, { 'label': 'Intitulé du compte ' }) }}
+                                {{ form_row(form.acceptIn, { 'label': 'Accepte les paiements de cotisation' }) }}
+                                {{ form_row(form.acceptOut, { 'label': 'Accepte les reglements de remboursement ' }) }}
+                                {{ form_row(form.codeJournal, { 'label': 'Code de journal tresorerie ' }) }}
+                                {{ form_row(form.note, { 'label': 'Notes ' }) }}
                                 <div class="form-row">
                                     <div class="col-12 text-right">
-                                        <button type="submit" class="btn btn-success">Ajouter <i class="mdi mdi-keyboard-return"></i></button>
+                                        <button type="submit" class="btn btn-success">{% if editMode %}Enregitrer les modifications{% else %}Ajouter nouveau trésorerie{% endif %} <i class="mdi mdi-keyboard-return"></i></button>
                                     </div>
                                 </div>                                                     
                             {{ form_end(form) }}

@@ -38,7 +38,7 @@
                                     {% for compte in donnees.charge %}
                                         <tr>
                                             <td title="{{ compte.poste }}" data-toggle="tooltip">{{ compte.titre }}</td>
-                                            <td>{{ compte.solde }}</td> {% set totalC = totalC + compte.solde %}
+                                            <td>{{ compte.solde|number_format(2,',',' ') }}</td> {% set totalC = totalC + compte.solde %}
                                         </tr>
                                     {% endfor %}
                                     
@@ -46,7 +46,7 @@
                                 <tfoot>
                                     <tr class="table-active">
                                         <th>TOTAL DES CHARGES</th>
-                                        <td>{{ totalC }}</td>
+                                        <td>{{ totalC|number_format(2,',',' ') }}</td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -63,7 +63,7 @@
                                     {% for compte in donnees.produit %}
                                         <tr>
                                             <td title="{{ compte.poste }}" data-toggle="tooltip">{{ compte.titre }}</td>
-                                            <td>{{ compte.solde }}</td> {% set totalP = totalP + compte.solde %}
+                                            <td>{{ compte.solde|number_format(2,',',' ') }}</td> {% set totalP = totalP + compte.solde %}
                                         </tr>
                                     {% endfor %}
                                     
@@ -71,7 +71,7 @@
                                 <tfoot>
                                     <tr class="table-active">
                                         <th>TOTAL DES PRODUITS</th>
-                                        <td>{{ totalP }}</td>
+                                        <td>{{ totalP|number_format(2,',',' ') }}</td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -81,7 +81,7 @@
                         <div class="col-12">
                             {% set resultat = totalP - totalC %}
                             <div class="alert {% if resultat >= 0 %}alert-success{% else %}alert-danger{% endif %} " role="alert">
-                                RESULTAT DE L'EXERCICE = {{totalP}} - {{totalC}} = {{ totalP - totalC }}
+                                RESULTAT DE L'EXERCICE = {{totalP|number_format(2,',',' ')}} - {{totalC|number_format(2,',',' ')}} = {{ (totalP - totalC)|number_format(2,',',' ') }}
                             </div>
                         </div>
                         

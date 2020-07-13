@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Type journal{% endblock %}
+{% block title %}Les journaux comptables{% endblock %}
 
 {% block header %}
     <div class="page-breadcrumb">
         <div class="d-flex align-items-center">
-            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Journaux comptables</h4>
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Selection de journaux comptables</h4>
             <div class="ml-auto">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb m-0 p-0">
@@ -21,17 +21,18 @@
 {% block body %}
     <div class="row">
         <div class="col-md-12">
+
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Journaux comptables</h4>
+                    <hr>
                     <div class="feed-widget">
                         <ul class="list-style-none feed-body m-0 p-b-20">
-                            <li class="feed-item">
-                                <div class="feed-icon bg-info"></div> <a href="{{ path('comptabilite_journal', { 'journal' : 'cotisation' }) }}"> Journal des cotisations. <span class="ml-auto font-12 text-muted"></span></a></li>
-                            <li class="feed-item">
-                                <div class="feed-icon bg-success"></div> <a href="{{ path('comptabilite_journal', { 'journal' : 'remboursement' }) }}"> Journal des remboursements.<span class="ml-auto font-12 text-muted"></span></a></li>
-                            <li class="feed-item">
-                                <div class="feed-icon bg-warning"></div> <a href="{{ path('comptabilite_journal', { 'journal' : 'divers' }) }}"> Journal des opérations divers.<span class="ml-auto font-12 text-muted"></span></a></li>
+                            <li class="p-1"><a href="{{ path('comptabilite_journal') }}"> Journal géneral </a></li>
+                            {% for code in codes %}
+                            <li class="p-1"><a href="{{ path('comptabilite_journal', { journal: code.codeJournal }) }}"> Journal {{ code.titre }} </a></li> 
+                            {% endfor %}
+                            
                         </ul>
                     </div>
                 </div>

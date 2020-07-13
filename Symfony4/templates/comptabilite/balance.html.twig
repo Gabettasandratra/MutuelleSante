@@ -46,16 +46,16 @@
                                     {% for compte in comptes %}
                                         <tr>
                                             <th>{{ compte.compte }}</th>
-                                            <td>{{ compte.debit }}</td> {% set debit = debit + compte.debit %}
-                                            <td>{{ compte.credit }}</td> {% set credit = credit + compte.credit %}
-                                            <td>{{ compte.solde }}</td> {% set solde = solde + compte.solde %}
+                                            <td>{{ compte.debit|number_format(2,',',' ') }}</td> {% set debit = debit + compte.debit %}
+                                            <td>{{ compte.credit|number_format(2,',',' ') }}</td> {% set credit = credit + compte.credit %}
+                                            <td>{{ compte.solde|number_format(2,',',' ') }}</td> {% set solde = solde + compte.solde %}
                                         </tr>                                        
                                     {% endfor %}
                                     <tr>
                                         <th>TOTAL : {{ classe }}</th>
-                                        <td>{{ debit }}</td>
-                                        <td>{{ credit }}</td>
-                                        <td>{{ solde }}</td>
+                                        <td>{{ debit|number_format(2,',',' ') }}</td>
+                                        <td>{{ credit|number_format(2,',',' ') }}</td>
+                                        <td>{{ solde|number_format(2,',',' ') }}</td>
                                     </tr>
                                 {% endfor %}        
                             </tbody>

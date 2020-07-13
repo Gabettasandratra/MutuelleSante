@@ -12,6 +12,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * @ORM\Entity(repositoryClass=CompteRepository::class)
  * @UniqueEntity(fields={"poste"}, message="Ce numéro de compte existe déja")
+ * @UniqueEntity(fields={"codeJournal"}, message="Le code {{ value }} est déja utiliser")
  */
 class Compte
 {
@@ -50,11 +51,6 @@ class Compte
     private $isTresor;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $libelle;
-
-    /**
      * @ORM\Column(type="text", nullable=true)
      */
     private $note;
@@ -64,9 +60,25 @@ class Compte
      */
     private $classe;
 
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true, unique=true)
+     */
+    private $codeJournal;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $acceptOut;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $acceptIn;
+
     public function __construct()
     {
-        
+        $this->acceptOut = true;
+        $this->acceptIn = true;
     }
 
     public function getId(): ?int
@@ -135,18 +147,6 @@ class Compte
         return $this;
     }
 
-    public function getLibelle(): ?string
-    {
-        return $this->libelle;
-    }
-
-    public function setLibelle(?string $libelle): self
-    {
-        $this->libelle = $libelle;
-
-        return $this;
-    }
-
     public function getNote(): ?string
     {
         return $this->note;
@@ -167,6 +167,42 @@ class Compte
     public function setClasse(string $classe): self
     {
         $this->classe = $classe;
+
+        return $this;
+    }
+
+    public function getCodeJournal(): ?string
+    {
+        return $this->codeJournal;
+    }
+
+    public function setCodeJournal(string $codeJournal): self
+    {
+        $this->codeJournal = strtoupper($codeJournal);
+
+        return $this;
+    }
+
+    public function getAcceptOut(): ?bool
+    {
+        return $this->acceptOut;
+    }
+
+    public function setAcceptOut(bool $acceptOut): self
+    {
+        $this->acceptOut = $acceptOut;
+
+        return $this;
+    }
+
+    public function getAcceptIn(): ?bool
+    {
+        return $this->acceptIn;
+    }
+
+    public function setAcceptIn(bool $acceptIn): self
+    {
+        $this->acceptIn = $acceptIn;
 
         return $this;
     }

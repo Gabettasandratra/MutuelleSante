@@ -47,8 +47,8 @@
                                     <td>{{ prestation.date |date('d/m/Y') }}</td>
                                     <td>{{ prestation.pac.codeMutuelle ~ ' - ' ~ prestation.pac.nom ~ ' ' ~ prestation.pac.prenom }}</td>
                                     <td>{{ prestation.designation }}</td>
-                                    <td>{{ prestation.frais }}</td> {% set tFrais = tFrais + prestation.frais %}
-                                    <td>{{ prestation.rembourse }}</td> {% set tRembourse = tRembourse + prestation.rembourse %}
+                                    <td>{{ prestation.frais|number_format(2,',',' ') }}</td> {% set tFrais = tFrais + prestation.frais %}
+                                    <td>{{ prestation.rembourse|number_format(2,',',' ') }}</td> {% set tRembourse = tRembourse + prestation.rembourse %}
                                     <td>{{ (prestation.rembourse / prestation.frais) | round(3, 'floor') * 100 }}%</td>
                                 </tr>
 
@@ -57,8 +57,8 @@
                                     <tfoot>
                                         <tr>
                                             <th scope="row" colspan=4>Total</th>
-                                            <td>{{ tFrais }}</td>
-                                            <td>{{ tRembourse }}</td>
+                                            <td>{{ tFrais|number_format(2,',',' ') }}</td>
+                                            <td>{{ tRembourse|number_format(2,',',' ') }}</td>
                                             <td>{{ (tRembourse / tFrais)| round(3, 'floor') * 100 }}%</td>
                                         </tr>
                                     </tfoot>

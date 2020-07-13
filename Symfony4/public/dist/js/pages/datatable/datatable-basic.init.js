@@ -48,6 +48,15 @@ $('#order_2_desc').DataTable({
     "language": french
 });
 
+$('#scroll_ver').DataTable({
+    "dom": "t",
+    "scrollY": "50vh",
+    "scrollX": true,
+    "scrollCollapse": true,
+    "paging": false,
+    "language": french
+});
+
 var tableExcel = $('#export_excel').DataTable({
     dom: "t",
     buttons: [

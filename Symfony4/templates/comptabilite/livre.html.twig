@@ -71,14 +71,14 @@
                                                     <td>{{ article.libelle }}</td>
                                                     <td>{{ article.piece }}</td>
                                                     <td>{{ article.categorie }}</td>
-                                                    <td>{% if article.debit %}{{ article.debit }}{% endif %}</td> {% set debit = debit + article.debit %}
-                                                    <td>{% if article.credit %}{{ article.credit }}{% endif %}</td> {% set credit = credit + article.credit %}
+                                                    <td>{% if article.debit %}{{ article.debit|number_format(2,',',' ') }}{% endif %}</td> {% set debit = debit + article.debit %}
+                                                    <td>{% if article.credit %}{{ article.credit|number_format(2,',',' ') }}{% endif %}</td> {% set credit = credit + article.credit %}
                                                 </tr>
                                             {% endfor %}  
                                             <tr>
                                                 <th colspan=4>Total : {{ compte }}</span></th>
-                                                <td>{{ debit }}</td>
-                                                <td>{{ credit }}</td>
+                                                <td>{{ debit|number_format(2,',',' ') }}</td>
+                                                <td>{{ credit|number_format(2,',',' ') }}</td>
                                             </tr>    
                                         {% endfor %}
                                     {% endfor %}        
@@ -94,8 +94,8 @@
                                             <td>{{ article.libelle }}</td>
                                             <td>{{ article.piece }}</td>
                                             <td>{{ article.categorie }}</td>
-                                            <td>{% if article.debit %}{{ article.debit }}{% endif %}</td> {% set debit = debit + article.debit %}
-                                            <td>{% if article.credit %}{{ article.credit }}{% endif %}</td> {% set credit = credit + article.credit %}
+                                            <td>{% if article.debit %}{{ article.debit|number_format(2,',',' ') }}{% endif %}</td> {% set debit = debit + article.debit %}
+                                            <td>{% if article.credit %}{{ article.credit|number_format(2,',',' ') }}{% endif %}</td> {% set credit = credit + article.credit %}
                                         </tr>
                                     {% else %}
                                         <tr>
@@ -104,8 +104,8 @@
                                     {% endfor %} 
                                     <tr>
                                         <th colspan=4>Total : {{ donnees.compte.poste ~' '~ donnees.compte.titre }}</span></th>
-                                        <td>{{ debit }}</td>
-                                        <td>{{ credit }}</td>
+                                        <td>{{ debit|number_format(2,',',' ') }}</td>
+                                        <td>{{ credit|number_format(2,',',' ') }}</td>
                                     </tr>     
                                 </tbody>
                             {% endif %}

@@ -91,19 +91,19 @@
                                 <div class="col-md-8">
                                     <ul class="list-style-none">
                                         <li class="my-3 border-bottom">
-                                            <span> {{ exercice.cotAncien }} / bénéficiaire / ans</span>
+                                            <span> {{ exercice.cotAncien|number_format(0,',',' ') }} / bénéficiaire / ans</span>
                                         </li>
                                         <li class="my-3 border-bottom">
-                                            <span> {{ exercice.cotNouveau }} / bénéficiaire / ans</span>
+                                            <span> {{ exercice.cotNouveau|number_format(0,',',' ') }} / bénéficiaire / ans</span>
                                         </li>
                                         <li class="my-3 border-bottom">               
-                                            <span> {{ compteCotisation.ancien }}</span>
+                                            <span> {{ compteCotisation.ancien|number_format(0,',',' ') }}</span>
                                         </li>
                                         <li class="my-3 border-bottom">               
-                                            <span> {{ compteCotisation.nouveau }}</span>
+                                            <span> {{ compteCotisation.nouveau|number_format(0,',',' ') }}</span>
                                         </li>
                                         <li class="my-3 border-bottom">   
-                                            <span> {{ compteCotisation.due }} </span>
+                                            <span> {{ compteCotisation.due|number_format(0,',',' ') }} </span>
                                         </li>
                                     </ul>
                                 </div>
@@ -142,8 +142,8 @@
                                             <th scope="row">{{ compteCotisation.exercice.annee }}</th>
                                             <td>{{ compteCotisation.ancien }}</td>
                                             <td>{{ compteCotisation.nouveau }}</td>
-                                            <td>{{ compteCotisation.due }}</td>
-                                            <td>{{ compteCotisation.paye }}</td>
+                                            <td>{{ compteCotisation.due|number_format(2,',',' ') }}</td>
+                                            <td>{{ compteCotisation.paye|number_format(2,',',' ') }}</td>
                                             <td>
                                                 {% if compteCotisation.isPaye %}
                                                     <span class="label label-rounded label-success">Payé</span>
@@ -151,7 +151,7 @@
                                                     <span class="label label-rounded label-warning">Non payé</span>
                                                 {% endif %}         
                                             </td>
-                                            <td>{{ compteCotisation.reste }}</td>
+                                            <td>{{ compteCotisation.reste|number_format(2,',',' ')  }}</td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
@@ -164,7 +164,7 @@
                         <div class="col-5">
                             <h4 class="card-title">Versement de cotisation</h4>
                         </div>
-                        {% if not compteCotisation.isPaye and not exercice.isCloture %}
+                        {% if not compteCotisation.isPaye and exercice.isCurrent and not exercice.isCloture %}
                             <div class="col-7">
                                 <div class="text-right">
                                     <a href="{{ path('cotisation_pay', {'id': adherent.id}) }}" class="btn btn-sm btn-info"><i class="mdi mdi-plus-circle-outline"></i> Enregistrer nouveau paiement</a>
@@ -181,7 +181,7 @@
                                     <th scope="col">Date</th>
                                     <th scope="col">Année</th>
                                     <th scope="col">Montant</th>
-                                    <th scope="col">Paiement</th>
+                                    <th scope="col">Mode de Paiement</th>
                                     <th scope="col">Réference</th>
                                     {% if not exercice.isCloture %}
                                     <th scope="col">Action</th>
@@ -195,8 +195,8 @@
                                         <th scope="row">{{ loop.index }}</th>
                                         <td>{{ historiqueCotisation.datePaiement |date('d/m/Y') }}</td>
                                         <td>{{ compteCotisation.exercice.annee }}</td>
-                                        <td>{{ historiqueCotisation.montant }}</td> {% set t = t + historiqueCotisation.montant %}
-                                        <td>{{ historiqueCotisation.tresorerie.libelle }}</td>
+                                        <td>{{ historiqueCotisation.montant|number_format(2,',',' ') }}</td> {% set t = t + historiqueCotisation.montant %}
+                                        <td>{{ historiqueCotisation.tresorerie.titre }}</td>
                                         <td>{{ historiqueCotisation.reference }}</td>
                                         {% if not exercice.isCloture %}                                                                        
                                         <td class="text-center"><a href="{{ path('cotisation_edit', { 'adherent_id': adherent.id, 'cotisation_id': historiqueCotisation.id }) }}" class="label label-primary">Modifier</a></span></td>
@@ -207,7 +207,7 @@
                                         <tfoot>
                                             <tr>
                                                 <th scope="row" colspan=3>Total</th>
-                                                <td>{{ t }}</td>
+                                                <td>{{ t|number_format(2,',',' ') }}</td>
                                                 <td colspan=3></td>
                                             </tr>
                                         </tfoot>

@@ -94,13 +94,13 @@
                                 <div class="col-md-6">
                                     <ul class="list-style-none">
                                         <li class="my-3 border-bottom">
-                                            <span> {{ info.tRemb }} </span>
+                                            <span> {{ info.tRemb|number_format(0,',',' ') }} </span>
                                         </li>
                                         <li class="my-3 border-bottom">
-                                            <span> {{ info.plafond }} </span>
+                                            <span> {{ info.plafond|number_format(0,',',' ') }} </span>
                                         </li>
                                         <li class="my-3 border-bottom">
-                                            <span> {{ info.plafond - info.tRemb }} </span>
+                                            <span> {{ (info.plafond - info.tRemb)|number_format(0,',',' ') }} </span>
                                         </li>
                                     </ul>
                                 </div>
@@ -126,7 +126,7 @@
                         <div class="col-8">
                             <h4 class="card-title">Liste des prestations consommées</h4>
                         </div>
-                        {% if info.possedeDroit and exercice.isCurrent %}
+                        {% if info.possedeDroit and exercice.isCurrent and not exercice.isCloture %}
                         <div class="col-4">
                             <div class="text-right">
                                 <a href="{{ path('prestation_beneficiaire_decompte', {'id' : pac.id}) }}" class="btn btn-sm btn-info"><i class="mdi mdi-hospital"></i> Saisir decompte de prestations</a>

@@ -11,6 +11,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class RemboursementType extends AbstractType
 {
@@ -32,11 +33,15 @@ class RemboursementType extends AbstractType
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('c')
                             ->andWhere('c.isTresor = true')
+                            ->andWhere('c.acceptOut = true')
                             ->orderBy('c.poste', 'ASC');
                 },
-                'choice_label' => 'libelle',
+                'choice_label' => 'titre',
             ])
             ->add('reference')
+            ->add('remarque', TextareaType::class, [
+                'required' => false
+            ])
         ;
     }
 

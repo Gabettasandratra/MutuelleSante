@@ -51,6 +51,7 @@ class HistoriqueCotisation
 
     /**
      * @ORM\Column(type="text", nullable=true)
+     * @Assert\Length(max="255", maxMessage="Maximum 255 caractères acceptés")
      */
     private $remarque;
 

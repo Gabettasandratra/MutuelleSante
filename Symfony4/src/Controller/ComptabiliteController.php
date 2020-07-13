@@ -9,46 +9,51 @@ use App\Form\CompteType;
 use App\Form\ArticleType;
 use App\Repository\CompteRepository;
 use App\Repository\ArticleRepository;
+use Symfony\Component\Form\FormError;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ComptabiliteController extends AbstractController
 {
     /**
-     * @Route("/comptabilite/journal", name="comptabilite_select_journal")
+     * @Route("/comptabilite/journaux", name="comptabilite_select_journal")
      */
-    public function selectJournal()
+    public function selectJournal(CompteRepository $repositoryCompte)
     {
-        return $this->render('comptabilite/selectJournal.html.twig');
+        return $this->render('comptabilite/selectJournal.html.twig', [
+            'codes' => $repositoryCompte->findCodeJournaux()
+        ]);
     }
 
     /**
      * @Route("/comptabilite/journal/{journal}", name="comptabilite_journal")
      */
-    public function journal($journal, ArticleRepository $repositoryArticle)
+    public function journal($journal = null, ArticleRepository $repositoryArticle, CompteRepository $repositoryCompte, SessionInterface $session)
     {
-        $exercice = $this->getDoctrine()
-                         ->getRepository(Exercice::class)
-                         ->findCurrent();
+        $exercice = $session->get('exercice');
+        $codeJournaux = $repositoryCompte->findCodeJournaux();
 
-        if ($journal == 'cotisation') {
-            $articles = $repositoryArticle->findJournal($exercice, 'Cotisation');
-        } else if ($journal == 'remboursement') {
-            $articles = $repositoryArticle->findJournal($exercice, 'Remboursement');
-        } else if ($journal == 'divers') {
-            $articles = $repositoryArticle->findJournal($exercice, 'Divers');
+        if ($journal == null) {
+            $articles = $repositoryArticle->findJournal($exercice);
+            $codeJournal = ['titre' => 'Génerale', 'codeJournal' => ''];
         } else {
-            throw $this->createNotFoundException('Ce journal comptable n\'existe pas');
+            $codeJournal = $this->journal_exist($codeJournaux, $journal);
+            if ($codeJournal) {
+                $articles = $repositoryArticle->findJournal($exercice, $codeJournal['codeJournal']);
+            } else {
+                throw $this->createNotFoundException('Ce journal comptable n\'existe pas');
+            }           
         }
         
         return $this->render('comptabilite/journal.html.twig', [
             'articles' => $articles,
-            'journal'  => $journal
+            'journal'  => $codeJournal
         ]);
     }
 
@@ -56,24 +61,36 @@ class ComptabiliteController extends AbstractController
      * @Route("/comptabilite/journal/{journal}/saisie", name="comptabilite_saisie")
      * @Route("/comptabilite/journal/{journal}/modifier/{id}", name="comptabilite_modifier_article")
      */
-    public function saisie($journal, Article $article = null, Request $request, EntityManagerInterface $manager)
+    public function saisie($journal, Article $article = null, Request $request, CompteRepository $repositoryCompte, EntityManagerInterface $manager)
     {
         if (!$article) {
             $article = new Article();
-        }
-    
-        $article->setCategorie('Divers');
+            $article->setCategorie($journal);
+        }    
+        
         $form = $this->createForm(ArticleType::class, $article);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $manager->persist($article);
-            $manager->flush();
 
-            return $this->redirectToRoute('comptabilite_journal', ['journal' => 'divers']);
+            // protect against negative solde
+            $montant = $form->get('montant')->getData();
+            $cCredit = $form->get('compteCredit')->getData();
+
+            if ($cCredit->getIsTresor()) {
+                $solde = $repositoryCompte->findSolde($cCredit);
+                if ($montant <= $solde) {
+                    $manager->persist($article);
+                    $manager->flush();
+                    return $this->redirectToRoute('comptabilite_journal', ['journal' => $journal ]);
+                } else {
+                    $form->get('montant')->addError(new FormError("Le solde negatif est interdit pour les trésoreries. Solde actuelle $solde"));
+                }
+            }
         }
 
         return $this->render('comptabilite/saisie.html.twig', [
             'form' => $form->createView(),
+            'codeJournal' => $journal,
             'editMode' => $article->getId() !== null,
         ]);
     }
@@ -82,11 +99,9 @@ class ComptabiliteController extends AbstractController
      * @Route("/comptabilite/grandlivre", name="comptabilite_livre")
      * @Route("/comptabilite/grandlivre/{poste}", name="comptabilite_livre_aux")
      */
-    public function livre($poste = null, ArticleRepository $repositoryArticle, CompteRepository $repositoryCompte)
+    public function livre($poste = null, ArticleRepository $repositoryArticle, CompteRepository $repositoryCompte, SessionInterface $session)
     {
-        $exercice = $this->getDoctrine()
-                         ->getRepository(Exercice::class)
-                         ->findCurrent();
+        $exercice = $session->get('exercice');
 
         if ($poste === null) {
             $donnees = $repositoryArticle->findGrandLivre($exercice);
@@ -114,11 +129,9 @@ class ComptabiliteController extends AbstractController
     /**
      * @Route("/comptabilite/balance", name="comptabilite_balance")
      */
-    public function balance(ArticleRepository $repositoryArticle)
+    public function balance(ArticleRepository $repositoryArticle, SessionInterface $session)
     {
-        $exercice = $this->getDoctrine()
-                         ->getRepository(Exercice::class)
-                         ->findCurrent();
+        $exercice = $session->get('exercice');
 
         return $this->render('comptabilite/balance.html.twig', [
             'donnees' => $repositoryArticle->findBalance($exercice)
@@ -216,11 +229,9 @@ class ComptabiliteController extends AbstractController
     /**
      * @Route("/comptabilite/bilan", name="comptabilite_bilan")
      */
-    public function bilan(CompteRepository $repositoryCompte)
+    public function bilan(CompteRepository $repositoryCompte, SessionInterface $session)
     {
-        $exercice = $this->getDoctrine()
-                         ->getRepository(Exercice::class)
-                         ->findCurrent();
+        $exercice = $session->get('exercice');
 
         $donnees['actif'] = $repositoryCompte->findBilanActif($exercice);
         $donnees['passif'] = $repositoryCompte->findBilanPassif($exercice);
@@ -232,16 +243,23 @@ class ComptabiliteController extends AbstractController
     /**
      * @Route("/comptabilite/resultat", name="comptabilite_resultat")
      */
-    public function resultat(CompteRepository $repositoryCompte)
+    public function resultat(CompteRepository $repositoryCompte, SessionInterface $session)
     {
-        $exercice = $this->getDoctrine()
-                         ->getRepository(Exercice::class)
-                         ->findCurrent();
-
+        $exercice = $session->get('exercice');
         $donnees['charge'] = $repositoryCompte->findGestionCharge($exercice);
         $donnees['produit'] = $repositoryCompte->findGestionProduit($exercice);
         return $this->render('comptabilite/resultat.html.twig', [
             'donnees' => $donnees,
         ]);
+    }
+
+    private function journal_exist($codeJournaux, $code)
+    {
+        foreach ($codeJournaux as $codeJournal) {
+            if ($codeJournal['codeJournal'] == $code) {
+                return $codeJournal;
+            }
+        }
+        return false;
     }
 }

@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Journal {{ journal }}s
+    Journal {{ journal.titre }}
 {% endblock %}
 
 {% block stylesheets %}
@@ -11,13 +11,13 @@
 {% block header %}
     <div class="page-breadcrumb">
         <div class="d-flex align-items-center">
-            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Journaux comptables</h4>
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Journal comptable</h4>
             <div class="ml-auto">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb m-0 p-0">
                         <li class="breadcrumb-item text-muted active" aria-current="page">Comptabilité</li>
                         <li class="breadcrumb-item text-muted" aria-current="page">Journal</li>
-                        <li class="breadcrumb-item text-muted" aria-current="page">{{ journal |title }}</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">{{ journal.codeJournal }}</li>
                     </ol>
                 </nav>
             </div>
@@ -30,11 +30,11 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Journal {{ journal }}</h4>
+                    <h4 class="card-title">Journal {{ journal.titre }}</h4>
                     <hr>                           
                     <div class="row">
                         <div class="col-md-12 table-responsive">
-                            <table class="table" id="zero_config">
+                            <table class="table" id="scroll_ver">
                                 <thead class="thead-light">
                                     <tr>
                                         <th scope="col">Date</th>
@@ -44,10 +44,9 @@
                                         <th scope="col">Réference</th>
                                         <th scope="col">Compte débité</th>
                                         <th scope="col">Compte crédité</th>
-                                        <th scope="col">Compte analytique</th>
-                                        {% if journal == 'divers' %}           
+                                        <th scope="col">Analytique</th>
+                                        <th scope="col">Journal</th>
                                         <th scope="col">Action</th>
-                                        {% endif %}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -56,24 +55,24 @@
                                             <td>{{ article.date |date('d/m/Y') }}</td>
                                             <td>{{ article.id }}</td>
                                             <td>{{ article.libelle }}</td>
-                                            <td>{{ article.montant }}</td>
+                                            <td>{{ article.montant|number_format(2,',',' ') }}</td>
                                             <td>{{ article.piece }}</td>
                                             <td title="{{ article.compteDebit.titre }}" data-toggle="tooltip">{{ article.compteDebit.poste }}</td>
                                             <td title="{{ article.compteCredit.titre }}" data-toggle="tooltip">{{ article.compteCredit.poste }}</td>
                                             <td>{{ article.analytique }}</td>
-                                            {% if journal == 'divers' %}           
-                                            <td>{% if article.isFerme %}<span class="label label-rounded btn-secondary label-secondary disabled">Modifier</span>{% else %}<a href="{{ path('comptabilite_modifier_article', {'id': article.id, 'journal': article.categorie}) }}" class="label btn-primary label-primary">Modifier</a>{% endif %}</td>
-                                            {% endif %}
+                                            <td>{{ article.categorie }}</td>
+                                            <td>{% if article.isFerme or app.session.get('exercice').isCloture %}<span class="label label-rounded btn-secondary label-secondary disabled">Modifier</span>{% else %}<a href="{{ path('comptabilite_modifier_article', {'id': article.id, 'journal': article.categorie}) }}" class="label label-rounded btn-primary label-primary">Modifier</a>{% endif %}</td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                    {% if journal == 'divers' %}           
+                    {% if journal.codeJournal %}           
                         <div class="row mt-4">
                             <div class="col-md-12 text-right">
-                                <a href="{{ path('comptabilite_saisie', { 'journal': journal }) }}" class="btn btn-success">Saisie écriture comptable</a>
+                                <a href="{{ path('comptabilite_saisie', { 'journal': journal.codeJournal }) }}" class="btn btn-success"><i class="mdi mdi-receipt"></i> Saisie écriture comptable</a>
+                                <a href="{{ path('comptabilite_select_journal') }}" class="btn btn-secondary"><i class="mdi mdi-close-circle-outline"></i> Fermer</a>
                             </div>
                         </div>
                     {% endif %}

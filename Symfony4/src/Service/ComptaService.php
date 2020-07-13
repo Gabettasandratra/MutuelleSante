@@ -41,11 +41,12 @@ class ComptaService
         $article->setCompteDebit($cotisation->getTresorerie());
         $article->setCompteCredit($compteCotisation);
         $article->setLibelle($label);
-        $article->setCategorie('Cotisation'); // journal
+        $article->setCategorie($cotisation->getTresorerie()->getCodeJournal()); // journal
         $article->setAnalytique('Cotisation');
         $article->setMontant($cotisation->getMontant());
         $article->setDate($cotisation->getDatePaiement());
         $article->setPiece($cotisation->getReference());
+        $article->setIsFerme(true); // No modifiable depuis journal
 
         $cotisation->setArticle($article);
 
@@ -71,11 +72,12 @@ class ComptaService
         $article->setCompteDebit($compteRemboursement);        
         $article->setCompteCredit($remboursement->getTresorerie());        
         $article->setLibelle($label);
-        $article->setCategorie('Remboursement'); // journal
+        $article->setCategorie($remboursement->getTresorerie()->getCodeJournal()); // journal
         $article->setAnalytique('Remboursement');
         $article->setMontant($remboursement->getMontant());
         $article->setDate($remboursement->getDate());
         $article->setPiece($remboursement->getReference());
+        $article->setIsFerme(true); // No modifiable depuis journal
 
         $remboursement->setArticle($article);
 

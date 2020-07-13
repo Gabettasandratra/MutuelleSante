@@ -13,6 +13,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class HistoriqueCotisationType extends AbstractType
 {
@@ -35,12 +36,15 @@ class HistoriqueCotisationType extends AbstractType
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('c')
                             ->andWhere('c.isTresor = true')
+                            ->andWhere('c.acceptIn = true')
                             ->orderBy('c.poste', 'ASC');
                 },
-                'choice_label' => 'libelle',
+                'choice_label' => 'titre',
             ])
             ->add('reference')
-            ->add('remarque')
+            ->add('remarque', TextareaType::class, [
+                'required' => false
+            ])
         ;
     }
 

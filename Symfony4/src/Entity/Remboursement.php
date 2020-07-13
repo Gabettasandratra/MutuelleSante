@@ -69,6 +69,12 @@ class Remboursement
      */
     private $article;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\Length(max="255", maxMessage="Maximum 255 caractères acceptés")
+     */
+    private $remarque;
+
     public function __construct(Adherent $adherent, Exercice $exercice, $montant)
     {   
         $this->date = new \DateTime();
@@ -194,6 +200,18 @@ class Remboursement
     public function setArticle(article $article): self
     {
         $this->article = $article;
+
+        return $this;
+    }
+
+    public function getRemarque(): ?string
+    {
+        return $this->remarque;
+    }
+
+    public function setRemarque(?string $remarque): self
+    {
+        $this->remarque = $remarque;
 
         return $this;
     }

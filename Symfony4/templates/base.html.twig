@@ -128,13 +128,13 @@
                         </li>
 
                         {% block sidebarMenu %}
-                            {#<li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ path('dashboard') }}"><i class="mdi mdi-view-dashboard"></i><span class="hide-menu"> Tableau de bord</span></a></li>#}
+                        <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ path('dashboard') }}"><i class="mdi mdi-view-dashboard"></i><span class="hide-menu"> Tableau de bord</span></a></li>
                         {% if is_granted('ROLE_GESTIONNAIRE') %}
                             <li class="nav-small-cap"><span class="hide-menu">Gestion mutuelle</span></li>
                             <li class="sidebar-item"> 
                                 <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-account-multiple"></i><span class="hide-menu"> Adhesion </span></a>
                                 <ul aria-expanded="false" class="collapse first-level">
-                                    {% if app.session.get('exercice').isCurrent %}
+                                    {% if app.session.get('exercice').isCurrent and not app.session.get('exercice').isCloture %}
                                     <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('adhesion_new') }}" class="sidebar-link"><i class="mdi mdi-account-plus"></i><span class="hide-menu"> Inscrire congrégation </span></a></li>
                                     {% endif %}
                                     <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('adhesion') }}" class="sidebar-link"><i class="mdi mdi-account-search"></i><span class="hide-menu"> Liste des congrégations </span></a></li>
@@ -177,7 +177,7 @@
                             <li class="sidebar-item"> 
                                 <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-bank"></i><span class="hide-menu"> Trésorerie </span></a>
                                 <ul aria-expanded="false" class="collapse first-level">
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('tresorerie') }}" class="sidebar-link"><i class="mdi mdi-cube"></i><span class="hide-menu"> Gestion </span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('tresorerie') }}" class="sidebar-link"><i class="mdi mdi-cube"></i><span class="hide-menu"> Gestion de trésorerie</span></a></li>
                                     
                                 </ul>
                             </li>
