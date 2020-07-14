@@ -6,6 +6,7 @@ use App\Entity\Pac;
 use App\Entity\Adherent;
 use App\Repository\ExerciceRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx as ReaderXlsx;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -25,6 +26,8 @@ class ExcelReader
     public function savePacFromExcel(Adherent $adherent, $file)
     {
         $reader = new ReaderXlsx();
+        $reader->setReadDataOnly(true);
+        $reader->setReadEmptyCells(false);
         $spreadsheet = $reader->load($file);
 
         $data = [];
@@ -77,10 +80,11 @@ class ExcelReader
             $pac->setNom($donnee[1]);
             $pac->setPrenom($donnee[2]);
             $pac->setSexe($donnee[3]);
-            $pac->setDateNaissance(\DateTime::createFromFormat('d/m/Y', $donnee[4]));
+
+            $pac->setDateNaissance($this->getDateTimeFromExcel( $donnee[4]));
             $pac->setCin($donnee[5]);
             $pac->setParente($donnee[6]);
-            $pac->setDateEntrer(\DateTime::createFromFormat('d/m/Y', $donnee[7]));
+            $pac->setDateEntrer($this->getDateTimeFromExcel( $donnee[7]));
 
             $pac->setCreatedAt(new \DateTime());
             $pac->setIsSortie(false);
@@ -113,6 +117,16 @@ class ExcelReader
         $this->manager->flush(); 
         
         return $retour;
+    }
+
+    public function getDateTimeFromExcel($data)
+    {
+        if(strpos($data, "/"))
+        {
+            return \DateTime::createFromFormat('d/m/Y', $data);
+        } else {
+            return Date::excelToDateTimeObject($data);
+        }
     }
     
 }

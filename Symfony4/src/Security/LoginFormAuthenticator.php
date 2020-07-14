@@ -4,6 +4,7 @@ namespace App\Security;
 
 use App\Entity\User;
 use App\Entity\Exercice;
+use App\Entity\Parametre;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
@@ -92,15 +93,16 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator implements P
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
-    {
-        $allParameters = $repository->getParameters();
-        if (!$allParameters) {
-            return new RedirectResponse($this->urlGenerator->generate('parametre_mutuelle'));
-        }
+    {      
         /* Set the exercice session */
         $exercice = $this->entityManager->getRepository(Exercice::class)->findCurrent();
         $session = $request->getSession();
         $session->set('exercice', $exercice);
+
+        $allParameters = $this->entityManager->getRepository(Parametre::class)->getParameters();
+        if (!$allParameters) {
+            return new RedirectResponse($this->urlGenerator->generate('parametre_mutuelle'));
+        }
 
         if ($targetPath = $this->getTargetPath($session, $providerKey)) {
             return new RedirectResponse($targetPath);

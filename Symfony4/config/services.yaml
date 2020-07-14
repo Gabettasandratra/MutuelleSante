@@ -6,6 +6,8 @@
 parameters:
     users_img_root_directory: '%kernel.project_dir%/public/uploads/img/users'
     users_img_directory: 'uploads/img/users'
+    export_temp_root_directory: '%kernel.project_dir%/public/temp/export/excel'
+    export_temp_directory: 'temp/export/excel'
 
 
 services:

@@ -53,7 +53,7 @@
                                             {% if exercice.id != app.session.get('exercice').id %}
                                             <a href="{{ path('parametre_exercice_select', {'id': exercice.id}) }}" class="label btn-primary label-info">Selectionner</a>
                                             {% else %}
-                                            <span class="label label-danger">En cours</span>   
+                                            <span class="label label-success"><i class="mdi mdi-check"></i></span>   
                                             {% endif %}
                                         </td>
                                     </tr>                                        

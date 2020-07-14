@@ -27,7 +27,7 @@
                     <hr>
                     <div class="row">
                         <div class="col-md-12">
-                            <table class="table m-t-20">
+                            <table class="table m-t-20 table-bordered">
                                 <thead class="thead-light">
                                     <tr>
                                         <th scope="col">Poste</th>
@@ -59,6 +59,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12 text-right">
+
                             <a href="{{ path('comptabilite_plan_bilan') }}" class="btn btn-success">Nouveau compte de bilan <i class="mdi mdi-arrow-right"></i></a>
                         </div>
                     </div>
@@ -73,7 +74,7 @@
                     <hr>
                     <div class="row">
                         <div class="col-md-12">
-                            <table class="table m-t-20">
+                            <table class="table m-t-20 table-bordered">
                                 <thead class="thead-light">
                                     <tr>
                                         <th scope="col">Poste</th>
@@ -106,6 +107,11 @@
                     <div class="row">
                         <div class="col-md-12 text-right">
                             <a href="{{ path('comptabilite_plan_gestion') }}" class="btn btn-success">Nouveau compte de gestion <i class="mdi mdi-arrow-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-12 text-right">
+                            <a href="{{ path('comptabilite_plan_analytique') }}" class="btn btn-primary"><i class="mdi mdi-file-document-box"></i> Plan analytique</a>
                         </div>
                     </div>
                 </div>

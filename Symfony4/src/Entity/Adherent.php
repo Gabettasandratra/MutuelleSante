@@ -159,6 +159,14 @@ class Adherent
         return $this;
     }
 
+    public function getTelephone(): ?string
+    {
+        if ($this->telephone2) {
+            return $this->telephone1.'/'.$this->telephone2;
+        }
+        return $this->telephone1;
+    }
+
     public function getDateInscription(): ?\DateTimeInterface
     {
         return $this->dateInscription;

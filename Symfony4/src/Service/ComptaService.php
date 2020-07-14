@@ -42,7 +42,7 @@ class ComptaService
         $article->setCompteCredit($compteCotisation);
         $article->setLibelle($label);
         $article->setCategorie($cotisation->getTresorerie()->getCodeJournal()); // journal
-        $article->setAnalytique('Cotisation');
+        $article->setAnalytique($this->paramService->getParametre('analytique_cotisation'));
         $article->setMontant($cotisation->getMontant());
         $article->setDate($cotisation->getDatePaiement());
         $article->setPiece($cotisation->getReference());
@@ -73,7 +73,7 @@ class ComptaService
         $article->setCompteCredit($remboursement->getTresorerie());        
         $article->setLibelle($label);
         $article->setCategorie($remboursement->getTresorerie()->getCodeJournal()); // journal
-        $article->setAnalytique('Remboursement');
+        $article->setAnalytique($this->paramService->getParametre('analytique_prestation'));
         $article->setMontant($remboursement->getMontant());
         $article->setDate($remboursement->getDate());
         $article->setPiece($remboursement->getReference());

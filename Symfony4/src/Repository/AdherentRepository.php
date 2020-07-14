@@ -70,4 +70,11 @@ class AdherentRepository extends ServiceEntityRepository
                                     ->setParameter('e', $exercice)
                                     ->getSingleScalarResult();
     }
+
+    public function findByExercice(Exercice $exercice)
+    {
+        return $this->_em->createQuery('select a from App\Entity\Adherent a where a.dateInscription < :dateFin ')
+                                    ->setParameter('dateFin', $exercice->getDateFin())
+                                    ->getResult();
+    }
 }

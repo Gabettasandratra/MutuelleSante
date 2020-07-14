@@ -10,12 +10,17 @@ use App\Form\ArticleType;
 use App\Repository\CompteRepository;
 use App\Repository\ArticleRepository;
 use Symfony\Component\Form\FormError;
+use App\Repository\ParametreRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -61,14 +66,41 @@ class ComptabiliteController extends AbstractController
      * @Route("/comptabilite/journal/{journal}/saisie", name="comptabilite_saisie")
      * @Route("/comptabilite/journal/{journal}/modifier/{id}", name="comptabilite_modifier_article")
      */
-    public function saisie($journal, Article $article = null, Request $request, CompteRepository $repositoryCompte, EntityManagerInterface $manager)
+    public function saisie($journal, Article $article = null, Request $request, ParametreRepository $repositoryParametre, CompteRepository $repositoryCompte, EntityManagerInterface $manager)
     {
         if (!$article) {
             $article = new Article();
             $article->setCategorie($journal);
         }    
-        
-        $form = $this->createForm(ArticleType::class, $article);
+        $plan_analytiques = $repositoryParametre->findOneBy(['nom' => 'plan_analytique'])->getList();
+        $choices = [];
+        foreach ($plan_analytiques as $key => $value) {
+            $choices[$value] = $key;
+        } // reverse key value
+        $form = $this->createFormBuilder($article)
+                    ->add('date', DateType::class, [
+                        'data' => new \DateTime()
+                    ])
+                    ->add('montant', NumberType::class)
+                    ->add('libelle')
+                    ->add('piece')
+                    ->add('analytique', ChoiceType::class, [
+                        'choices' => $choices
+                    ])            
+                    ->add('compteDebit', EntityType::class, [
+                        'class' => Compte::class,
+                        'choice_label' => function ($c) {
+                            return $c->getPoste().' | '.$c->getTitre();
+                        },
+                    ])
+                    ->add('compteCredit', EntityType::class, [
+                        'class' => Compte::class,
+                        'choice_label' => function ($c) {
+                            return $c->getPoste().' | '.$c->getTitre();
+                        },
+                    ])
+                    ->getForm();
+
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
 
@@ -141,7 +173,7 @@ class ComptabiliteController extends AbstractController
     /**
      * @Route("/comptabilite/plan", name="comptabilite_plan")
      */
-    public function plan(Request $request, CompteRepository $repositoryCompte)
+    public function plan(CompteRepository $repositoryCompte)
     {
         return $this->render('comptabilite/plan.html.twig',[
             'classes' => [
@@ -150,6 +182,29 @@ class ComptabiliteController extends AbstractController
             ]
         ]);
     }
+
+    /**
+     * @Route("/comptabilite/plan/analytique", name="comptabilite_plan_analytique")
+     */
+    public function planAnalytique(Request $request, ParametreRepository $repositoryParametre, EntityManagerInterface $manager)
+    {
+        $parametre = $repositoryParametre->findOneBy(['nom' => 'plan_analytique']);
+        $data['plan_analytique'] = json_encode($parametre->getList());
+        $form = $this->createFormBuilder($data)
+                    ->add('plan_analytique', TextareaType::class)
+                    ->getForm()
+        ;   
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {   
+            $parametre->setList(json_decode($form->get('plan_analytique')->getData(), true));
+            $manager->flush();
+        }
+
+        return $this->render('comptabilite/analytique.html.twig',[
+            'form' => $form->createView()
+        ]);
+    }
+
 
     /**
      * @Route("/comptabilite/plan/bilan", name="comptabilite_plan_bilan")
