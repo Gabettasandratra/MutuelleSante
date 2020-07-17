@@ -55,6 +55,9 @@
                                         <li class="my-3">
                                             <span class="font-weight-medium text-dark"> Date d'entrée:</span>
                                         </li>
+                                        <li class="my-3">
+                                            <span class="font-weight-medium text-dark"> Téléphone:</span>
+                                        </li>
                                     </ul>
                                 </div>
                                 <div class="col-md-8">
@@ -69,7 +72,10 @@
                                             <span> {{ pac.matricule }}</span>
                                         </li>
                                         <li class="my-3 border-bottom">
-                                            <span> {{ pac.dateEntrer | date('d / m / Y') }}</span>
+                                            <span> {{ pac.dateEntrer | date('d/m/Y') }}</span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span>{% if pac.tel %} {{ pac.tel }}{% else %} <span class="text-muted">...</span>{% endif %} </span>
                                         </li>
                                     </ul>
                                 </div>

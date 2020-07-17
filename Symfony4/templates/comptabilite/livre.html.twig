@@ -45,27 +45,52 @@
                                 </div>
                             </div>
                         </div>                       
-                    </div>                        
-                    <div class="table-responsive-lg">
-                        <table class="table table-bordered">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th scope="col">Date</th>
-                                    <th scope="col">Libellé</th>
-                                    <th scope="col">Réference</th>
-                                    <th scope="col">Journal</th>
-                                    <th scope="col">Débit</th>
-                                    <th scope="col">Crédit</th>
-                                </tr>
-                            </thead>
-                            {% if not isAux %}                            
-                                <tbody>
-                                    {% for classe, comptes in donnees %}
-                                        <tr><th colspan=6>{{ classe }}</th></tr>
-                                        {% for compte, articles in comptes %}
-                                            <tr><th colspan=6  class="table-active">{{ compte }}</th></tr> 
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th scope="col">Date</th>
+                                            <th scope="col">Libellé</th>
+                                            <th scope="col">Réference</th>
+                                            <th scope="col">Journal</th>
+                                            <th scope="col">Débit</th>
+                                            <th scope="col">Crédit</th>
+                                        </tr>
+                                    </thead>
+                                    {% if not isAux %}                            
+                                        <tbody>
+                                            {% for classe, comptes in donnees %}
+                                                <tr><th colspan=6>{{ classe }}</th></tr>
+                                                {% for compte, articles in comptes %}
+                                                    <tr><th colspan=6  class="table-active">{{ compte }}</th></tr> 
+                                                    {% set debit = 0 %} {% set credit = 0 %}
+                                                    {% for article in articles %}
+                                                        <tr>
+                                                            <td>{{ article.date |date('d/m/Y') }}</td>
+                                                            <td>{{ article.libelle }}</td>
+                                                            <td>{{ article.piece }}</td>
+                                                            <td>{{ article.categorie }}</td>
+                                                            <td>{% if article.debit %}{{ article.debit|number_format(2,',',' ') }}{% endif %}</td> {% set debit = debit + article.debit %}
+                                                            <td>{% if article.credit %}{{ article.credit|number_format(2,',',' ') }}{% endif %}</td> {% set credit = credit + article.credit %}
+                                                        </tr>
+                                                    {% endfor %}  
+                                                    <tr>
+                                                        <th colspan=4>Total : {{ compte }}</span></th>
+                                                        <td>{{ debit|number_format(2,',',' ') }}</td>
+                                                        <td>{{ credit|number_format(2,',',' ') }}</td>
+                                                    </tr>    
+                                                {% endfor %}
+                                            {% endfor %}        
+                                        </tbody>
+                                    {% else %}
+                                        <tbody>
+                                            <tr><th colspan=6>{{ donnees.compte.classe }}</th></tr>
+                                            <tr><th colspan=6>{{ donnees.compte.poste ~' '~ donnees.compte.titre }}</th></tr>
                                             {% set debit = 0 %} {% set credit = 0 %}
-                                            {% for article in articles %}
+                                            {% for article in donnees.articles %}
                                                 <tr>
                                                     <td>{{ article.date |date('d/m/Y') }}</td>
                                                     <td>{{ article.libelle }}</td>
@@ -74,43 +99,22 @@
                                                     <td>{% if article.debit %}{{ article.debit|number_format(2,',',' ') }}{% endif %}</td> {% set debit = debit + article.debit %}
                                                     <td>{% if article.credit %}{{ article.credit|number_format(2,',',' ') }}{% endif %}</td> {% set credit = credit + article.credit %}
                                                 </tr>
-                                            {% endfor %}  
+                                            {% else %}
+                                                <tr>
+                                                    <td colspan=6>Aucune opération à afficher</td>
+                                                </tr>
+                                            {% endfor %} 
                                             <tr>
-                                                <th colspan=4>Total : {{ compte }}</span></th>
+                                                <th colspan=4>Total : {{ donnees.compte.poste ~' '~ donnees.compte.titre }}</span></th>
                                                 <td>{{ debit|number_format(2,',',' ') }}</td>
                                                 <td>{{ credit|number_format(2,',',' ') }}</td>
-                                            </tr>    
-                                        {% endfor %}
-                                    {% endfor %}        
-                                </tbody>
-                            {% else %}
-                                <tbody>
-                                    <tr><th colspan=6>{{ donnees.compte.classe }}</th></tr>
-                                    <tr><th colspan=6>{{ donnees.compte.poste ~' '~ donnees.compte.titre }}</th></tr>
-                                    {% set debit = 0 %} {% set credit = 0 %}
-                                    {% for article in donnees.articles %}
-                                        <tr>
-                                            <td>{{ article.date |date('d/m/Y') }}</td>
-                                            <td>{{ article.libelle }}</td>
-                                            <td>{{ article.piece }}</td>
-                                            <td>{{ article.categorie }}</td>
-                                            <td>{% if article.debit %}{{ article.debit|number_format(2,',',' ') }}{% endif %}</td> {% set debit = debit + article.debit %}
-                                            <td>{% if article.credit %}{{ article.credit|number_format(2,',',' ') }}{% endif %}</td> {% set credit = credit + article.credit %}
-                                        </tr>
-                                    {% else %}
-                                        <tr>
-                                            <td colspan=6>Aucune opération à afficher</td>
-                                        </tr>
-                                    {% endfor %} 
-                                    <tr>
-                                        <th colspan=4>Total : {{ donnees.compte.poste ~' '~ donnees.compte.titre }}</span></th>
-                                        <td>{{ debit|number_format(2,',',' ') }}</td>
-                                        <td>{{ credit|number_format(2,',',' ') }}</td>
-                                    </tr>     
-                                </tbody>
-                            {% endif %}
+                                            </tr>     
+                                        </tbody>
+                                    {% endif %}
 
-                        </table>
+                                </table>
+                            </div>
+                        </div>                        
                     </div>
                 </div>
             </div>

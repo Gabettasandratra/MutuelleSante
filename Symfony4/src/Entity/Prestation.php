@@ -134,6 +134,11 @@ class Prestation
         return $this->rembourse;
     }
 
+    public function getPercent(): ?float
+    {
+        return round($this->rembourse / $this->frais, 4) * 100;
+    }
+
     public function setRembourse(float $rembourse): self
     {
         $this->rembourse = $rembourse;

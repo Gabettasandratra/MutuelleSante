@@ -45,6 +45,15 @@
                                         <li class="my-3">
                                             <span class="font-weight-medium text-dark"> N° code:</span>
                                         </li>
+                                        <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark"> Adresse:</span>
+                                        </li>
+                                        <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark"> Numéro téléphone:</span>
+                                        </li>
+                                        <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark"> Email:</span>
+                                        </li>
                                         <li class="my-3">
                                             <span class="font-weight-medium text-dark"> Date d'entrée:</span>
                                         </li>                                       
@@ -57,6 +66,15 @@
                                         </li>
                                         <li class="my-3 border-bottom">
                                             <span> {{ adherent.numero }} </span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ adherent.adresse }}</span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ adherent.telephone1 }} {% if adherent.telephone2 %}/ {{ adherent.telephone2 }}{% endif %}</span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {% if adherent.email %}{{ adherent.email }}{% else %} ... {% endif %} </span>
                                         </li>
                                         <li class="my-3 border-bottom">
                                             <span> {{ adherent.dateInscription | date('d / m / Y') }}</span>

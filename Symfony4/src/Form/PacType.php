@@ -30,13 +30,14 @@ class PacType extends AbstractType
             ])
             ->add('dateNaissance', BirthdayType::class)
             ->add('cin')
+            ->add('tel')
             ->add('parente', ChoiceType::class, [
                 'choices'  => [
                     'Responsable' => 'Responsable',
                     'Membre' => 'Membre',
                     'Autre' => 'Autre',
                 ],
-                'label' => 'Fonction'
+                'label' => 'Fonction au seon de la congrégation'
             ])
             ->add('dateEntrer', DateType::class)
             ->add('photo', FileType::class, [

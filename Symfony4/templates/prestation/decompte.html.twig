@@ -108,7 +108,7 @@
                                     <div class="form-group row">
                                         <label for="prestation_date" class="col-form-label col-sm-3 required">Date *</label>
                                         <div class="col-sm-6">
-                                            <input type="text" id="prestation_date" name="prestation[date]" required="required" class="form-control datepicker" autocomplete="false">
+                                            <input type="text" id="prestation_date" name="prestation[date]" autocomplete="false" required="required" class="form-control datepicker" autocomplete="false">
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -129,7 +129,13 @@
                                     </div>
                                     <div class="form-group row">
                                         <label for="prestation_rembourse" class="col-form-label col-sm-3 required">Remboursés *</label>
-                                        <div class="col-sm-9">    
+                                        <div class="input-group col-sm-3">    
+                                            <input type="number" id="prestation_percent" required="required" class="form-control">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">    
                                             <input type="number" id="prestation_rembourse" name="prestation[rembourse]" required="required" class="form-control">
                                         </div>
                                     </div>
@@ -179,7 +185,6 @@
                     'facture'         :   $('#prestation_facture').val()
                 };
                 if (index) {
-                    console.log(index)
                     prestations[index] = prestation;
                 } else {                   
                     prestations.push(prestation);
@@ -189,12 +194,22 @@
                 $('#prestation').trigger("reset");
             }); 
 
+            $('#prestation_percent').change(function(e) {
+                var percent = parseFloat($(this).val());
+                var frais =  parseFloat($('#prestation_frais').val());
+                $('#prestation_rembourse').val(percent * frais / 100);
+            });
+
+            $('#prestation_rembourse').change(function(e) {
+                var rembourse = parseFloat($(this).val());
+                var frais = parseFloat($('#prestation_frais').val());
+                $('#prestation_percent').val(Math.round((rembourse/frais )*100));
+            });
+
             $('#del').click(function(e) {
                 e.preventDefault();
-                console.log('delete'+prestations);             
                 var index = $('#index_del').val();
                 prestations.splice(index, 1);  
-                console.log('delete'+prestations);             
                 refreshTable(prestations);
             });   
 
@@ -274,6 +289,7 @@
             $('#prestation_designation').val(prestation.designation);
             $('#prestation_frais').val(prestation.frais);
             $('#prestation_rembourse').val(prestation.rembourse);
+            $('#prestation_percent').val(Math.round((prestation.rembourse/prestation.frais)*100));
             $('#prestation_prestataire').val(prestation.prestataire);
             $('#prestation_facture').val(prestation.facture);
             $('#modal').modal('show');

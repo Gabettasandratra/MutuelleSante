@@ -233,9 +233,16 @@ class ComptabiliteController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $manager->persist($compte);
-            $manager->flush();
-            return $this->redirectToRoute('comptabilite_plan');
+            // Verify class
+            $class = $form->get('classe')->getData();
+            $poste = $form->get('poste')->getData();
+            if ($poste[0] == $class[0]) {
+                $manager->persist($compte);
+                $manager->flush();
+                return $this->redirectToRoute('comptabilite_plan');
+            } else {
+                $form->get('poste')->addError(new FormError("Le numero de compte $poste n'appartient pas à la classe $class"));
+            }   
         }
 
         return $this->render('comptabilite/compteForm.html.twig', [
@@ -270,10 +277,16 @@ class ComptabiliteController extends AbstractController
             } else {
                 $compte->setType(false);
             }
-
-            $manager->persist($compte);
-            $manager->flush();
-            return $this->redirectToRoute('comptabilite_plan');
+            // Verify class
+            $class = $form->get('classe')->getData();
+            $poste = $form->get('poste')->getData();
+            if ($poste[0] == $class[0]) {
+                $manager->persist($compte);
+                $manager->flush();
+                return $this->redirectToRoute('comptabilite_plan');
+            } else {
+                $form->get('poste')->addError(new FormError("Le numero de compte $poste n'appartient pas à la classe $class"));
+            } 
         }
 
         return $this->render('comptabilite/compteForm.html.twig', [

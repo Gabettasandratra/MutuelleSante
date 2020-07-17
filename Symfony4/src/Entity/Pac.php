@@ -106,6 +106,11 @@ class Pac
      */
     private $prestations;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $tel;
+
     public function __construct()
     {
         $this->dateEntrer = new \DateTime();
@@ -157,6 +162,11 @@ class Pac
         $this->prenom = $prenom;
 
         return $this;
+    }
+
+    public function getNomComplet(): ?string
+    {
+        return $this->nom.' '.$this->prenom;
     }
 
     public function getSexe(): ?string
@@ -329,6 +339,18 @@ class Pac
                 $prestation->setPac(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTel(): ?string
+    {
+        return $this->tel;
+    }
+
+    public function setTel(?string $tel): self
+    {
+        $this->tel = $tel;
 
         return $this;
     }

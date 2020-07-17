@@ -33,7 +33,8 @@
                         <table class="table table-bordered">
                             <thead class="thead-light">
                                 <tr>
-                                    <th scope="col">Compte</th>
+                                    <th scope="col">Poste</th>
+                                    <th scope="col">Intitulé de compte</th>
                                     <th scope="col">Débit</th>
                                     <th scope="col">Credit</th>
                                     <th scope="col">Solde</th>
@@ -45,14 +46,15 @@
                                     {% set debit = 0 %} {% set credit = 0 %} {% set solde = 0 %}
                                     {% for compte in comptes %}
                                         <tr>
-                                            <th>{{ compte.compte }}</th>
+                                            <td>{{ compte.poste }}</td>
+                                            <td>{{ compte.titre }}</td>
                                             <td>{{ compte.debit|number_format(2,',',' ') }}</td> {% set debit = debit + compte.debit %}
                                             <td>{{ compte.credit|number_format(2,',',' ') }}</td> {% set credit = credit + compte.credit %}
                                             <td>{{ compte.solde|number_format(2,',',' ') }}</td> {% set solde = solde + compte.solde %}
                                         </tr>                                        
                                     {% endfor %}
                                     <tr>
-                                        <th>TOTAL : {{ classe }}</th>
+                                        <th colspan=2 class="text-right">TOTAL : {{ classe }}</th>
                                         <td>{{ debit|number_format(2,',',' ') }}</td>
                                         <td>{{ credit|number_format(2,',',' ') }}</td>
                                         <td>{{ solde|number_format(2,',',' ') }}</td>

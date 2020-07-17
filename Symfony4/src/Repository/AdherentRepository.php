@@ -77,4 +77,23 @@ class AdherentRepository extends ServiceEntityRepository
                                     ->setParameter('dateFin', $exercice->getDateFin())
                                     ->getResult();
     }
+
+    public function findAncien(Exercice $exercice, Adherent $adherent)
+    {
+        return $this->_em->createQuery('select p from App\Entity\Pac p where p.adherent = :a and p.dateEntrer < :dateDebut')
+                         ->setParameter('a', $adherent)
+                         ->setParameter('dateDebut', $exercice->getDateDebut())
+                         ->getResult()
+        ;
+    }
+
+    public function findNouveau(Exercice $exercice, Adherent $adherent)
+    {
+        return $this->_em->createQuery('select p from App\Entity\Pac p where p.adherent = :a and p.dateEntrer between :dateDebut and :dateFin')
+                         ->setParameter('a', $adherent)
+                         ->setParameter('dateDebut', $exercice->getDateDebut())
+                         ->setParameter('dateFin', $exercice->getDateFin())
+                         ->getResult()
+        ;
+    }
 }

@@ -80,9 +80,7 @@ class ArticleRepository extends ServiceEntityRepository
                                 ->setParameter('dateDebut', $exercice->getDateDebut())
                                 ->setParameter('dateFin', $exercice->getDateFin())                   
                                 ->getSingleScalarResult();
-
-                $labelCompte = $compte->getPoste()." ".$compte->getTitre();
-                $retour[$str][] = ['compte' => $labelCompte, 'debit' => $debit, 'credit' => $credit, 'solde' => ($debit - $credit)];               
+                $retour[$str][] = ['poste' => $compte->getPoste(), 'titre' => $compte->getTitre(), 'debit' => $debit, 'credit' => $credit, 'solde' => ($debit - $credit)];               
             }
         }
         return $retour; 
