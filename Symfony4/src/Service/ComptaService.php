@@ -61,7 +61,7 @@ class ComptaService
     */
     public function payRemboursement(Remboursement $remboursement)
     {
-        $posteRemboursement = $this->paramService->getParametre('compte_prestation');
+        $posteRemboursement = $this->paramService->getParametre('compte_dette_prestation');
         $compteRemboursement = $this->comptaRepo->findOneByPoste($posteRemboursement);
         $label = $this->paramService->getParametre('label_prestation');
         
@@ -85,5 +85,31 @@ class ComptaService
         $this->manager->flush();    
 
         return $remboursement;
+    }
+
+    public function saveRemboursement($montant, $pac, $decompte, $journal ='PRE')
+    {
+        $posteRemboursement = $this->paramService->getParametre('compte_prestation');
+        $compteRemboursement = $this->comptaRepo->findOneByPoste($posteRemboursement);
+
+        $posteRembDette = $this->paramService->getParametre('compte_dette_prestation');
+        $compteRembDette = $this->comptaRepo->findOneByPoste($posteRembDette);
+
+        $article = new Article();
+        $article->setCompteDebit($compteRemboursement);        
+        $article->setCompteCredit($compteRembDette); 
+        $label = 'Prestation: '.$pac->getMatricule(). ' - '.$pac->getAdherent()->getNumero().'/'.$decompte;
+        $article->setLibelle($label);
+        $article->setCategorie($journal);
+        $article->setAnalytique($this->paramService->getParametre('analytique_prestation'));
+
+        $article->setMontant($montant);
+        $article->setDate(new \DateTime());
+        $article->setPiece($pac->getAdherent()->getNumero().'/'.$decompte);
+        $article->setIsFerme(true);
+
+        $this->manager->persist($article);
+        $this->manager->flush();
+        return $article;        
     }
 }

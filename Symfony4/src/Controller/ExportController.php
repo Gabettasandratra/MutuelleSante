@@ -12,17 +12,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class ExportController extends AbstractController
 {
     /**
-     * @Route("/export/vider", name="export_vider")
-     */
-    public function vider(ExportExcel $exportService)
-    {
-        $filename = $exportService->exportEtatFinanciere();
-        $filePath = $this->getParameter('export_temp_root_directory').'/'.$filename;
-
-        return $this->file($filePath, $filename, ResponseHeaderBag::DISPOSITION_INLINE);
-    }
-
-    /**
      * @Route("/export/rapport/cotisation", name="export_rapport_cotisations")
      */
     public function rapportCotisation(ExportExcel $exportService)
@@ -54,6 +43,40 @@ class ExportController extends AbstractController
 
         return $this->file($filePath, $filename, ResponseHeaderBag::DISPOSITION_INLINE);
     }
+
+    /**
+     * @Route("/export/rapport/journal/{code}", name="export_rapport_journal")
+     */
+    public function rapportJournal($code = null, ExportExcel $exportService)
+    {
+        $filename = $exportService->exportJournaux($code);
+        $filePath = $this->getParameter('export_temp_root_directory').'/'.$filename;
+
+        return $this->file($filePath, $filename, ResponseHeaderBag::DISPOSITION_INLINE);
+    }
+
+    /**
+     * @Route("/export/rapport/grandlivre", name="export_rapport_grandlivre")
+     */
+    public function rapportGrandlivre(ExportExcel $exportService)
+    {
+        $filename = $exportService->exportGrandlivre();
+        $filePath = $this->getParameter('export_temp_root_directory').'/'.$filename;
+
+        return $this->file($filePath, $filename, ResponseHeaderBag::DISPOSITION_INLINE);
+    }
+
+    /**
+     * @Route("/export/rapport/balance", name="export_rapport_balance")
+     */
+    public function rapportBalance(ExportExcel $exportService)
+    {
+        $filename = $exportService->exportBalance();
+        $filePath = $this->getParameter('export_temp_root_directory').'/'.$filename;
+
+        return $this->file($filePath, $filename, ResponseHeaderBag::DISPOSITION_INLINE);
+    }
+
 
     /**
      * @Route("/export/detail/{id}", name="export_detail_remboursement")

@@ -94,12 +94,12 @@ class ArticleRepository extends ServiceEntityRepository
     public function findJournal(Exercice $exercice, $journal = null)
     {
         if ($journal === null) {
-            return $this->_em->createQuery('select a from App\Entity\Article a where a.categorie !=\'CLOT\' and a.date between :dateDebut and :dateFin order by a.date DESC, a.id DESC')
+            return $this->_em->createQuery('select a from App\Entity\Article a where a.date between :dateDebut and :dateFin order by a.date DESC, a.id DESC')
                             ->setParameter('dateDebut', $exercice->getDateDebut())
                             ->setParameter('dateFin', $exercice->getDateFin())
                             ->getResult(); 
         }
-        return $this->_em->createQuery('select a from App\Entity\Article a where a.categorie !=\'CLOT\' and a.categorie = :cat and a.date between :dateDebut and :dateFin order by a.date DESC, a.id DESC')
+        return $this->_em->createQuery('select a from App\Entity\Article a where a.categorie = :cat and a.date between :dateDebut and :dateFin order by a.date DESC, a.id DESC')
                             ->setParameter('cat', $journal)                      
                             ->setParameter('dateDebut', $exercice->getDateDebut())
                             ->setParameter('dateFin', $exercice->getDateFin())

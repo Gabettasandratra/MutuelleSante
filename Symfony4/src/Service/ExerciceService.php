@@ -58,7 +58,7 @@ class ExerciceService
             if ($solde != 0) {
                 $article = new Article();
                 $article->setCategorie('CLOT')
-                        ->setAnalytique('CLOT')
+                        ->setAnalytique('-')
                         ->setLibelle('Clôture exercice '. $exercice->getAnnee())
                         ->setPiece('Clôture '.$exercice->getAnnee() .' '. date('d/m/Y'))
                         ->setDate(new \DateTime())

@@ -163,4 +163,12 @@ class Exercice
         }
         return false;
     }
+
+    public function check(\DateTimeInterface $date)
+    {       
+        if ( $this->dateDebut <= $date && $this->dateFin >= $date) {
+            return true;
+        }
+        return false;
+    }
 }

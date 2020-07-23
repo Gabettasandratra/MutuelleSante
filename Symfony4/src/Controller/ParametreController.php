@@ -50,11 +50,14 @@ class ParametreController extends AbstractController
         $pAnalytiquePrestation = $allParameters['analytique_prestation'];
         $pSoins = $allParameters['soins_prestation'];
         $pPercent = $allParameters['percent_prestation'];
+        $pPercentRemb = $allParameters['percent_rembourse_prestation'];
+        $pCompteRembPrestation = $allParameters['compte_dette_prestation'];
         $pPlafond = $allParameters['plafond_prestation'];
 
         /* Pour bien afficher le formulaire avec les données */
         $compteCot = $repositoryCompte->findOneByPoste($pCotisation->getValue());        
         $comptePre = $repositoryCompte->findOneByPoste($pPrestation->getValue());        
+        $compteRembPre = $repositoryCompte->findOneByPoste($pCompteRembPrestation->getValue());        
         $data['compte_cotisation'] = $compteCot;
         $data['label_cotisation'] = $pLabelCotisation->getValue();
         $data['analytique_cotisation'] = $pAnalytiqueCotisation->getValue();
@@ -62,6 +65,8 @@ class ParametreController extends AbstractController
         $data['label_prestation'] = $pLabelPrestation->getValue();
         $data['analytique_prestation'] = $pAnalytiquePrestation->getValue();
         $data['percent_prestation'] = $pPercent->getValue();
+        $data['percent_rembourse_prestation'] = $pPercentRemb->getValue();
+        $data['compte_dette_prestation'] = $pCompteRembPrestation->getValue();
         $data['plafond_prestation'] = $pPlafond->getValue();
         $data['soins_prestation'] = json_encode($pSoins->getList());
         /* Le data est uniquement pour afficher le données dans le formulaire */
@@ -78,7 +83,9 @@ class ParametreController extends AbstractController
             $pLabelPrestation->setValue($form->get('label_prestation')->getData());
             $pAnalytiquePrestation->setValue($form->get('analytique_prestation')->getData());
             $pPercent->setValue($form->get('percent_prestation')->getData());
+            $pPercentRemb->setValue($form->get('percent_rembourse_prestation')->getData());
             $pPlafond->setValue($form->get('plafond_prestation')->getData());
+            $pCompteRembPrestation->setValue($form->get('compte_dette_prestation')->getData()->getPoste());
             $pSoins->setList(json_decode($form->get('soins_prestation')->getData(), true));
 
             $manager->flush(); // flush suffit

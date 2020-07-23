@@ -37,11 +37,13 @@
                                 {{ form_row(form.analytique_prestation, { 'label' : 'Code analytique'}) }}
                                 {{ form_row(form.percent_prestation, { 'label' : 'Pourcentage de cotisation versé pour avoir accès au prestation'}) }}
                                 {{ form_row(form.plafond_prestation, { 'label' : 'Plafond de prestation (ex: 2 x cotisation)'}) }}
+                                {{ form_row(form.percent_rembourse_prestation, { 'label' : 'Pourcentage de remboursement par defaut'}) }}
+                                {{ form_row(form.compte_dette_prestation, { 'label' : 'Compte associé au préstation non payé'}) }}
                                 {{ form_row(form.soins_prestation, { 'label' : ' '}) }}
                                 <hr>
                                 <div class="form-row">
                                     <div class="col-12 text-right">
-                                        <button type="submit" class="btn btn-success">Enregistrer <i class="mdi mdi-keyboard-return"></i></button>
+                                        <button type="submit" class="btn btn-success"><i class="mdi mdi-content-save"></i> Enregistrer</button>
                                     </div>
                                 </div>                                                     
                             {{ form_end(form) }}

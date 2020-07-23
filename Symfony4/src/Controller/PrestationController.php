@@ -86,10 +86,12 @@ class PrestationController extends AbstractController
     {
         $generatedNumero = $repositoryPrestation->generateNumero($pac);
         $soins = $repositoryParametre->findOneByNom('soins_prestation');
+        $remb = $repositoryParametre->findOneByNom('percent_rembourse_prestation');
 
         return $this->render('prestation/decompte.html.twig', [
             'pac' => $pac,
             'numero' => $generatedNumero,
+            'remb' => $remb->getValue(),
             'soins' => $soins->getList(),
         ]);
     }
@@ -97,7 +99,7 @@ class PrestationController extends AbstractController
     /**
      * @Route("/prestation/beneficiaire/{id}/decompte/save", name="prestation_beneficiaire_save_decompte", requirements={"id"="\d+"}, methods={"POST"})
      */
-    public function saveJsonDecompte(Pac $pac, Request $request, ValidatorInterface $validator, EntityManagerInterface $manager)
+    public function saveJsonDecompte(Pac $pac, Request $request, ValidatorInterface $validator, ComptaService $comptaService, EntityManagerInterface $manager)
     {
         $data = json_decode( $request->getContent(), true);
         $prestations = $data['prestations'];
@@ -107,6 +109,8 @@ class PrestationController extends AbstractController
                 'ErrorMessages' => [ 'Le décompte de prestation est invalide' ]
             ]);
         }
+        $tot_remb = 0; // Total des rembs
+        
         foreach ($prestations as $key => $prestationJs) {
             $prestation = new Prestation($pac);
             $prestation->setDate(\DateTime::createFromFormat('d/m/Y', $prestationJs['date']));
@@ -127,9 +131,15 @@ class PrestationController extends AbstractController
                 }
                 return new JsonResponse($retour);
             }
-        }
 
+            // If prestation is valid
+            $tot_remb += $prestation->getRembourse();
+        }
         $manager->flush();
+
+        // Sauvegarde en tant que dette
+        $comptaService->saveRemboursement($tot_remb, $pac, $data['numero']);
+
         return new JsonResponse([
             'hasError' => false
         ]);

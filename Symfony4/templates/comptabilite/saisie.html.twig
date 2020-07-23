@@ -30,7 +30,13 @@
                     <div class="row">
                         <div class="col-6">
                             {{ form_start(form) }}
-                                {{ form_widget(form) }}
+                                {{ form_row(form.date) }}
+                                {{ form_row(form.montant) }}
+                                {{ form_row(form.libelle) }}
+                                {{ form_row(form.piece, { label: 'Pièce justificative'}) }}
+                                {{ form_row(form.analytique, { label: 'Destination (analytique)'}) }}
+                                {{ form_row(form.compteDebit) }}
+                                {{ form_row(form.compteCredit) }}
                                 <div class="form-row">
                                     <div class="col-12 text-right">
                                         <button type="submit" class="btn btn-success">
@@ -48,4 +54,9 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="{{ asset('dist/js/bootstrap-datepicker.min.js') }}"></script>
+<script src="{{ asset('dist/js/datepicker.js') }}"></script>
 {% endblock %}

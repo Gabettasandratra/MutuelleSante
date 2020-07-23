@@ -86,11 +86,20 @@ class CompteRepository extends ServiceEntityRepository
         return ($debit - $credit);
     }
 
-    public function findCodeJournaux()
+    public function findCodeJournaux($in = null)
     {
         $codes =  $this->_em->createQuery('select c.titre, c.codeJournal from App\Entity\Compte c where c.isTresor =  true order by c.codeJournal')
                             ->getResult();
         $codes[] = [ 'titre' => 'Opération divers', 'codeJournal' => 'OD'];
+        $codes[] = [ 'titre' => 'Clôture d\'exercice', 'codeJournal' => 'CLOT'];
+        $codes[] = [ 'titre' => 'Prestation', 'codeJournal' => 'PRE'];
+        if ($in) {
+            foreach ($codes as $code) {
+                if ($code['codeJournal'] == $in) {
+                    return [$code];
+                }
+            }
+        }
         return $codes;
     }
 

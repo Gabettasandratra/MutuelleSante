@@ -44,7 +44,21 @@ class ParametersType extends AbstractType
             ->add('label_prestation')
             ->add('analytique_prestation')
             ->add('percent_prestation', PercentType::class)
+            ->add('percent_rembourse_prestation', PercentType::class)
             ->add('plafond_prestation', NumberType::class)
+            ->add('compte_dette_prestation', EntityType::class, [
+                'class' => Compte::class,
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('c')
+                            ->andWhere('c.classe != \'6-COMPTES DE CHARGES\'')
+                            ->andWhere('c.classe != \'7-COMPTES DE PRODUITS\'')
+                            ->andWhere('c.type = false')
+                            ->orderBy('c.poste', 'ASC');
+                },
+                'choice_label' => function ($c) {
+                    return $c->getPoste().' | '.$c->getTitre();
+                },
+            ])
             ->add('soins_prestation', TextareaType::class, [
                 'attr' => [
                     'style' => 'display:none;'

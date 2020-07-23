@@ -45,8 +45,10 @@
                                         <th scope="col">Compte débité</th>
                                         <th scope="col">Compte crédité</th>
                                         <th scope="col">Analytique</th>
-                                        {% if not app.session.get('exercice').isCloture %}
+                                        {% if journal.codeJournal and not app.session.get('exercice').isCloture %}
                                         <th scope="col">Action</th>
+                                        {% else %}
+                                        <th scope="col">Journal</th> 
                                         {% endif %}
                                     </tr>
                                 </thead>
@@ -61,8 +63,10 @@
                                             <td title="{{ article.compteDebit.titre }}" data-toggle="tooltip">{{ article.compteDebit.poste }}</td>
                                             <td title="{{ article.compteCredit.titre }}" data-toggle="tooltip">{{ article.compteCredit.poste }}</td>
                                             <td>{{ article.analytique }}</td>
-                                            {% if not app.session.get('exercice').isCloture %}
+                                            {% if journal.codeJournal and not app.session.get('exercice').isCloture %}
                                             <td>{% if article.isFerme %}<span class="label label-rounded btn-secondary label-secondary disabled">Modifier</span>{% else %}<a href="{{ path('comptabilite_modifier_article', {'id': article.id, 'journal': article.categorie}) }}" class="label label-rounded btn-primary label-primary">Modifier</a>{% endif %}</td>
+                                            {% else %}
+                                            <th scope="col">{{article.categorie}}</th>
                                             {% endif %}
                                         </tr>
                                     {% endfor %}
@@ -70,14 +74,17 @@
                             </table>
                         </div>
                     </div>
-                    {% if journal.codeJournal %}           
-                        <div class="row mt-4">
-                            <div class="col-md-12 text-right">
-                                {% if not app.session.get('exercice').isCloture %}<a href="{{ path('comptabilite_saisie', { 'journal': journal.codeJournal }) }}" class="btn btn-success"><i class="mdi mdi-receipt"></i> Saisie écriture comptable</a>{% endif %}
-                                <a href="{{ path('comptabilite_select_journal') }}" class="btn btn-secondary"><i class="mdi mdi-close-circle-outline"></i> Fermer</a>
-                            </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-12 text-right">
+                            {% if journal.codeJournal and not app.session.get('exercice').isCloture %}           
+                            <a href="{{ path('comptabilite_saisie', { 'journal': journal.codeJournal }) }}" class="btn btn-success"><i class="mdi mdi-receipt"></i> Saisie écriture comptable</a>
+                            {% endif %}
+                            <a href="{{ path('export_rapport_journal', {code: journal.codeJournal}) }}" class="btn btn-info"><i class="mdi mdi-printer"></i> Exporter</a>
+                            <a href="{{ path('comptabilite_select_journal') }}" class="btn btn-secondary"><i class="mdi mdi-close-circle-outline"></i> Fermer</a>
                         </div>
-                    {% endif %}
+                    </div>
+                
                 </div>
             </div>
         </div>

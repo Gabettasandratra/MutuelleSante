@@ -261,6 +261,56 @@ class ExportExcel
      */
 
     /*
+     * Exportation journaux comptable
+     */
+    public function exportJournaux($in = null)
+    {
+        $codes = $this->manager->getRepository(Compte::class)->findCodeJournaux($in);
+
+        $exercice = $this->session->get('exercice');
+        $spreadsheet = new Spreadsheet();
+        // Données
+        $key = 0;
+        foreach ($codes as $code) {       
+            $articles = $this->manager->getRepository(Article::class)->findJournal($exercice, $code['codeJournal']);
+            if ($articles) {
+                if ($key != 0) {
+                    $spreadsheet->createSheet();
+                }  
+                $spreadsheet->setActiveSheetIndex($key);
+                $sheet = $spreadsheet->getActiveSheet();
+                $sheet->setTitle($code['codeJournal']);
+
+                $headers = ['Date', 'N° article', 'Libellé', 'Montant', 'Réference', 'Débit', 'Crédit', 'Déstination'];
+                $this->writeHeaders($sheet, $headers);
+                $row = 1;
+                foreach ($articles as $article) {
+                    $row++;
+                    $sheet->setCellValueByColumnAndRow(1, $row, $article->getDate()->format('d/m/Y'));
+                    $sheet->setCellValueByColumnAndRow(2, $row, $article->getId());
+                    $sheet->setCellValueByColumnAndRow(3, $row, $article->getLibelle());
+                    $sheet->setCellValueByColumnAndRow(4, $row, $article->getMontant())
+                            ->getStyle('D'.$row)
+                            ->getNumberFormat()
+                            ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+                    $sheet->setCellValueByColumnAndRow(5, $row, $article->getPiece());
+                    $sheet->setCellValueByColumnAndRow(6, $row, $article->getCompteDebit()->getPoste());
+                    $sheet->setCellValueByColumnAndRow(7, $row, $article->getCompteCredit()->getPoste());
+                    $sheet->setCellValueByColumnAndRow(8, $row, $article->getAnalytique());
+                }
+                $this->addBorder($sheet, $headers, $row);
+                $key++;
+            }
+        }
+
+        $this->autoSizeColumns($spreadsheet);    
+
+        $filename = 'Journal '. $in.' '. $exercice->getAnnee() .'.xlsx';
+     
+        return $this->saveTemp($spreadsheet, $filename);
+    }
+
+    /*
      * Exportation de grand livre comptable
      */
     public function exportGrandlivre()
@@ -311,6 +361,7 @@ class ExportExcel
                             ->getStyle('A'.$row)
                             ->getAlignment()
                             ->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+                $sheet->getStyle('A'.$row)->getFont()->setBold(true);
                 $sheet->setCellValueByColumnAndRow(5, $row, $totalDebit)
                             ->getStyle('E'.$row)
                             ->getNumberFormat()
@@ -344,13 +395,13 @@ class ExportExcel
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Balance des comptes '. $exercice->getAnnee());
   
-        $headers = ['Poste', 'Intitulé du compte', 'Débit', 'Crédit', 'Solde'];
+        $headers = ['Poste', 'Intitulé du compte', 'Mvt débit', 'Mvt crédit', 'Solde débit', 'Solde crédit'];
         $this->writeHeaders($sheet, $headers);
 
         $row = 1;
         foreach ($balances as $classe => $comptes) {
             $row++;
-            $sheet->mergeCells('A'.$row.':E'.$row);
+            $sheet->mergeCells('A'.$row.':F'.$row);
             $sheet->setCellValueByColumnAndRow(1, $row, $classe)
                     ->getStyle('A'.$row)->getFont()->setBold(true);
 
@@ -370,8 +421,15 @@ class ExportExcel
                         ->getStyle('D'.$row)
                         ->getNumberFormat()
                         ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-                $sheet->setCellValueByColumnAndRow(5, $row, $compte['solde'])
+
+                $solde_debiteur = ($compte['solde'] >= 0) ? $compte['solde'] : 0 ;
+                $solde_crediteur = ($compte['solde'] >= 0) ? 0 : $compte['solde'];
+                $sheet->setCellValueByColumnAndRow(5, $row, $solde_debiteur)
                         ->getStyle('E'.$row)
+                        ->getNumberFormat()
+                        ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+                $sheet->setCellValueByColumnAndRow(6, $row, abs($solde_crediteur))
+                        ->getStyle('F'.$row)
                         ->getNumberFormat()
                         ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
                 
@@ -393,11 +451,16 @@ class ExportExcel
                         ->getStyle('D'.$row)
                         ->getNumberFormat()
                         ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-            $sheet->setCellValueByColumnAndRow(5, $row, $totalDebit - $totalCredit)
+            $t_debiteur = (($totalDebit - $totalCredit) >= 0) ? ($totalDebit - $totalCredit) : 0 ;
+            $t_crediteur = (($totalDebit - $totalCredit) >= 0) ? 0 : ($totalDebit - $totalCredit);
+            $sheet->setCellValueByColumnAndRow(5, $row, $t_debiteur)
                         ->getStyle('E'.$row)
                         ->getNumberFormat()
                         ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-            
+            $sheet->setCellValueByColumnAndRow(6, $row, abs($t_crediteur))
+                        ->getStyle('F'.$row)
+                        ->getNumberFormat()
+                        ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 
         }
         $this->autoSizeColumns($spreadsheet);

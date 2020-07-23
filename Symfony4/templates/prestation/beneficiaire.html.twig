@@ -168,9 +168,9 @@
                                         <th scope="row">{{ loop.index }}</th>
                                         <td>{{ prestation.date | date('d/m/Y') }}</td>
                                         <td>{{ prestation.designation }}</td>
-                                        <td>{{ prestation.frais }}</td> {% set tFrais = tFrais + prestation.frais %}
-                                        <td>{{ prestation.rembourse }}</td> {% set tRemb = tRemb + prestation.rembourse %}
-                                        <td>{{ (prestation.rembourse / prestation.frais)| round(3, 'floor') * 100 }}%</td>
+                                        <td>{{ prestation.frais|number_format(2,',',' ') }}</td> {% set tFrais = tFrais + prestation.frais %}
+                                        <td>{{ prestation.rembourse|number_format(2,',',' ') }}</td> {% set tRemb = tRemb + prestation.rembourse %}
+                                        <td>{{ (prestation.rembourse / prestation.frais)|round(2, 'floor') * 100 }}%</td>
                                         <td>{{ pac.adherent.numero ~ ' / ' ~ prestation.decompte }}</td>
                                         <td>
                                             {% if prestation.isPaye %}
@@ -186,9 +186,9 @@
                                         <tfoot>
                                             <tr>
                                                 <th scope="row" colspan=3>Total</th>
-                                                <td>{{ tFrais }}</td>
-                                                <td>{{ tRemb }}</td>
-                                                <td>{{ (tRemb / tFrais)| round(3, 'floor') * 100 }}%</td>
+                                                <td>{{ tFrais|number_format(2,',',' ') }}</td>
+                                                <td>{{ tRemb|number_format(2,',',' ') }}</td>
+                                                <td>{{ (tRemb / tFrais)| round(2, 'floor') * 100 }}%</td>
                                                 <td colspan=2></td>
                                             </tr>
                                         </tfoot>

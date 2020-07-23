@@ -67,11 +67,13 @@ class ComptabiliteController extends AbstractController
      * @Route("/comptabilite/journal/{journal}/saisie", name="comptabilite_saisie")
      * @Route("/comptabilite/journal/{journal}/modifier/{id}", name="comptabilite_modifier_article")
      */
-    public function saisie($journal, Article $article = null, Request $request, ParametreRepository $repositoryParametre, CompteRepository $repositoryCompte, EntityManagerInterface $manager)
+    public function saisie($journal, Article $article = null, Request $request, ParametreRepository $repositoryParametre, CompteRepository $repositoryCompte, EntityManagerInterface $manager, SessionInterface $session)
     {
         if (!$article) {
             $article = new Article();
-            $article->setCategorie($journal);
+            $article->setCompteDebit($repositoryCompte->findOneBy(['codeJournal' => $journal]))
+                    ->setCompteCredit($repositoryCompte->findOneBy(['codeJournal' => $journal]))
+                    ->setCategorie($journal);
         }    
         $plan_analytiques = $repositoryParametre->findOneBy(['nom' => 'plan_analytique'])->getList();
         $choices = [];
@@ -92,7 +94,7 @@ class ComptabiliteController extends AbstractController
                         'class' => Compte::class,
                         'query_builder' => function (EntityRepository $er) {
                             return $er->createQueryBuilder('c')
-                                    ->andWhere('c.classe != \'7-COMPTES DE PRODUITS\'')
+                                    //->andWhere('c.classe != \'7-COMPTES DE PRODUITS\'')
                                     ->orderBy('c.poste', 'ASC');
                         },
                         'choice_label' => function ($c) {
@@ -103,7 +105,7 @@ class ComptabiliteController extends AbstractController
                         'class' => Compte::class,
                         'query_builder' => function (EntityRepository $er) {
                             return $er->createQueryBuilder('c')
-                                    ->andWhere('c.classe != \'6-COMPTES DE CHARGES\'')
+                                    //->andWhere('c.classe != \'6-COMPTES DE CHARGES\'')
                                     ->orderBy('c.poste', 'ASC');
                         },
                         'choice_label' => function ($c) {
@@ -114,20 +116,29 @@ class ComptabiliteController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-
-            // protect against negative solde
-            $montant = $form->get('montant')->getData();
-            $cCredit = $form->get('compteCredit')->getData();
-
-            if ($cCredit->getIsTresor()) {
-                $solde = $repositoryCompte->findSolde($cCredit);
-                if ($montant <= $solde) {
+            // Verifier la date
+            $date = $form->get('date')->getData();
+            if ($session->get('exercice')->check($date)) {
+                // protect against negative solde
+                $montant = $form->get('montant')->getData();
+                $cCredit = $form->get('compteCredit')->getData();
+                if ($cCredit->getIsTresor()) { // Trésorerie
+                    $solde = $repositoryCompte->findSolde($cCredit);
+                    if ($montant <= $solde) {
+                        $manager->persist($article);
+                        $manager->flush();
+                        return $this->redirectToRoute('comptabilite_journal', ['journal' => $journal ]);
+                    } else {
+                        $form->get('montant')->addError(new FormError("Le solde negatif est interdit pour les trésoreries. Solde actuelle $solde"));
+                    }
+                }
+                else { // Operation divers
                     $manager->persist($article);
                     $manager->flush();
                     return $this->redirectToRoute('comptabilite_journal', ['journal' => $journal ]);
-                } else {
-                    $form->get('montant')->addError(new FormError("Le solde negatif est interdit pour les trésoreries. Solde actuelle $solde"));
                 }
+            } else {
+                $form->get('date')->addError(new FormError("La date ".$date->format('d/m/Y')." n'appartient pas à l'exercice courant"));
             }
         }
 
