@@ -18,3 +18,54 @@ ul.border-bottom-white li {
 .table-hover tbody tr:hover .actions {
     visibility: visible;
 }
+
+
+/* TEXT COLOR */
+
+.text-blue-chart {
+    color: #4fc3f7;
+}
+
+.text-red-chart {
+    color: #f05b4f;
+}
+
+
+/* CHART */
+
+.chart-line,
+.chart-bar {
+    position: relative;
+    height: 250px;
+}
+
+.chart-line .ct-series-a .ct-area {
+    fill-opacity: 0.2;
+    fill: url(#gradient);
+}
+
+.chart-line .ct-series-a .ct-line,
+.chart-line .ct-series-a .ct-point {
+    stroke: #4fc3f7;
+    stroke-width: 2px;
+}
+
+.chart-line .ct-series-b .ct-area {
+    fill: #7460ee;
+    fill-opacity: 0.1;
+}
+
+.chart-line .ct-series-b .ct-line,
+.chart-line .ct-series-b .ct-point {
+    stroke: #7460ee;
+    stroke-width: 2px;
+}
+
+.chart-line .ct-series-a .ct-point,
+.chart-line .ct-series-b .ct-point {
+    stroke-width: 6px;
+}
+
+.chart-bar .ct-series-a .ct-bar {
+    stroke: #4fc3f7;
+}

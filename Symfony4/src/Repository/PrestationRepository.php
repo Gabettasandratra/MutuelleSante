@@ -62,4 +62,39 @@ class PrestationRepository extends ServiceEntityRepository
                             ->setParameter('dateFin', $exercice->getDateFin())
                             ->getResult();                    
     }
+
+    public function findMontantPayedEachMonth($annee)
+    {
+        // Les douze mois de l'anneé
+        $retour = [];
+        for ($i=1; $i <= 12; $i++) { 
+            $retour[$i] = $this->_em->createQuery('select sum(p.frais) as t_frais, avg(p.frais) as m_frais, sum(p.rembourse) as t_remb, avg(p.rembourse) as m_remb from App\Entity\Prestation p where year(p.date) = :year and month(p.date) = :month')
+                                                ->setParameter('year', $annee)
+                                                ->setParameter('month', $i)
+                                                ->getOneOrNullResult();
+        }
+        return $retour;  
+    }
+
+    public function findPercentActe($annee)
+    {
+        # Total des prestations dans une anneé
+        $total = $this->_em->createQuery('select count(p) from App\Entity\Prestation p where year(p.date) = :year')
+                                ->setParameter('year', $annee)
+                                ->getSingleScalarResult();
+        $listDesSoins = $this->_em->createQuery('select p.list from App\Entity\Parametre p where p.nom = \'soins_prestation\'')
+                                ->getOneOrNullResult();
+        # A chaque soins
+        $retour = [];
+        foreach ($listDesSoins['list'] as $code => $description) {
+            $nb = $this->_em->createQuery('select count(p) from App\Entity\Prestation p where year(p.date) = :year and p.designation = :code')
+                                ->setParameter('year', $annee)
+                                ->setParameter('code', $code)
+                                ->getSingleScalarResult();
+            
+            $retour[$code] = round($nb / $total, 4)* 100;
+        }
+
+        return $retour;
+    }
 }

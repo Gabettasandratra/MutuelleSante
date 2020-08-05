@@ -96,4 +96,30 @@ class AdherentRepository extends ServiceEntityRepository
                          ->getResult()
         ;
     }
+
+    public function findEvolutionCongregation($annee)
+    {
+        // Les dix années précedents
+        $retour = [];
+        for ($i=0; $i < 10; $i++) { 
+            $year = $annee - $i;
+            $retour[$year] = (int) $this->_em->createQuery('select count(a) from App\Entity\Adherent a where year(a.dateInscription) <= :year')
+                                                ->setParameter('year', $year)
+                                                ->getSingleScalarResult();
+        }
+        return $retour;      
+    }
+
+    public function findEvolutionBeneficiaire($annee)
+    {
+        // Les dix années précedents
+        $retour = [];
+        for ($i=0; $i < 10; $i++) { 
+            $year = $annee - $i;
+            $retour[$year] = (int) $this->_em->createQuery('select count(p) from App\Entity\Pac p where year(p.dateEntrer) <= :year')
+                                                ->setParameter('year', $year)
+                                                ->getSingleScalarResult();
+        }
+        return $retour;      
+    }
 }

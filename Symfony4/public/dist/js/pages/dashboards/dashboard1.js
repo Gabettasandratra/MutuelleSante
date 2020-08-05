@@ -27,10 +27,10 @@ $(function() {
         ],
         axisY: {
             onlyInteger: true,
-            scaleMinSpace: 30,
-            offset: 5,
+            scaleMinSpace: 40,
+            offset: 20,
             labelInterpolationFnc: function(value) {
-                return value;
+                return (value / 1) + 'k';
             }
         },
 
