@@ -361,7 +361,18 @@ class Adherent
      */
     public function getRemboursements(): Collection
     {
-        return $this->remboursements;
+        return $this->remboursements;      
+    }
+
+    public function getRemboursementByExercice(Exercice $exercice)
+    {
+        $out = [];
+        foreach ( $this->remboursements as $remboursement) {
+            if ( $remboursement->getExercice()->getAnnee() == $exercice->getAnnee()) {
+                $out[] = $remboursement; 
+            }
+        }
+        return $out;
     }
 
     public function addRemboursement(Remboursement $remboursement): self

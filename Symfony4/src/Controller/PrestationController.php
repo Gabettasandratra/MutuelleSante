@@ -160,10 +160,7 @@ class PrestationController extends AbstractController
                 'nom' => $adherent->getNom(),
                 'attente' => $repositoryAdherent->findSommePrestationAttente($exercice, $adherent),
             ];
-        }       
-
-        dump($repositoryAdherent->findJoinPrestationAttente($exercice));
-        
+        }               
         return $this->render('prestation/adherent.html.twig', [
             'adherents' => $retour
         ]);
