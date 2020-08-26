@@ -169,14 +169,24 @@
                                         <td>{{ prestation.date | date('d/m/Y') }}</td>
                                         <td>{{ prestation.designation }}</td>
                                         <td>{{ prestation.frais|number_format(2,',',' ') }}</td> {% set tFrais = tFrais + prestation.frais %}
-                                        <td>{{ prestation.rembourse|number_format(2,',',' ') }}</td> {% set tRemb = tRemb + prestation.rembourse %}
+
+                                        <td>
+                                            {% if prestation.status == 1 %}
+                                                {{ prestation.rembourse|number_format(2,',',' ') }}
+                                            {% else %}       
+                                                {% if prestation.status == 0 %}<span class="label label-rounded label-info">En attente</span>
+                                                {% else %}<span class="label label-rounded label-danger">Non remb</span>{% endif %}
+                                                      
+                                            {% endif %}
+                                            </td> {% set tRemb = tRemb + prestation.rembourse %}
+
                                         <td>{{ (prestation.rembourse / prestation.frais)|round(2, 'floor') * 100 }}%</td>
-                                        <td>{{ pac.adherent.numero ~ ' / ' ~ prestation.decompte }}</td>
+                                        <td>{{ pac.adherent.numero ~ '/' ~ app.session.get('exercice').annee ~ '/' ~ prestation.decompte }}</td>
                                         <td>
                                             {% if prestation.isPaye %}
                                                 <span class="label label-rounded label-success">Payé</span>
                                             {% else %}
-                                                <span class="label label-rounded label-primary">En attente</span>
+                                                <span class="label label-rounded label-primary">Non Payé</span>
                                             {% endif %}
                                         </td>
                                     </tr>

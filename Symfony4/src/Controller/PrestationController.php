@@ -82,9 +82,10 @@ class PrestationController extends AbstractController
     /**
      * @Route("/prestation/beneficiaire/{id}/decompte", name="prestation_beneficiaire_decompte", requirements={"id"="\d+"})
      */
-    public function addDecompte(Pac $pac, PrestationRepository $repositoryPrestation, ParametreRepository $repositoryParametre)
+    public function addDecompte(Pac $pac, PrestationRepository $repositoryPrestation, ParametreRepository $repositoryParametre, SessionInterface $session)
     {
-        $generatedNumero = $repositoryPrestation->generateNumero($pac);
+        $exercice = $session->get('exercice');
+        $generatedNumero = $repositoryPrestation->generateNumero($pac, $exercice);
         $soins = $repositoryParametre->findOneByNom('soins_prestation');
         $remb = $repositoryParametre->findOneByNom('percent_rembourse_prestation');
 
@@ -117,6 +118,7 @@ class PrestationController extends AbstractController
             $prestation->setDesignation($prestationJs['designation']);
             $prestation->setFrais($prestationJs['frais']);
             $prestation->setRembourse($prestationJs['rembourse']);
+            $prestation->setStatus($prestationJs['status']);
             $prestation->setPrestataire($prestationJs['prestataire']);
             $prestation->setFacture($prestationJs['facture']);
             $prestation->setDecompte($data['numero']);

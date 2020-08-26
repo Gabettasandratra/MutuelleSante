@@ -35,8 +35,8 @@
                             <span>N°{{ pac.adherent.numero ~ '/' ~ pac.codeMutuelle }} | {{ pac.nom ~ ' ' ~ pac.prenom }}</span>
                         </div>
                         <div class="col-md-4 border rounded p-2 bg-light text-center" data-toggle="tooltip" title="Veuillez noté ce réference sur le décompte de présatations">
-                            <span class="lead">Référence de décompte</span> 
-                            <span class="pl-3" style="font-size: 1.5rem;">{{ pac.adherent.numero }} / {{ numero }}</span>
+                            <span class="lead">Référence de décompte</span> <br>
+                            <span class="pl-3" style="font-size: 1.5rem;">{{ pac.adherent.numero }} / {{ app.session.get('exercice').annee }} / {{ numero }}</span>
                         </div>
                         <div class="col-md-4 text-right p-2">
                             <button class="btn btn-info" data-toggle="modal" href="#modal"><i class="mdi mdi-bookmark-plus-outline"></i> Ajouter prestation</button>
@@ -53,7 +53,7 @@
                                         <th scope="col">Date</th>
                                         <th scope="col">Designation</th>
                                         <th scope="col">Frais</th>
-                                        <th scope="col">Remboursés</th>
+                                        <th scope="col">Remb</th>
                                         <th scope="col">%</th>
                                         <th scope="col">Prestataire</th>
                                         <th scope="col">Facture</th>
@@ -127,7 +127,19 @@
                                             <input type="number" id="prestation_frais" name="prestation[frais]" required="required" class="form-control">
                                         </div>
                                     </div>
+                                    {# Pour selectionner le status de la prestation #}
                                     <div class="form-group row">
+                                        <label for="prestation_status" class="col-form-label col-sm-3 required">Status *</label>
+                                        <div class="col-sm-9">
+                                            <select name="prestation[status]" id="prestation_status" required="required" class="form-control">
+                                                <option value="0">En attente de décision</option>
+                                                <option value="1">Remboursé</option>
+                                                <option value="-1">Non remboursé</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row" id="remb_form">
                                         <label for="prestation_rembourse" class="col-form-label col-sm-3 required">Remboursés *</label>
                                         <div class="input-group col-sm-3">    
                                             <input type="number" id="prestation_percent" value="{{ remb * 100 }}" required="required" class="form-control">
@@ -180,10 +192,17 @@
                     'date'            :   $('#prestation_date').val(),
                     'designation'     :   $('#prestation_designation').val(),
                     'frais'           :   $('#prestation_frais').val(),
-                    'rembourse'       :   $('#prestation_rembourse').val(),
+                    'status'          :   $('#prestation_status').val(),
                     'prestataire'     :   $('#prestation_prestataire').val(),
                     'facture'         :   $('#prestation_facture').val()
                 };
+                // Montant remboursé
+                if (prestation.status != 1) {
+                    prestation.rembourse = 0;
+                } else {
+                    prestation.rembourse = $('#prestation_rembourse').val();
+                }
+
                 if (index) {
                     prestations[index] = prestation;
                 } else {                   
@@ -212,6 +231,17 @@
                 $('#prestation_percent').val(Math.round((rembourse/frais )*100));
             });
 
+            // When status changed
+            $('#remb_form').hide();  // First
+            $('#prestation_status').change(function(e) {
+                var status = $(this).val();
+                if (status == 1) {
+                   $('#remb_form').show("slow"); 
+                } else {
+                   $('#remb_form').hide("slow");  
+                }  
+            });
+
             $('#del').click(function(e) {
                 e.preventDefault();
                 var index = $('#index_del').val();
@@ -223,7 +253,8 @@
                 e.preventDefault();
                 $('#prestation').trigger("reset");
                 $('#modal').modal('hide');
-            });   
+            });  
+ 
 
             $("#formDecompte").submit(function(event){
                 event.preventDefault(); 
@@ -265,7 +296,15 @@
                 markup += "<td>" + prestation.date + "</td>";
                 markup += "<td>" + prestation.designation + "</td>";
                 markup += "<td>" + prestation.frais + "</td>";
-                markup += "<td>" + prestation.rembourse + "</td>";
+                // Switch prestation_status
+                if (prestation.status == 1) {
+                    markup += "<td>" + prestation.rembourse + "</td>";
+                } else if (prestation.status == 0) {
+                    markup += "<td><span class='label label-rounded label-sm label-info'>En attente</span></td>";
+                } else {
+                    markup += "<td><span class='label label-rounded label-sm label-danger'>Non remb</span></td>";
+                }
+                
                 markup += "<td>" + Math.round((prestation.rembourse / prestation.frais)*100) + " %</td>";
                 markup += "<td>" + prestation.prestataire + "</td>";
                 markup += "<td>" + prestation.facture + "</td>";

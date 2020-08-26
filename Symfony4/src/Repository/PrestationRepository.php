@@ -39,10 +39,12 @@ class PrestationRepository extends ServiceEntityRepository
         ;
     }
 
-    public function generateNumero($pac)
+    public function generateNumero($pac, $exercice)
     {
-        $lastNum = (int) $this->_em->createQuery('select max(p.decompte) from App\Entity\Prestation p where p.adherent = :ad')
+        $lastNum = (int) $this->_em->createQuery('select max(p.decompte) from App\Entity\Prestation p where p.adherent = :ad and p.date between :dateDebut and :dateFin')
                                     ->setParameter('ad', $pac->getAdherent())
+                                    ->setParameter('dateDebut', $exercice->getDateDebut())
+                                    ->setParameter('dateFin', $exercice->getDateFin())
                                     ->getSingleScalarResult();
         return $lastNum + 1;
     }

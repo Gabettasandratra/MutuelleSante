@@ -38,7 +38,7 @@ class Prestation
 
     /**
      * @ORM\Column(type="float")
-     * @Assert\Positive
+     * @Assert\PositiveOrZero
      * @Assert\LessThan(propertyPath="frais", message="Le montant remboursé ne doit pas depasser le frais")
      */
     private $rembourse;
@@ -80,12 +80,23 @@ class Prestation
      */
     private $decompte;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $status;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $dateDecision;
+
     public function __construct(Pac $pac)
     {
         $this->date = new \DateTime(); // Afin que la date d'aujourdui sera afficher par defaut
         $this->pac = $pac;
         $this->adherent = $pac->getAdherent();
         $this->isPaye = false;
+        $this->dateDecision = new \DateTime(); // Meme en attente
     }
 
     public function getId(): ?int
@@ -226,6 +237,30 @@ class Prestation
     public function setDecompte(int $decompte): self
     {
         $this->decompte = $decompte;
+
+        return $this;
+    }
+
+    public function getStatus(): ?int
+    {
+        return $this->status;
+    }
+
+    public function setStatus(int $status): self
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function getDateDecision(): ?\DateTimeInterface
+    {
+        return $this->dateDecision;
+    }
+
+    public function setDateDecision(\DateTimeInterface $dateDecision): self
+    {
+        $this->dateDecision = $dateDecision;
 
         return $this;
     }
