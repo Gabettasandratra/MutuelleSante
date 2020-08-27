@@ -180,36 +180,36 @@
                                         <th scope="col">% Remb</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="tbody_pre">
                                     {% set tFrais = 0 %}
                                     {% set  tRembourse = 0 %}
                                     {% for prestation in prestationNotPayed %}
-                                        <tr>
-                                            <th>{{ loop.index }}</th>
-                                            <td>{{ prestation.date |date('d/m /Y') }}</td>
-                                            <td>{{ prestation.pac.codeMutuelle ~ ' - ' ~ prestation.pac.nom ~ ' ' ~ prestation.pac.prenom }}</td>
-                                            <td>{{ prestation.designation }}</td>
-                                            <td>{{ prestation.frais|number_format(2,',',' ') }}</td> {% set tFrais = tFrais + prestation.frais %}
+                                        <tr {% if prestation.dateDecision %}data-toggle="tooltip" title="Décidé le {{ prestation.dateDecision|date('d/m/Y') }}"{% endif %}>
+                                            <th>{{ loop.index }} <span class="id d-none">{{ prestation.id }}</span></th>
+                                            <td class="date">{{ prestation.date|date('d/m/Y') }}</td>
+                                            <td class="beneficiaire">{{ prestation.pac.codeMutuelle ~ ' - ' ~ prestation.pac.nom ~ ' ' ~ prestation.pac.prenom }}</td>
+                                            <td class="designation">{{ prestation.designation }}</td>
+                                            <td class="frais">{{ prestation.frais|number_format(2,',',' ') }}</td> {% set tFrais = tFrais + prestation.frais %}
                                             <td>
                                                 {% if prestation.status == 1 %}
-                                                    {{ prestation.rembourse|number_format(2,',',' ') }}
+                                                    <span class="remb">{{ prestation.rembourse|number_format(2,',',' ') }}</span>
                                                 {% else %}       
-                                                    {% if prestation.status == 0 %}<span class="label label-rounded label-info">En attente</span>
-                                                    {% else %}<span class="label label-rounded label-danger">Non remb</span>{% endif %}
+                                                    {% if prestation.status == 0 %}<span class="label label-rounded label-info remb">En attente</span>
+                                                    {% else %}<span class="label label-rounded label-danger remb">Non remb</span>{% endif %}
+                                                    <span class='float-right actions'><a class='edit mr-1'><i class='ti-pencil-alt'></i></a>
                                                 {% endif %}
-                                                <span class='float-right actions'><a class='edit mr-1'><i class='ti-pencil-alt'></i></a>
-                                                
+                                                <span class="m_remb d-none">{{ prestation.rembourse }}</span>
                                             </td>  {% set tRembourse = tRembourse + prestation.rembourse %}
-                                            <td>{{ (prestation.rembourse / prestation.frais) | round(3, 'floor') * 100 }}%</td>
+                                            <td class="percent">{{ (prestation.rembourse / prestation.frais) | round(3, 'floor') * 100 }}%</td>
                                         </tr>
                                         {% if loop.last %}
                                             </tbody>                                    
                                             <tfoot>
                                                 <tr>
                                                     <th scope="row" colspan=4>Total</th>
-                                                    <td>{{ tFrais|number_format(2,',',' ') }}</td>
-                                                    <td>{{ tRembourse|number_format(2,',',' ') }}</td>
-                                                    <td>{{ (tRembourse / tFrais)| round(3, 'floor') * 100 }}%</td>
+                                                    <td id="total_frais">{{ tFrais|number_format(2,',',' ') }}</td>
+                                                    <td id="total_remb">{{ tRembourse|number_format(2,',',' ') }}</td>
+                                                    <td id="total_per">{{ (tRembourse / tFrais)| round(3, 'floor') * 100 }}%</td>
                                                 </tr>
                                             </tfoot>
                                         {% endif %}
@@ -225,9 +225,13 @@
                         </div>
                     </div>
                     {% if tFrais != 0 and app.session.get('exercice').isCurrent and not app.session.get('exercice').isCloture %}
-                        <div class="row mt-1">
+                        <div class="row mt-2 mr-1">
+                            <div class="alert alert-warning alert-dismissible col-12" style="display:none" id="alert">
+                                <h5>Il existe encore de prestation en attente de décision</h5>
+                                <button type="button" class="alert-close close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            </div>
                             <div class="col-12 text-right">
-                                <a href="{{ path('prestation_adherent_rembourser', {'id': adherent.id}) }}" class="btn btn-info"><i class="mdi mdi-credit-card"></i> Enregistrer paiement</a>
+                                <a href="{{ path('prestation_adherent_rembourser', {'id': adherent.id}) }}" class="btn btn-info" id="pay_link"><i class="mdi mdi-credit-card"></i> Passer au paiement</a>
                             </div>
                         </div>      
                     {% endif %}             
@@ -250,26 +254,35 @@
                     <div class="modal-body">
                         <div class="row">                                                  
                             <div class="col-12">
-                                    <input type="hidden" name="index" id="prestation_index">
-
+                                    <input type="hidden" name="id" id="prestation_id">
+                                    <div class="form-group row">
+                                        <label for="prestation_date" class="col-form-label col-sm-3">Date * </label>
+                                        <div class="col-sm-9">    
+                                            <input type="text" id="prestation_date" class="form-control" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="prestation_beneficiaire" class="col-form-label col-sm-3">Bénéficiaire * </label>
+                                        <div class="col-sm-9">    
+                                            <input type="text" id="prestation_beneficiaire" class="form-control" readonly>
+                                        </div>
+                                    </div>
                                     <div class="form-group row">
                                         <label for="prestation_designation" class="col-form-label col-sm-3">Désignation * </label>
                                         <div class="col-sm-9">    
                                             <input type="text" id="prestation_designation" class="form-control" readonly>
                                         </div>
                                     </div>
-
                                     <div class="form-group row">
                                         <label for="prestation_frais" class="col-form-label col-sm-3 required">Frais *</label>
                                         <div class="col-sm-9">
-                                            <input type="number" id="prestation_frais" class="form-control" readonly>
+                                            <input type="text" id="prestation_frais" class="form-control" readonly>
                                         </div>
                                     </div>
-
                                     <div class="form-group row">
                                         <label for="prestation_status" class="col-form-label col-sm-3 required">Status *</label>
                                         <div class="col-sm-9">
-                                            <select name="prestation[status]" id="prestation_status" required="required" class="form-control">
+                                            <select name="status" id="prestation_status" required="required" class="form-control">
                                                 <option value="1">Remboursé</option>
                                                 <option value="-1">Non remboursé</option>
                                             </select>
@@ -279,7 +292,7 @@
                                     <div class="form-group row" id="remb_form">
                                         <label for="prestation_rembourse" class="col-form-label col-sm-3 required">Remboursés *</label>
                                         <div class="input-group col-sm-3">    
-                                            <input type="number" id="prestation_percent" value="" required="required" class="form-control">
+                                            <input type="number" id="prestation_percent" value="{{ percent * 100 }}" required="required" class="form-control">
                                             <div class="input-group-append">
                                                 <span class="input-group-text">%</span>
                                             </div>
@@ -292,7 +305,7 @@
                                     <div class="form-row btn-list">
                                         <div class="col-12 text-right">
                                             <button type="reset" class="btn btn-danger mr-3" data-dismiss="modal" id="fermer"><i class="mdi mdi-close-circle-outline"></i> Fermer</button>
-                                            <button type="submit" class="btn btn-info" id="Ajouter"><i class="mdi mdi-login-variant"></i> Ajouter</button>
+                                            <button type="submit" class="btn btn-info" id="Ajouter"><i class="mdi mdi-login-variant"></i> Enregistrer</button>
                                         </div>
                                     </div>
                                 </form>
@@ -310,7 +323,31 @@
 <script>
 $(document).ready(function() { 
     $(document).on("click", ".edit", function(e) {
-        $('#modal').modal('show');
+        var row = $(this).parent().parent().parent();
+        var id = row.find('.id').text();
+        var date = row.find('.date').text();
+        var beneficiaire = row.find('.beneficiaire').text();
+        var designation = row.find('.designation').text();
+        var frais = row.find('.frais').text();
+        $('#prestation_id').val(id);
+        $('#prestation_date').val(date);
+        $('#prestation_beneficiaire').val(beneficiaire);
+        $('#prestation_designation').val(designation);
+        $('#prestation_frais').val(frais);
+        $('#prestation_percent').val({{ percent * 100}});
+
+        var remb = row.find('.remb').text();
+        
+        if (remb == "Non remb") {
+            $('#prestation_status').val(-1);
+        } else {
+            $('#prestation_status').val(1);
+        }
+        $('#prestation_status').change();
+        var m_frais = parseFloat(frais.replace(",", ".").replace(/\s/g, ""));
+        var percent = parseFloat($('#prestation_percent').val());
+        $('#prestation_rembourse').val(Math.round(percent * m_frais / 100));
+        $('#modal').modal({backdrop: "static"});
     });
 
     $('#prestation_status').change(function(e) {
@@ -321,6 +358,95 @@ $(document).ready(function() {
             $('#remb_form').hide("slow");  
         }  
     });
+
+    $('#prestation_percent').change(function(e) {
+        var percent = parseFloat($(this).val());    
+        var frais =  parseFloat($('#prestation_frais').val().replace(",", ".").replace(/\s/g, ""));
+        $('#prestation_rembourse').val(Math.round(percent * frais / 100));
+    });
+
+    $('#prestation_rembourse').change(function(e) {
+        var rembourse = parseFloat($(this).val());
+        var frais = parseFloat($('#prestation_frais').val().replace(",", ".").replace(/\s/g, ""));
+        $('#prestation_percent').val(Math.round((rembourse/frais )*100));
+    });
+
+    $('#pay_link').click(function(e) {
+        e.preventDefault();
+        var bool = true;
+        $('.remb').each(function() {
+            if ($(this).text() == "En attente")
+                bool = false;
+        });
+        if (bool) {
+            window.location.href = $(this).attr('href');
+        } else {
+            $("#alert").show("slow");  
+        }
+    });
+
+    $(document).on('click', '.alert-close', function() {
+       $(this).parent().hide();
+    })
+
+    $('#prestation').submit(function(e) {
+        e.preventDefault();
+        var id = $('#prestation_id').val();
+        var data = {
+            id        : $('#prestation_id').val(),
+            status    : $('#prestation_status').val(),
+            rembourse : $('#prestation_rembourse').val()
+        };
+        var posting = $.post('{{ path('prestation_update_ajax') }}', JSON.stringify(data));
+        posting.done(function(data) {
+            if (data.hasError == false) {
+                $('#modal').modal('hide');
+                var row = $(".id:contains("+data.data.id+")").parent().parent();
+                var remb = row.find('.remb');
+                remb.removeClass('label').removeClass('label-rounded').removeClass('label-info').removeClass('label-danger');
+                var percent = row.find('.percent');
+                var m_remb_span = row.find('.m_remb');
+                if (data.data.status == -1) {
+                    remb.text("Non remb");
+                    remb.addClass('label label-rounded label-danger');
+                    percent.text("0%");
+                    m_remb_span.text("0");
+                } else {
+                    var m_remb = parseFloat(data.data.rembourse);
+                    remb.text(format(m_remb.toFixed(2)));
+                    m_remb_span.text(m_remb);
+                    percent.text((100 * m_remb / parseFloat($('#prestation_frais').val().replace(",", ".").replace(/\s/g, ""))) + "%");
+                    row.find('.actions').remove();
+                }
+
+                updateSum();
+            }
+        });
+        posting.fail(function(data) {
+            console.log("FAIL");
+        });
+    }); 
 });
+
+function format(n, dp){
+    var s = ''+(Math.floor(n)), d = n % 1, i = s.length, r = '';
+    while ( (i -= 3) > 0 ) { r = ' ' + s.substr(i, 3) + r; }
+    return s.substr(0, i + 3) + r + 
+        (d ? ',' + Math.round(d * Math.pow(10, dp || 2)) : ',00');
+}
+
+function updateSum() {
+    var total = 0;
+    $('.m_remb').each(function() {
+        var value = parseFloat($(this).text());
+        console.log(value);
+        if (!isNaN(value)) {
+            total += value;
+        }
+    });
+    $('#total_remb').text(format(total));
+    $('#total_per').text(Math.round(10000 * total / parseFloat($('#total_frais').text().replace(",", ".").replace(/\s/g, "")))/100 + "%");
+}
+
 </script>
 {% endblock %}

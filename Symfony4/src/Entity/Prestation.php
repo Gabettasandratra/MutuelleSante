@@ -96,7 +96,6 @@ class Prestation
         $this->pac = $pac;
         $this->adherent = $pac->getAdherent();
         $this->isPaye = false;
-        $this->dateDecision = new \DateTime(); // Meme en attente
     }
 
     public function getId(): ?int

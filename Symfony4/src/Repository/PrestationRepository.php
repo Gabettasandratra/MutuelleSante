@@ -39,6 +39,17 @@ class PrestationRepository extends ServiceEntityRepository
         ;
     }
 
+    public function findNoEcriture()
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.status = 1')
+            ->andWhere('p.dateDecision is NULL')
+            ->orderBy('p.date', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     public function generateNumero($pac, $exercice)
     {
         $lastNum = (int) $this->_em->createQuery('select max(p.decompte) from App\Entity\Prestation p where p.adherent = :ad and p.date between :dateDebut and :dateFin')

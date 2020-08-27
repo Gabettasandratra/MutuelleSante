@@ -109,7 +109,7 @@ class ParametreController extends AbstractController
     /**
      * @Route("/parametre/exercice/configurer", name="parametre_exercice_configurer")
      */
-    public function addExercice(ExerciceRepository $repository, Request $request, ExerciceService $exerciceService)
+    public function addExercice(ExerciceRepository $repository, Request $request, ExerciceService $exerciceService, SessionInterface $session)
     {      
         $exercice = new Exercice();  
         
@@ -130,7 +130,9 @@ class ParametreController extends AbstractController
                 $interval = (int) date_diff($dateDebut, $dateFin)->format('%a');
                 // verifie la longueur de l'exercice
                 if ($interval == 364 || $interval == 365) {
-                    $exerciceService->createNewExercice($exercice); // Sauvegarde de l'exercice
+                    $new  = $exerciceService->createNewExercice($exercice); // Sauvegarde de l'exercice
+                    // Si l'exercice est le premier 
+                    $session->set('exercice', $new);
                     return $this->redirectToRoute('parametre_exercice');
                 } else {
                     $form->get('dateFin')->addError(new FormError("Un exercice doit durée en une année, $interval donné"));

@@ -122,6 +122,7 @@ class PrestationController extends AbstractController
             $prestation->setPrestataire($prestationJs['prestataire']);
             $prestation->setFacture($prestationJs['facture']);
             $prestation->setDecompte($data['numero']);
+    
             $errors = $validator->validate($prestation);
             if (0 === count($errors)) {
                 $manager->persist($prestation);
@@ -140,7 +141,7 @@ class PrestationController extends AbstractController
         $manager->flush();
 
         // Sauvegarde en tant que dette
-        $comptaService->saveRemboursement($tot_remb, $pac, $data['numero']);
+        $comptaService->updateDetteRemb();
 
         return new JsonResponse([
             'hasError' => false
@@ -195,12 +196,45 @@ class PrestationController extends AbstractController
         ];
 
         $prestationNotPayed = $repositoryPrestation->findNotPayed($adherent);
+        $percent = $repositoryParametre->findOneByNom('percent_rembourse_prestation')->getValue(); // pourcentage par defaut
 
         return $this->render('prestation/show.html.twig', [
             'adherent' => $adherent,
             'info' => $info,
             'remboursements' => $remboursements,
+            'percent' => $percent,
             'prestationNotPayed' => $prestationNotPayed,
+        ]);
+    }
+
+    /**
+     * @Route("/prestation/update", name="prestation_update_ajax")
+     */
+    public function ajaxUpadatePrestation(PrestationRepository $repo, Request $request, EntityManagerInterface $manager, ComptaService $comptaService)
+    {
+        $data = json_decode( $request->getContent(), true);
+        $prestation = $repo->find($data['id']);
+        if ( $prestation === null ) {
+            return new JsonResponse([
+                'hasError' => true,
+                'message' => "La prestation demandé n'existe pas",
+            ]);
+        }
+        $prestation->setStatus($data['status']);
+        if($data['status'] == 1) {
+            $prestation->setRembourse($data['rembourse']);
+        } else {
+            $prestation->setRembourse(0);
+        }
+        $manager->flush();
+
+        // Suvegarde des dettes
+        $comptaService->updateDetteRemb();
+
+        return new JsonResponse([
+            'hasError' => false,
+            'message' => "Mis à jour avec success",
+            'data' => $data,
         ]);
     }
 

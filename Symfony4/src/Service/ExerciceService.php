@@ -25,12 +25,14 @@ class ExerciceService
 
     public function createNewExercice(Exercice $exercice)
     {
-        $dernierExercice = $this->exerciceRepo->findDernierExercice();
         $allAdherents = $this->adherentRepo->findAll();
         foreach ($allAdherents as $adherent) {
             $compteCotisation = new CompteCotisation($exercice, $adherent);
-            $nbAncien = $this->adherentRepo->findNbPac($dernierExercice, $adherent);
-            $compteCotisation->setAncien($nbAncien);
+            $nbAncien = $this->adherentRepo->findAncien($exercice, $adherent);
+            $nbNouveau = $this->adherentRepo->findNouveau($exercice, $adherent);
+
+            $compteCotisation->setAncien(count($nbAncien));
+            $compteCotisation->setNouveau(count($nbNouveau));
 
             $this->manager->persist($compteCotisation);  
         }

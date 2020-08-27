@@ -7,8 +7,10 @@ use App\Entity\Remboursement;
 use App\Service\ParametreService;
 use App\Entity\HistoriqueCotisation;
 use App\Repository\CompteRepository;
+use App\Repository\PrestationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /* Les opérations comptable de la gestion de Mutuelle */
 class ComptaService 
@@ -17,10 +19,12 @@ class ComptaService
     private $validator;
     private $comptaRepo;
 
-    public function __construct(ParametreService $paramService, EntityManagerInterface $entityManager, CompteRepository $comptaRepo)
+    public function __construct(SessionInterface $session, ParametreService $paramService, EntityManagerInterface $entityManager, CompteRepository $comptaRepo, PrestationRepository $prestationRepo)
     {
         $this->manager = $entityManager;
+        $this->session = $session;
         $this->comptaRepo = $comptaRepo;
+        $this->prestationRepo = $prestationRepo;
         $this->paramService = $paramService;
     }
 
@@ -85,6 +89,41 @@ class ComptaService
         $this->manager->flush();    
 
         return $remboursement;
+    }
+
+    /**
+     * Le but c'est d'enregistrer en tant que dette les prestations décidé de remboursé 
+     */
+    public function updateDetteRemb($journal ='PRE')
+    {
+        $posteRemboursement = $this->paramService->getParametre('compte_prestation'); // Charge
+        $compteRemboursement = $this->comptaRepo->findOneByPoste($posteRemboursement); 
+
+        $posteRembDette = $this->paramService->getParametre('compte_dette_prestation'); // Dette des prestations
+        $compteRembDette = $this->comptaRepo->findOneByPoste($posteRembDette);
+
+        // A chaque prestation décidé on enregistrer une article correspondant
+        $prestationNoEcris = $this->prestationRepo->findNoEcriture();
+
+        foreach ($prestationNoEcris as $prestation) {
+            $article = new Article();
+            $article->setCompteDebit($compteRemboursement);        
+            $article->setCompteCredit($compteRembDette); 
+            $label = "Préstation N°".$prestation->getId();
+            $article->setLibelle($label);
+            $article->setCategorie($journal);
+            $article->setAnalytique($this->paramService->getParametre('analytique_prestation'));
+
+            $article->setMontant($prestation->getRembourse());
+            $article->setDate(new \DateTime());
+            $piece = $prestation->getAdherent()->getNumero() ."/". $this->session->get('exercice')->getAnnee();
+            $article->setPiece($piece . "/" . $prestation->getDecompte()); // Le decompte de prestation
+            $article->setIsFerme(true);
+
+            $prestation->setDateDecision(new \DateTime());
+            $this->manager->persist($article);
+        }       
+        $this->manager->flush();       
     }
 
     public function saveRemboursement($montant, $pac, $decompte, $journal ='PRE')

@@ -42,12 +42,11 @@ class ExerciceRepository extends ServiceEntityRepository
     {
         $result =  $this->_em->createQuery('select max(e.dateFin) from App\Entity\Exercice e')  
                                 ->getOneOrNullResult(); 
-        if ($result) {
+        if ($result[1] != null) {
             return new \DateTimeImmutable($result[1]);
         } 
-
-        return null;
-        
+        // Quand on n'a trouvé aucun date fin
+        return \DateTimeImmutable::createFromFormat('j-m-Y', '31-12-'.(date('Y')-1));
     }
 
     public function findDernierExercice()

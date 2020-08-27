@@ -42,6 +42,7 @@
                             {% set tFrais = 0 %}
                             {% set  tRembourse = 0 %}
                             {% for prestation in remboursement.prestations %}
+                                {% if prestation.status != -1 %}  
                                 <tr>
                                     <th scope="row">{{ loop.index }}</th>
                                     <td>{{ prestation.date |date('d/m/Y') }}</td>
@@ -51,6 +52,7 @@
                                     <td>{{ prestation.rembourse|number_format(2,',',' ') }}</td> {% set tRembourse = tRembourse + prestation.rembourse %}
                                     <td>{{ (prestation.rembourse / prestation.frais) | round(3, 'floor') * 100 }}%</td>
                                 </tr>
+                                {% endif %}
 
                                 {% if loop.last %}
                                     </tbody>                                    

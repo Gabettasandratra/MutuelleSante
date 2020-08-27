@@ -96,6 +96,11 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator implements P
     {      
         /* Set the exercice session */
         $exercice = $this->entityManager->getRepository(Exercice::class)->findCurrent();
+
+        if (!$exercice) {
+            return new RedirectResponse($this->urlGenerator->generate('parametre_exercice'));
+        }
+
         $session = $request->getSession();
         $session->set('exercice', $exercice);
 
