@@ -69,7 +69,7 @@ class CompteRepository extends ServiceEntityRepository
             $credit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteCredit = :cp')
                             ->setParameter('cp', $compte)                      
                             ->getSingleScalarResult();
-            $retour[] = ['id' => $compte->getId(), 'poste' => $compte->getPoste(), 'titre' => $compte->getTitre(), 'solde' => ($debit - $credit), 'codeJournal' => $compte->getCodeJournal() ];
+            $retour[] = ['id' => $compte->getId(), 'poste' => $compte->getPoste(), 'titre' => $compte->getTitre(), 'solde' => ($debit - $credit), 'codeJournal' => $compte->getCodeJournal(), 'isCheque' => $compte->isTresorerieCheque() ];
         }
 
         return $retour;

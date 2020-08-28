@@ -132,7 +132,9 @@ class ParametreController extends AbstractController
                 if ($interval == 364 || $interval == 365) {
                     $new  = $exerciceService->createNewExercice($exercice); // Sauvegarde de l'exercice
                     // Si l'exercice est le premier 
-                    $session->set('exercice', $new);
+                    if (!$session->get('exercice')) {
+                        $session->set('exercice', $new);
+                    }
                     return $this->redirectToRoute('parametre_exercice');
                 } else {
                     $form->get('dateFin')->addError(new FormError("Un exercice doit durée en une année, $interval donné"));

@@ -120,4 +120,27 @@ class ArticleRepository extends ServiceEntityRepository
                             ->setParameter('dateFin', $exercice->getDateFin())
                             ->getResult(); 
     }
+
+    public function findCheques(Exercice $exercice, Compte $compteCheque)
+    {
+        $cheques = $this->_em->createQuery('select a from App\Entity\Article a where a.compteDebit = :c and a.date between :dateDebut and :dateFin')
+                ->setParameter('c', $compteCheque)
+                ->setParameter('dateDebut', $exercice->getDateDebut())
+                ->setParameter('dateFin', $exercice->getDateFin())
+                ->getResult();
+        $retour = [];
+        foreach ($cheques as $cheque) {
+            // Check if verser : montant, libelle
+            $versement = $this->_em->createQuery('select a from App\Entity\Article a where a.compteCredit = :c and a.montant = :m and a.libelle = :l and a.date between :dateDebut and :dateFin')
+                ->setParameter('c', $compteCheque)
+                ->setParameter('m', $cheque->getMontant())
+                ->setParameter('l', "Versement chèque: ".$cheque->getPiece())
+                ->setParameter('dateDebut', $exercice->getDateDebut())
+                ->setParameter('dateFin', $exercice->getDateFin())
+                ->getOneOrNullResult();
+            $retour[] = ['id' => $cheque->getId(), 'numero' => $cheque->getPiece(), 'montant' => $cheque->getMontant(), 'utilisation' => $cheque->getLibelle(), 'versement' => $versement];
+        }
+
+        return $retour;
+    }
 }

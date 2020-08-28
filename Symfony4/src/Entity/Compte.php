@@ -206,4 +206,13 @@ class Compte
 
         return $this;
     }
+
+    /**
+     * Verifie si le compte de trésorerie est un compte de chèque
+     */
+    public function isTresorerieCheque()
+    {
+        return str_split($this->poste, 4)[0] == "5112";
+    }
+
 }

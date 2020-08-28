@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Versement du chèque {{ cheque.piece }}{% endblock %}
+
+{% block header %}
+    <div class="page-breadcrumb">
+        <div class="d-flex align-items-center">
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Versement de chèque</h4>
+            <div class="ml-auto">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0 p-0">
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Trésorerie</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Chèque</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% form_theme form 'bootstrap_4_layout.html.twig' %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Versement du chèque {{ cheque.piece }}</h4>
+                    <hr>
+                    <div class="row">
+                        <div class="col-6">
+                            {{ form_start(form) }}         
+                                <div class="form-group">
+                                    <label class="required">Numero de chèque</label>
+                                    <input type="text" class="form-control" readonly value="{{ cheque.piece }}">
+                                </div>
+                                <div class="form-group">
+                                    <label class="required">Montant</label>
+                                    <input type="text" class="form-control" readonly value="{{ cheque.montant|number_format(2,',',' ') }}">
+                                </div>
+                                {{ form_row(form.date, { 'label': 'Date du versement' }) }}
+                                {{ form_row(form.banque, { 'label': 'Banque' }) }}
+                                {{ form_row(form.piece, { 'label': 'Réference du versement' }) }}
+                                <div class="form-row">
+                                    <div class="col-12 text-right">
+                                        <button type="submit" class="btn btn-success">Sauvegarder</button>
+                                    </div>
+                                </div>                                                     
+                            {{ form_end(form) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

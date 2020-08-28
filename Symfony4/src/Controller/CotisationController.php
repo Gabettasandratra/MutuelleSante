@@ -116,7 +116,7 @@ class CotisationController extends AbstractController
                                     ->andWhere('c.isTresor = true')
                                     ->orderBy('c.poste', 'ASC');
                         },
-                        'choice_label' => 'libelle',
+                        'choice_label' => 'titre',
                     ])
                      ->add('reference')
                      ->add('remarque')

@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion de {{ compte.titre }}{% endblock %}
+
+{% block header %}
+    <div class="page-breadcrumb">
+        <div class="d-flex align-items-center">
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Gestion de {{ compte.titre }}</h4>
+            <div class="ml-auto">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0 p-0">
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Trésorerie</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Chèque</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">{{ compte.titre }}</h4>
+                    <hr>
+                    <div class="row">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">N° de chèque</th>
+                                        <th scope="col">Montant</th>
+                                        <th scope="col">Utilisation</th>
+                                        <th scope="col">Versement</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for cheque in cheques %}
+                                        <tr {% if cheque.versement %} data-toggle="tooltip" title="Versé le {{ cheque.versement.date|date('d/m/Y') }} au compte de la {{ cheque.versement.compteDebit.titre }} (réf: {{ cheque.versement.piece }})" {% endif %}>
+                                            <th scope="row">{{ loop.index }}</th>
+                                            <td>{{ cheque.numero }}</td>
+                                            <td>{{ cheque.montant|number_format(2,',',' ') }}</td>
+                                            <td>{{ cheque.utilisation }}</td>
+                                            <td>
+                                                {% if cheque.versement %}
+                                                    <span class="label label-success"><i class="mdi mdi-check"></i></span>
+                                                {% else %}
+                                                    <a href="{{ path('tresorerie_cheque_verser', {id:cheque.id}) }}" class="label label-rounded btn-info label-info">Verser</a>   
+                                                {% endif %}
+                                            </td>
+                                            
+                                        </tr>
+                                    {% else %}
+                                        Aucun chèque recu pendant cette exercice
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

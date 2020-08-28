@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Compte;
 use App\Entity\Article;
 use App\Entity\Remboursement;
 use App\Service\ParametreService;
@@ -126,29 +127,22 @@ class ComptaService
         $this->manager->flush();       
     }
 
-    public function saveRemboursement($montant, $pac, $decompte, $journal ='PRE')
+    public function verserCheque(Article $articleCheque, Compte $compteBanque, \DateTime $date, $borderaux)
     {
-        $posteRemboursement = $this->paramService->getParametre('compte_prestation');
-        $compteRemboursement = $this->comptaRepo->findOneByPoste($posteRemboursement);
-
-        $posteRembDette = $this->paramService->getParametre('compte_dette_prestation');
-        $compteRembDette = $this->comptaRepo->findOneByPoste($posteRembDette);
-
         $article = new Article();
-        $article->setCompteDebit($compteRemboursement);        
-        $article->setCompteCredit($compteRembDette); 
-        $label = 'Prestation: '.$pac->getMatricule(). ' - '.$pac->getAdherent()->getNumero().'/'.$decompte;
-        $article->setLibelle($label);
-        $article->setCategorie($journal);
-        $article->setAnalytique($this->paramService->getParametre('analytique_prestation'));
-
-        $article->setMontant($montant);
-        $article->setDate(new \DateTime());
-        $article->setPiece($pac->getAdherent()->getNumero().'/'.$decompte);
+        $article->setCompteDebit($compteBanque);        
+        $article->setCompteCredit($articleCheque->getCompteDebit());        
+        $article->setLibelle("Versement chèque: ". $articleCheque->getPiece());
+        $article->setCategorie($compteBanque->getCodeJournal()); // journal de la banque
+        $article->setAnalytique('');
+        $article->setMontant($articleCheque->getMontant());
+        $article->setDate($date);
+        $article->setPiece($borderaux);
         $article->setIsFerme(true);
 
         $this->manager->persist($article);
         $this->manager->flush();
-        return $article;        
+
+        return $article;
     }
 }
