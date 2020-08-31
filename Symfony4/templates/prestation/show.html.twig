@@ -135,7 +135,7 @@
                                         <th scope="col">Date</th>
                                         <th scope="col">Exercice</th>
                                         <th scope="col">Montant</th>
-                                        <th scope="col">Mode de paiement</th>
+                                        <th scope="col">Paiement depuis</th>
                                         <th scope="col">Reférence</th>
                                         <th scope="col">Détail</th>
                                     </tr>
@@ -163,7 +163,7 @@
                     
                     <div class="row mt-4">
                         <div class="col-5">
-                            <h4 class="card-title">Préstations en attente</h4>
+                            <h4 class="card-title">Prestations en attente de remboursement</h4>
                         </div>
                     </div>
                     <div class="row">
@@ -176,8 +176,8 @@
                                         <th scope="col">Béneficiaire</th>
                                         <th scope="col">Designation</th>
                                         <th scope="col">Frais</th>
-                                        <th scope="col">Remboursé</th>
-                                        <th scope="col">% Remb</th>
+                                        <th scope="col">Décidé</th>
+                                        <th scope="col">%</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tbody_pre">
@@ -196,7 +196,7 @@
                                                 {% else %}       
                                                     {% if prestation.status == 0 %}<span class="label label-rounded label-info remb">En attente</span>
                                                     {% else %}<span class="label label-rounded label-danger remb">Non remb</span>{% endif %}
-                                                    <span class='float-right actions'><a class='edit mr-1'><i class='ti-pencil-alt'></i></a>
+                                                    <span class='float-right actions'><a class='edit mr-1'><i class='ti-pencil-alt'></i></a></span>
                                                 {% endif %}
                                                 <span class="m_remb d-none">{{ prestation.rembourse }}</span>
                                             </td>  {% set tRembourse = tRembourse + prestation.rembourse %}
@@ -284,7 +284,7 @@
                                         <div class="col-sm-9">
                                             <select name="status" id="prestation_status" required="required" class="form-control">
                                                 <option value="1">Remboursé</option>
-                                                <option value="-1">Non remboursé</option>
+                                                <option value="-1">Refusé</option>
                                             </select>
                                         </div>
                                     </div>          
@@ -407,11 +407,12 @@ $(document).ready(function() {
                 var percent = row.find('.percent');
                 var m_remb_span = row.find('.m_remb');
                 if (data.data.status == -1) {
-                    remb.text("Non remb");
+                    remb.text("Refusé");
                     remb.addClass('label label-rounded label-danger');
                     percent.text("0%");
                     m_remb_span.text("0");
                 } else {
+                    console.log(m_remb_span);
                     var m_remb = parseFloat(data.data.rembourse);
                     remb.text(format(m_remb.toFixed(2)));
                     m_remb_span.text(m_remb);

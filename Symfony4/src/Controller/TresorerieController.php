@@ -15,6 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -85,6 +86,7 @@ class TresorerieController extends AbstractController
         $form = $this->createFormBuilder()
                     ->add('date', DateType::class, [
                         'data' => new \DateTime(),
+                        'constraints' => [new LessThanOrEqual("today")]
                     ])
                     ->add('banque', EntityType::class, [
                         'class' => Compte::class,

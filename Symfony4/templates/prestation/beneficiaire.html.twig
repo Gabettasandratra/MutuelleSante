@@ -149,7 +149,7 @@
                                     <th scope="col">Date</th>
                                     <th scope="col">Soin</th>
                                     <th scope="col">Frais</th>
-                                    <th scope="col">Remboursés</th>
+                                    <th scope="col">Décidé</th>
                                     <th scope="col">%</th>
                                     <th scope="col">Réf décompte</th>
                                     <th scope="col">Paiement</th>
@@ -175,8 +175,7 @@
                                                 {{ prestation.rembourse|number_format(2,',',' ') }}
                                             {% else %}       
                                                 {% if prestation.status == 0 %}<span class="label label-rounded label-info">En attente</span>
-                                                {% else %}<span class="label label-rounded label-danger">Non remb</span>{% endif %}
-                                                      
+                                                {% else %}<span class="label label-rounded label-danger">Refusé</span>{% endif %}
                                             {% endif %}
                                             </td> {% set tRemb = tRemb + prestation.rembourse %}
 

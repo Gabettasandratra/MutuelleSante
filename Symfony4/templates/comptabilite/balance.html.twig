@@ -46,6 +46,7 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                {% set Tdebit = 0 %} {% set Tcredit = 0 %} {% set Tsolde = 0 %}
                                 {% for classe, comptes in donnees %}
                                     <tr><th colspan=6 class="table-active">{{ classe }}</th></tr>
                                     {% set debit = 0 %} {% set credit = 0 %} {% set solde = 0 %}
@@ -67,18 +68,33 @@
                                     {% endfor %}
                                     <tr>
                                         <th colspan=2 class="text-right">TOTAL : {{ classe }}</th>
-                                        <td>{{ debit|number_format(2,',',' ') }}</td>
-                                        <td>{{ credit|number_format(2,',',' ') }}</td>
+                                        <td>{{ debit|number_format(2,',',' ') }}</td> {% set Tdebit = Tdebit + debit %}
+                                        <td>{{ credit|number_format(2,',',' ') }}</td> {% set Tcredit = Tcredit + credit %}
+        
                                         {% if solde >= 0 %}
                                             <td>{{ solde|abs|number_format(2,',',' ') }}</td>
                                             <td>0,00</td>
                                         {% else %}
                                             <td>0,00</td>
                                             <td>{{ solde|abs|number_format(2,',',' ') }}</td>
-                                        {% endif %}
-                                        
+                                        {% endif %} 
+                                        {% set Tsolde = Tsolde + solde %}             
                                     </tr>
-                                {% endfor %}        
+                                {% endfor %}
+
+                                <tr class="border-top table-active">
+                                    <th colspan=2 class="text-right">TOTAUX</th>
+                                    <td>{{ Tdebit|number_format(2,',',' ') }}</td>
+                                    <td>{{ Tcredit|number_format(2,',',' ') }}</td>
+                                    {% if Tsolde >= 0 %}
+                                        <td>{{ Tsolde|abs|number_format(2,',',' ') }}</td>
+                                        <td>0,00</td>
+                                    {% else %}
+                                        <td>0,00</td>
+                                        <td>{{ Tsolde|abs|number_format(2,',',' ') }}</td>
+                                    {% endif %}
+                                    
+                                </tr>       
                             </tbody>
                         </table>
                     </div>

@@ -39,11 +39,11 @@
                                     <input type="text" class="form-control" readonly value="{{ cheque.montant|number_format(2,',',' ') }}">
                                 </div>
                                 {{ form_row(form.date, { 'label': 'Date du versement' }) }}
-                                {{ form_row(form.banque, { 'label': 'Banque' }) }}
+                                {{ form_row(form.banque, { 'label': 'Banque de réception versement' }) }}
                                 {{ form_row(form.piece, { 'label': 'Réference du versement' }) }}
                                 <div class="form-row">
                                     <div class="col-12 text-right">
-                                        <button type="submit" class="btn btn-success">Sauvegarder</button>
+                                        <button type="submit" class="btn btn-success">Valider</button>
                                     </div>
                                 </div>                                                     
                             {{ form_end(form) }}
