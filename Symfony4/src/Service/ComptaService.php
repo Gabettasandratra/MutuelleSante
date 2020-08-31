@@ -77,8 +77,8 @@ class ComptaService
         $article->setCompteDebit($compteRemboursement);        
         $article->setCompteCredit($remboursement->getTresorerie());        
         $article->setLibelle($label);
-        $article->setCategorie($remboursement->getTresorerie()->getCodeJournal()); // journal
-        $article->setAnalytique($this->paramService->getParametre('analytique_prestation'));
+        $article->setCategorie($remboursement->getTresorerie()->getCodeJournal());
+        $article->setAnalytique($remboursement->getAdherent()->getCodeAnalytique()); // Le congrégation rembourser
         $article->setMontant($remboursement->getMontant());
         $article->setDate($remboursement->getDate());
         $article->setPiece($remboursement->getReference());
@@ -110,7 +110,7 @@ class ComptaService
             $article = new Article();
             $article->setCompteDebit($compteRemboursement);        
             $article->setCompteCredit($compteRembDette); 
-            $label = "Préstation N°".$prestation->getId();
+            $label = "Préstation cong: ".$prestation->getAdherent()->getNom()." |bén: ".$prestation->getPac()->getMatricule();
             $article->setLibelle($label);
             $article->setCategorie($journal);
             $article->setAnalytique($this->paramService->getParametre('analytique_prestation'));

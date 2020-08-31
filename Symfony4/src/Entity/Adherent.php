@@ -96,6 +96,11 @@ class Adherent
      */
     private $remboursements;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $codeAnalytique;
+
 
     public function __construct()
     {   
@@ -394,6 +399,18 @@ class Adherent
                 $remboursement->setAdherent(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCodeAnalytique(): ?string
+    {
+        return $this->codeAnalytique;
+    }
+
+    public function setCodeAnalytique(?string $codeAnalytique): self
+    {
+        $this->codeAnalytique = $codeAnalytique;
 
         return $this;
     } 

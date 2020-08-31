@@ -37,6 +37,7 @@ class ParametreService
         $parametres[] = new Parametre('percent_rembourse_prestation', 0.6);
         $parametres[] = new Parametre('compte_dette_prestation');
         
+        
         $soins = new Parametre('soins_prestation');
         $soins->setList([
             'DENTAIRE' => 'Soins dentaires',
@@ -46,10 +47,12 @@ class ParametreService
 
         $analytiques = new Parametre('plan_analytique');
         $analytiques->setList([
+            'COM' => 'Commun',
             'BUR' => 'Bureau',
         ]); 
         
         $parametres[] = $analytiques;
+        $parametres[] = new Parametre('code_analytique_cong', 'CONG-{n}');
 
 
         foreach ($parametres as $parametre) {

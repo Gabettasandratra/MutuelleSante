@@ -91,8 +91,17 @@ class Parametre
 
     public function setList(?array $list): self
     {
+        ksort($list);
         $this->list = $list;
+        return $this;
+    }
 
+    public function addInList($key, $value)
+    {
+        $this->list[$key] = $value;
+        $list = $this->list;
+        ksort($list);
+        $this->list = $list;
         return $this;
     }
 }

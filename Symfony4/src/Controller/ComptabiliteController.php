@@ -78,7 +78,7 @@ class ComptabiliteController extends AbstractController
         $plan_analytiques = $repositoryParametre->findOneBy(['nom' => 'plan_analytique'])->getList();
         $choices = [];
         foreach ($plan_analytiques as $key => $value) {
-            $choices[$value] = $key;
+            $choices[$key.' | '.$value] = $key;
         } // reverse key value
         $form = $this->createFormBuilder($article)
                     ->add('date', DateType::class, [

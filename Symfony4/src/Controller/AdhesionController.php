@@ -14,6 +14,7 @@ use App\Repository\PacRepository;
 use Symfony\Component\Form\FormError;
 use App\Repository\AdherentRepository;
 use App\Repository\ExerciceRepository;
+use App\Repository\ParametreRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\CompteCotisationRepository;
@@ -79,7 +80,7 @@ class AdhesionController extends AbstractController
     /**
      * @Route("/adhesion/inscrire", name="adhesion_new")
      */
-    public function create(Request $request, AdherentRepository $repository, EntityManagerInterface $manager)
+    public function create(Request $request, AdherentRepository $repository, ParametreRepository $paramRepo, EntityManagerInterface $manager)
     { 
         $adherent = new Adherent();
         $generatedNumero = $repository->generateNumero();
@@ -110,6 +111,14 @@ class AdhesionController extends AbstractController
                                     ->getRepository(Exercice::class)
                                     ->findCurrent();
             $newCompteCotisation = new CompteCotisation($currentExercice, $adherent);
+            
+            // Create analytic account 
+            $codeAnalytique = $paramRepo->findOneByNom('code_analytique_cong')->getValue(); // Le modele code analytique
+            $code = str_ireplace('{n}', $adherent->getNumero(), $codeAnalytique);
+
+            $planAnalytique = $paramRepo->findOneByNom('plan_analytique');
+            $planAnalytique->addInList($code, 'Congrégation '.$adherent->getNom());
+            $adherent->setCodeAnalytique($code);
 
             $manager->persist($adherent);
             $manager->persist($newCompteCotisation);
