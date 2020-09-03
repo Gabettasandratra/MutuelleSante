@@ -34,6 +34,18 @@ $('#zero_config').DataTable({
     "language": french
 });
 
+$('#no-order').DataTable({
+    "ordering": false,
+    "language": french
+});
+
+$('#no-order-1').DataTable({
+    "ordering": false,
+    "language": french
+});
+
+
+
 $('#order').DataTable({
     "order": [
         [2, "asc"]
@@ -66,12 +78,3 @@ $('.scroll_no_order').DataTable({
     "ordering": false,
     "language": french
 });
-
-var tableExcel = $('#export_excel').DataTable({
-    dom: "t",
-    buttons: [
-        'excel'
-    ]
-});
-
-tableExcel.buttons().container().appendTo($('#export_excel_btn'));

@@ -19,6 +19,10 @@ ul.border-bottom-white li {
     visibility: visible;
 }
 
+.scrollme {
+    overflow-y: auto;
+}
+
 
 /* TEXT COLOR */
 
@@ -68,4 +72,19 @@ ul.border-bottom-white li {
 
 .chart-bar .ct-series-a .ct-bar {
     stroke: #4fc3f7;
+}
+
+
+/* Table row color */
+
+.table-blue,
+.table-blue>td,
+.table-blue>th {
+    background-color: #c8d3dde5;
+}
+
+.table-gris,
+.table-gris>td,
+.table-gris>th {
+    background-color: #b4bbc1;
 }

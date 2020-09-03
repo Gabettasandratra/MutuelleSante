@@ -47,7 +47,6 @@ class ComptaService
         $article->setCompteCredit($compteCotisation);
         $article->setLibelle($label);
         $article->setCategorie($cotisation->getTresorerie()->getCodeJournal()); // journal
-        $article->setAnalytique($this->paramService->getParametre('analytique_cotisation'));
         $article->setMontant($cotisation->getMontant());
         $article->setDate($cotisation->getDatePaiement());
         $article->setPiece($cotisation->getReference());
@@ -113,7 +112,6 @@ class ComptaService
             $label = "Préstation cong: ".$prestation->getAdherent()->getNom()." |bén: ".$prestation->getPac()->getMatricule();
             $article->setLibelle($label);
             $article->setCategorie($journal);
-            $article->setAnalytique($this->paramService->getParametre('analytique_prestation'));
 
             $article->setMontant($prestation->getRembourse());
             $article->setDate(new \DateTime());
@@ -134,7 +132,6 @@ class ComptaService
         $article->setCompteCredit($articleCheque->getCompteDebit());        
         $article->setLibelle("Versement chèque: ". $articleCheque->getPiece());
         $article->setCategorie($compteBanque->getCodeJournal()); // journal de la banque
-        $article->setAnalytique('');
         $article->setMontant($articleCheque->getMontant());
         $article->setDate($date);
         $article->setPiece($borderaux);

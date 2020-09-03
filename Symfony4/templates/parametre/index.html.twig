@@ -30,11 +30,9 @@
                             {{ form_start(form) }}
                                 {{ form_row(form.compte_cotisation, { 'label' : 'Compte associé au cotisation'}) }}
                                 {{ form_row(form.label_cotisation, { 'label' : 'Libellé des cotisations dans le journal comptable'}) }}
-                                {{ form_row(form.analytique_cotisation, { 'label' : 'Code analytique'}) }}
                                 <div class="m-4"><hr></div>
                                 {{ form_row(form.compte_prestation, { 'label' : 'Compte associé au remboursement'}) }}
                                 {{ form_row(form.label_prestation, { 'label' : 'Libellé des cotisations dans le journal comptable'}) }}
-                                {{ form_row(form.analytique_prestation, { 'label' : 'Code analytique'}) }}
                                 {{ form_row(form.percent_prestation, { 'label' : 'Pourcentage de cotisation versé pour avoir accès au prestation'}) }}
                                 {{ form_row(form.plafond_prestation, { 'label' : 'Plafond de prestation (ex: 2 x cotisation)'}) }}
                                 {{ form_row(form.percent_rembourse_prestation, { 'label' : 'Pourcentage de remboursement par defaut'}) }}

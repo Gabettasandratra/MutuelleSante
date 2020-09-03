@@ -29,7 +29,6 @@ class ParametersType extends AbstractType
                 },
             ])
             ->add('label_cotisation')
-            ->add('analytique_cotisation')
             ->add('compte_prestation', EntityType::class, [
                 'class' => Compte::class,
                 'query_builder' => function (EntityRepository $er) {
@@ -42,7 +41,6 @@ class ParametersType extends AbstractType
                 },
             ])
             ->add('label_prestation')
-            ->add('analytique_prestation')
             ->add('percent_prestation', PercentType::class)
             ->add('percent_rembourse_prestation', PercentType::class)
             ->add('plafond_prestation', NumberType::class)

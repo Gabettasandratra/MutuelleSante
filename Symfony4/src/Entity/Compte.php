@@ -25,7 +25,7 @@ class Compte
 
     /**
      * @ORM\Column(type="string", length=10, unique=true)
-     * @Assert\Regex("/^[1-7][0-9]{1,5}$/")
+     * @Assert\Regex("/^[1-7][0-9]{0,5}$/")
      */
     private $poste;
 
@@ -34,11 +34,6 @@ class Compte
      * @Assert\NotBlank
      */
     private $titre;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $categorie;
 
     /**
      * @ORM\Column(type="boolean")
@@ -79,6 +74,8 @@ class Compte
     {
         $this->acceptOut = true;
         $this->acceptIn = true;
+        $this->isTresor = false;
+        $this->type = true;
     }
 
     public function getId(): ?int
@@ -92,11 +89,52 @@ class Compte
     }
 
     public function setPoste(string $poste): self
-    {
-        
+    {   
         $this->poste = str_pad($poste, 6, "0");
-
+        $this->setClasseByPoste();
         return $this;
+    }
+
+    /* Rubrique des postes */
+    public function setPosteRubrique(string $poste): self
+    {   
+        $this->poste = $poste; // Pas de taille 6 position
+        $this->setClasseByPoste();
+        return $this;
+    }
+
+    public function setClasseByPoste()
+    {
+        switch ($this->poste[0]) {
+            case '1':
+                $this->classe = "1-COMPTES DE CAPITAUX";
+                break;
+            case '2':
+                $this->classe = "'2-COMPTES D\'IMMOBILISATIONS'";
+                break;
+            case '3':
+                $this->classe = "3-COMPTES DE STOCKS ET EN-COURS";
+                break;
+            case '4':
+                $this->classe = "4-COMPTES DE TIERS";
+                break;
+            case '5':
+                $this->classe = "5-COMPTES FINANCIERS";
+                break;
+            case '6':
+                $this->classe = "6-COMPTES DE CHARGES";
+                break;
+            case '7':
+                $this->classe = "7-COMPTES DE PRODUITS";
+                break;
+        }
+    }
+
+    public function isRubrique()
+    {
+        if (strlen($this->poste) < 6)
+            return true;
+        return false;
     }
 
     public function getTitre(): ?string
@@ -107,18 +145,6 @@ class Compte
     public function setTitre(string $titre): self
     {
         $this->titre = $titre;
-
-        return $this;
-    }
-
-    public function getCategorie(): ?string
-    {
-        return $this->categorie;
-    }
-
-    public function setCategorie(string $categorie): self
-    {
-        $this->categorie = $categorie;
 
         return $this;
     }

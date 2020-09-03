@@ -345,7 +345,7 @@ class DashboardController extends AbstractController
     }
 
     /**
-     * @Route("/export/pdf/Remboursement", name="dashboard_pdf_remb")
+     * @Route("/export/pdf/remboursement", name="dashboard_pdf_remb")
      */
     public function printPdfRemboursement(SessionInterface $session, AdherentRepository $repo, CompteCotisationRepository $repoCot)
     {

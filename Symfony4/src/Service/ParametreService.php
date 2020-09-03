@@ -28,10 +28,8 @@ class ParametreService
         
         $parametres[] = new Parametre('compte_cotisation');
         $parametres[] = new Parametre('label_cotisation', 'Cotisation {a} | {c}');
-        $parametres[] = new Parametre('analytique_cotisation', 'COT');
         $parametres[] = new Parametre('compte_prestation');
         $parametres[] = new Parametre('label_prestation', 'Remboursement {a} | {c}');
-        $parametres[] = new Parametre('analytique_prestation', 'REMB');
         $parametres[] = new Parametre('percent_prestation', 1);
         $parametres[] = new Parametre('plafond_prestation', 2);
         $parametres[] = new Parametre('percent_rembourse_prestation', 0.6);

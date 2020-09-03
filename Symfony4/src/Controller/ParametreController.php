@@ -44,10 +44,8 @@ class ParametreController extends AbstractController
 
         $pCotisation = $allParameters['compte_cotisation'];
         $pLabelCotisation = $allParameters['label_cotisation'];
-        $pAnalytiqueCotisation = $allParameters['analytique_cotisation'];
         $pPrestation = $allParameters['compte_prestation'];
         $pLabelPrestation = $allParameters['label_prestation'];
-        $pAnalytiquePrestation = $allParameters['analytique_prestation'];
         $pSoins = $allParameters['soins_prestation'];
         $pPercent = $allParameters['percent_prestation'];
         $pPercentRemb = $allParameters['percent_rembourse_prestation'];
@@ -60,10 +58,8 @@ class ParametreController extends AbstractController
         $compteRembPre = $repositoryCompte->findOneByPoste($pCompteRembPrestation->getValue());        
         $data['compte_cotisation'] = $compteCot;
         $data['label_cotisation'] = $pLabelCotisation->getValue();
-        $data['analytique_cotisation'] = $pAnalytiqueCotisation->getValue();
         $data['compte_prestation'] = $comptePre;
         $data['label_prestation'] = $pLabelPrestation->getValue();
-        $data['analytique_prestation'] = $pAnalytiquePrestation->getValue();
         $data['percent_prestation'] = $pPercent->getValue();
         $data['percent_rembourse_prestation'] = $pPercentRemb->getValue();
         $data['compte_dette_prestation'] = $pCompteRembPrestation->getValue();
@@ -77,11 +73,9 @@ class ParametreController extends AbstractController
             /* Enregistrer tous les parametres données */
             $pCotisation->setValue($form->get('compte_cotisation')->getData()->getPoste());
             $pLabelCotisation->setValue($form->get('label_cotisation')->getData());
-            $pAnalytiqueCotisation->setValue($form->get('analytique_cotisation')->getData());
 
             $pPrestation->setValue($form->get('compte_prestation')->getData()->getPoste());
             $pLabelPrestation->setValue($form->get('label_prestation')->getData());
-            $pAnalytiquePrestation->setValue($form->get('analytique_prestation')->getData());
             $pPercent->setValue($form->get('percent_prestation')->getData());
             $pPercentRemb->setValue($form->get('percent_rembourse_prestation')->getData());
             $pPlafond->setValue($form->get('plafond_prestation')->getData());

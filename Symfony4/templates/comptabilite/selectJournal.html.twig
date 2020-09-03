@@ -26,14 +26,29 @@
                 <div class="card-body">
                     <h4 class="card-title">Journaux comptables</h4>
                     <hr>
-                    <div class="feed-widget">
-                        <ul class="list-style-none feed-body m-0 p-b-20">
-                            <li class="p-1"><a href="{{ path('comptabilite_journal') }}"> Journal géneral </a></li>
-                            {% for code in codes %}
-                            <li class="p-1"><a href="{{ path('comptabilite_journal', { journal: code.codeJournal }) }}"> Journal {{ code.titre }} </a></li> 
-                            {% endfor %}
-                            
-                        </ul>
+                    <div class="row">
+                        <div class="col-md-10 table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col">Type</th>
+                                        <th scope="col">Code</th>
+                                        <th scope="col">Intitulé du journal</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for code in codes %}
+                                    <tr>
+                                        <td><span class="mdi {% if code.type == 'trésorerie' %}mdi-bank {% else %}{% if code.type == 'standard' %}mdi-arrow-compress {% else %}mdi-arrow-right{% endif %}{% endif %}"></span></td>
+                                        <td>{{ code.codeJournal }}</td>
+                                        <td>{{ code.titre }}</td>
+                                        <td><a href="{{ path('comptabilite_journal', { journal: code.codeJournal }) }}" class="label btn-info label-info"> saisie </a></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>

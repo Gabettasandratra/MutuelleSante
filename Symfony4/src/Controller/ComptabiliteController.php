@@ -7,6 +7,7 @@ use App\Entity\Article;
 use App\Entity\Exercice;
 use App\Form\CompteType;
 use App\Form\ArticleType;
+use App\Service\ImportExcel;
 use Doctrine\ORM\EntityRepository;
 use App\Repository\CompteRepository;
 use App\Repository\ArticleRepository;
@@ -17,13 +18,17 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Validator\Constraints\Length;
 
 class ComptabiliteController extends AbstractController
 {
@@ -94,7 +99,7 @@ class ComptabiliteController extends AbstractController
                         'class' => Compte::class,
                         'query_builder' => function (EntityRepository $er) {
                             return $er->createQueryBuilder('c')
-                                    //->andWhere('c.classe != \'7-COMPTES DE PRODUITS\'')
+                                    ->andWhere('length(c.poste) = 6')
                                     ->orderBy('c.poste', 'ASC');
                         },
                         'choice_label' => function ($c) {
@@ -105,7 +110,7 @@ class ComptabiliteController extends AbstractController
                         'class' => Compte::class,
                         'query_builder' => function (EntityRepository $er) {
                             return $er->createQueryBuilder('c')
-                                    //->andWhere('c.classe != \'6-COMPTES DE CHARGES\'')
+                                    ->andWhere('length(c.poste) = 6')
                                     ->orderBy('c.poste', 'ASC');
                         },
                         'choice_label' => function ($c) {
@@ -195,15 +200,37 @@ class ComptabiliteController extends AbstractController
     /**
      * @Route("/comptabilite/plan", name="comptabilite_plan")
      */
-    public function plan(CompteRepository $repositoryCompte)
+    public function plan(CompteRepository $repositoryCompte, Request $request, EntityManagerInterface $manager)
     {
+        $compte = new Compte();     
+        $form = $this->createFormBuilder($compte)     
+                     ->add('poste', TextType::class, [
+                        'constraints' => [
+                            new Length([
+                                'max' => 6
+                            ])
+                        ]
+                     ])
+                     ->add('titre')
+                     ->add('note')
+                     ->getForm();       
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // verifier si le rubrique existe
+            $rub = substr($compte->getPoste(), 0, 3);
+            if ($repositoryCompte->findByPoste($rub)) {
+                $manager->persist($compte);
+                $manager->flush();
+            } else {
+                $form->get('poste')->addError(new FormError("Le rubrique $rub n'existe pas dans le PCG, veuillez changer le numéro"));
+            }      
+        } 
         return $this->render('comptabilite/plan.html.twig',[
-            'classes' => [
-                'bilan' => $repositoryCompte->findBilanGroupByClass(),
-                'gestion' => $repositoryCompte->findGestionGroupByClass()
-            ]
+            'comptes' =>  $repositoryCompte->findComptes(),
+            'form' => $form->createView()
         ]);
-    }
+    }   
 
     /**
      * @Route("/comptabilite/plan/analytique", name="comptabilite_plan_analytique")
@@ -224,95 +251,6 @@ class ComptabiliteController extends AbstractController
 
         return $this->render('comptabilite/analytique.html.twig',[
             'form' => $form->createView()
-        ]);
-    }
-
-
-    /**
-     * @Route("/comptabilite/plan/bilan", name="comptabilite_plan_bilan")
-     */
-    public function addCompteBilan(Request $request, EntityManagerInterface $manager)
-    {
-        $compte = new Compte();
-        $compte->setIsTresor(false);
-        $compte->setCategorie('COMPTES DE BILAN');
-        $compte->setType(true); // Actif default
-        $form = $this->createFormBuilder($compte)
-                     ->add('classe', ChoiceType::class, [
-                        'choices'  => [
-                            '1-COMPTES DE CAPITAUX' => '1-COMPTES DE CAPITAUX',
-                            '2-COMPTES D\'IMMOBILISATIONS' => '2-COMPTES D\'IMMOBILISATIONS',
-                            '3-COMPTES DE STOCKS ET EN-COURS' => '3-COMPTES DE STOCKS ET EN-COURS',
-                            '4-COMPTES DE TIERS' => '4-COMPTES DE TIERS',
-                            '5-COMPTES FINANCIERS' => '5-COMPTES FINANCIERS',
-                        ]
-                     ])
-                     ->add('poste')
-                     ->add('titre')
-                     ->add('type', CheckboxType::class, [ 'required' => false, 'label' => 'Actif / Passif' ])
-                     ->add('note')
-                     ->getForm();       
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Verify class
-            $class = $form->get('classe')->getData();
-            $poste = $form->get('poste')->getData();
-            if ($poste[0] == $class[0]) {
-                $manager->persist($compte);
-                $manager->flush();
-                return $this->redirectToRoute('comptabilite_plan');
-            } else {
-                $form->get('poste')->addError(new FormError("Le numero de compte $poste n'appartient pas à la classe $class"));
-            }   
-        }
-
-        return $this->render('comptabilite/compteForm.html.twig', [
-            'form' => $form->createView(),
-        ]);
-    }
-
-    /**
-     * @Route("/comptabilite/plan/gestion", name="comptabilite_plan_gestion")
-     */
-    public function addCompteGestion(Request $request, EntityManagerInterface $manager)
-    {
-        $compte = new Compte();
-        $compte->setIsTresor(false);
-        $compte->setCategorie('COMPTES DE GESTION');
-        $form = $this->createFormBuilder($compte)
-                    ->add('classe', ChoiceType::class, [
-                    'choices'  => [
-                        '6-COMPTES DE CHARGES' => '6-COMPTES DE CHARGES',
-                        '7-COMPTES DE PRODUITS' => '7-COMPTES DE PRODUITS'
-                    ]
-                    ])
-                    ->add('poste')
-                    ->add('titre')
-                    ->add('note')
-                    ->getForm();       
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            if ($compte->getClasse() === '6-COMPTES DE CHARGES') {
-                $compte->setType(true);
-            } else {
-                $compte->setType(false);
-            }
-            // Verify class
-            $class = $form->get('classe')->getData();
-            $poste = $form->get('poste')->getData();
-            if ($poste[0] == $class[0]) {
-                $manager->persist($compte);
-                $manager->flush();
-                return $this->redirectToRoute('comptabilite_plan');
-            } else {
-                $form->get('poste')->addError(new FormError("Le numero de compte $poste n'appartient pas à la classe $class"));
-            } 
-        }
-
-        return $this->render('comptabilite/compteForm.html.twig', [
-            'form' => $form->createView(),
         ]);
     }
 
@@ -350,5 +288,38 @@ class ComptabiliteController extends AbstractController
             }
         }
         return false;
+    }
+
+    /**
+     * @Route("/comptabilite/plan/importer", name="omport_plan_comptable")
+     */
+    public function importPlanComptable(Request $request, ImportExcel $importService)
+    {
+        $form = $this->createFormBuilder()
+                    ->add('file', FileType::class, [
+                        'mapped' => false,
+                        'required' => true,
+                    ])
+                    ->add('save', SubmitType::class, ['label' => 'Importer xlsx'])
+                    ->getForm();
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $xlsxFile = $form->get('file')->getData();
+            if ($xlsxFile) {
+                $output = $importService->importPlanComptable($xlsxFile);  
+                if ($output['hasError'] === false) {
+                    return $this->redirectToRoute('comptabilite_plan'); 
+                } else {
+                    foreach ($output['ErrorMessages'] as $message) {
+                        $form->get('file')->addError(new FormError($message));
+                    }
+                }             
+            }
+            
+        }
+        
+        return $this->render('comptabilite/importPlanComptable.html.twig', [
+            'form' => $form->createView()
+        ]);
     }
 }

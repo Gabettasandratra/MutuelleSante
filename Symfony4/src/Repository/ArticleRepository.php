@@ -73,12 +73,12 @@ class ArticleRepository extends ServiceEntityRepository
         $retour = [];
         foreach ($classes as $classe) {
             $str = $classe['classe'];
-            $comptes = $this->_em->createQuery('select c from App\Entity\Compte c where c.classe = :cl order by c.poste')
+            $comptes = $this->_em->createQuery('select c from App\Entity\Compte c where c.classe = :cl and length(c.poste) = 6 order by c.poste')
                                     ->setParameter('cl', $str)
                                     ->getResult();          
             
             foreach ($comptes as $compte) {
-                if ($compte->getCategorie() != 'COMPTES DE GESTION') {
+                if (strpos($compte->getPoste(), '6') != 0 && strpos($compte->getPoste(), '7') != 0) {
                     $debit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteDebit = :cp and a.date < :dateFin')
                                 ->setParameter('cp', $compte) 
                                 ->setParameter('dateFin', $exercice->getDateFin())                     

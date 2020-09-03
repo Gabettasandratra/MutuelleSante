@@ -30,7 +30,7 @@
                     <h4 class="card-title">Balance des comptes</h4>
                     <hr>                           
                     <div class="table-responsive-lg">
-                        <table class="table table-bordered">
+                        <table class="table table-bordered no-padding">
                             <thead class="thead-light">
                                 <tr>
                                     <th scope="col" rowspan=2 class="text-center align-middle">Poste</th>
@@ -46,54 +46,59 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% set Tdebit = 0 %} {% set Tcredit = 0 %} {% set Tsolde = 0 %}
+                                {% set Tdebit = 0 %} {% set Tcredit = 0 %} {% set TsoldeD = 0 %} {% set TsoldeC = 0 %}
                                 {% for classe, comptes in donnees %}
-                                    <tr><th colspan=6 class="table-active">{{ classe }}</th></tr>
+                                    <tr><th colspan=6 class="table-blue">{{ classe }}</th></tr>
                                     {% set debit = 0 %} {% set credit = 0 %} {% set solde = 0 %}
                                     {% for compte in comptes %}
                                         <tr>
                                             <td>{{ compte.poste }}</td>
                                             <td>{{ compte.titre }}</td>
-                                            <td>{{ compte.debit|number_format(2,',',' ') }}</td> {% set debit = debit + compte.debit %}
-                                            <td>{{ compte.credit|number_format(2,',',' ') }}</td> {% set credit = credit + compte.credit %}
-                                            {% if compte.solde >= 0 %}
-                                                <td>{{ compte.solde|abs|number_format(2,',',' ') }}</td> {% set solde = solde + compte.solde %}
-                                                <td>0,00</td>
+                                            <td>{% if compte.debit != 0 %}{{ compte.debit|number_format(2,',',' ') }}{% endif %}</td> {% set debit = debit + compte.debit %}
+                                            <td>{% if compte.credit != 0 %}{{ compte.credit|number_format(2,',',' ') }}{% endif %}</td> {% set credit = credit + compte.credit %}
+                                            {% if compte.solde > 0 %}
+                                                <td>{{ compte.solde|abs|number_format(2,',',' ') }}</td> 
+                                                <td></td>
                                             {% else %}
-                                                <td>0,00</td>
-                                                <td>{{ compte.solde|abs|number_format(2,',',' ') }}</td> {% set solde = solde + compte.solde %}             
+                                                {% if compte.solde == 0 %}
+                                                <td></td>
+                                                <td></td>
+                                                {% else %}
+                                                <td></td>
+                                                <td>{{ compte.solde|abs|number_format(2,',',' ') }}</td> 
+                                                {% endif %}
                                             {% endif %}
-                                            
+                                            {% set solde = solde + compte.solde %}
                                         </tr>                                        
                                     {% endfor %}
                                     <tr>
                                         <th colspan=2 class="text-right">TOTAL : {{ classe }}</th>
-                                        <td>{{ debit|number_format(2,',',' ') }}</td> {% set Tdebit = Tdebit + debit %}
-                                        <td>{{ credit|number_format(2,',',' ') }}</td> {% set Tcredit = Tcredit + credit %}
+                                        <td>{% if debit != 0 %}{{ debit|number_format(2,',',' ') }}{% endif %}</td> {% set Tdebit = Tdebit + debit %}
+                                        <td>{% if credit != 0 %}{{ credit|number_format(2,',',' ') }}{% endif %}</td> {% set Tcredit = Tcredit + credit %}
         
-                                        {% if solde >= 0 %}
+                                        {% if solde > 0 %}
                                             <td>{{ solde|abs|number_format(2,',',' ') }}</td>
-                                            <td>0,00</td>
+                                            <td></td>
+                                            {% set TsoldeD = TsoldeD + solde|abs %}             
                                         {% else %}
-                                            <td>0,00</td>
+                                            {% if solde == 0 %}
+                                                <td></td>
+                                                <td></td>
+                                            {% else %}
+                                            <td></td>
                                             <td>{{ solde|abs|number_format(2,',',' ') }}</td>
+                                            {% endif %}
+                                            {% set TsoldeC = TsoldeC + solde|abs %}             
                                         {% endif %} 
-                                        {% set Tsolde = Tsolde + solde %}             
                                     </tr>
                                 {% endfor %}
 
-                                <tr class="border-top table-active">
+                                <tr class="border-top table-gris">
                                     <th colspan=2 class="text-right">TOTAUX</th>
                                     <td>{{ Tdebit|number_format(2,',',' ') }}</td>
                                     <td>{{ Tcredit|number_format(2,',',' ') }}</td>
-                                    {% if Tsolde >= 0 %}
-                                        <td>{{ Tsolde|abs|number_format(2,',',' ') }}</td>
-                                        <td>0,00</td>
-                                    {% else %}
-                                        <td>0,00</td>
-                                        <td>{{ Tsolde|abs|number_format(2,',',' ') }}</td>
-                                    {% endif %}
-                                    
+                                    <td>{{ TsoldeD|abs|number_format(2,',',' ') }}</td>
+                                    <td>{{ TsoldeC|abs|number_format(2,',',' ') }}</td>                                 
                                 </tr>       
                             </tbody>
                         </table>

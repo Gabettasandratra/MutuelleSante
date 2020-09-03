@@ -20,40 +20,15 @@ class CompteRepository extends ServiceEntityRepository
         parent::__construct($registry, Compte::class);
     }
 
-    public function findBilanGroupByClass()
-    {
-        $classes =  $this->_em->createQuery('select distinct c.classe from App\Entity\Compte c where c.categorie = :cat order by c.classe')
-                                ->setParameter('cat', 'COMPTES DE BILAN')                      
-                                ->getResult();
-        $retour = [];
-        foreach ($classes as $classe) {
-            $str = $classe['classe'];
-            $retour[$str] = $this->_em->createQuery('select c.poste,c.titre,c.type,c.note from App\Entity\Compte c where c.classe = :cl')
-                                    ->setParameter('cl', $str)
+    public function findComptes()
+    {       
+        return $this->_em->createQuery('select c from App\Entity\Compte c order by c.poste')
                                     ->getResult();
-        }
-
-        return $retour;
-    }
-
-    public function findGestionGroupByClass()
-    {
-        $classes =  $this->_em->createQuery('select distinct c.classe from App\Entity\Compte c where c.categorie = :cat order by c.classe')
-                                ->setParameter('cat', 'COMPTES DE GESTION')                      
-                                ->getResult();
-        $retour = [];
-        foreach ($classes as $classe) {
-            $str = $classe['classe'];
-            $retour[$str] = $this->_em->createQuery('select c.poste,c.titre,c.type,c.note from App\Entity\Compte c where c.classe = :cl order by c.poste')
-                                    ->setParameter('cl', $str)
-                                    ->getResult();
-        }
-        return $retour;
     }
 
     public function findPosteTitre()
     {
-        return $this->_em->createQuery('select c.poste,c.titre from App\Entity\Compte c order by c.poste')
+        return $this->_em->createQuery('select c.poste,c.titre from App\Entity\Compte c where length(c.poste) = 6 order by c.poste')
                         ->getResult();
     }
 
@@ -90,17 +65,20 @@ class CompteRepository extends ServiceEntityRepository
     {
         $codes =  $this->_em->createQuery('select c.titre, c.codeJournal from App\Entity\Compte c where c.isTresor =  true order by c.codeJournal')
                             ->getResult();
-        $codes[] = [ 'titre' => 'Opération divers', 'codeJournal' => 'OD'];
-        $codes[] = [ 'titre' => 'Clôture d\'exercice', 'codeJournal' => 'CLOT'];
-        $codes[] = [ 'titre' => 'Prestation', 'codeJournal' => 'PRE'];
+        foreach ($codes as $code) {
+            $code['type'] = 'trésorerie';
+            $retour[] = $code;
+        }
+        $retour[] = [ 'titre' => 'Opération divers', 'codeJournal' => 'OD','type' => 'standard'];
+        $retour[] = [ 'titre' => 'Remboursements', 'codeJournal' => 'REM' ,'type' => 'sortie'];
         if ($in) {
-            foreach ($codes as $code) {
+            foreach ($retour as $code) {
                 if ($code['codeJournal'] == $in) {
                     return [$code];
                 }
             }
         }
-        return $codes;
+        return $retour;
     }
 
     // Cumul de tous les exercices

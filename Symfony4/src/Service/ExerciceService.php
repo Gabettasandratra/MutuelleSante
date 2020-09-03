@@ -59,10 +59,10 @@ class ExerciceService
             $solde = $this->compteRepo->findSolde($compte);
             if ($solde != 0) {
                 $article = new Article();
-                $article->setCategorie('CLOT')
+                $article->setCategorie('OD')
                         ->setAnalytique('-')
-                        ->setLibelle('Clôture exercice '. $exercice->getAnnee())
-                        ->setPiece('Clôture '.$exercice->getAnnee() .' '. date('d/m/Y'))
+                        ->setLibelle('Solde des comptes de gestion - '. $exercice->getAnnee())
+                        ->setPiece($exercice->getAnnee() .' '. date('dmY'))
                         ->setDate(new \DateTime())
                         ->setMontant(abs($solde))
                         ->setIsFerme(true);
