@@ -23,68 +23,191 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Compte de résultat</h4>
+                    <h4 class="card-title">COMPTE DE RESULTAT</h4>
                     <hr>
                     <div class="row">
-                        <div class="col-md-6 col-sm-12 border-right">
-                            <table class="table table-bordered">
-                                <thead class="thead-light">
+                        <div class="col-md-12 border-right">
+                            <table class="table table-bordered no-padding-3">
+                                <thead class="thead-light text-center">
                                     <tr>
-                                        <th class="text-center" colspan=2>CHARGES</th>
-                                    </tr>                
+                                        <th>POSTES</th>
+                                        <th>Montant</th>
+                                    </tr>               
                                 </thead>
                                 <tbody>
-                                    {% set totalC = 0 %}
-                                    {% for compte in donnees.charge %}
-                                        <tr>
-                                            <td title="{{ compte.poste }}" data-toggle="tooltip">{{ compte.titre }}</td>
-                                            <td>{{ compte.solde|number_format(2,',',' ') }}</td> {% set totalC = totalC + compte.solde %}
-                                        </tr>
-                                    {% endfor %}
-                                    
-                                </tbody>
-                                <tfoot>
-                                    <tr class="table-active">
-                                        <th>TOTAL DES CHARGES</th>
-                                        <td>{{ totalC|number_format(2,',',' ') }}</td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                        <div class="col-md-6 col-sm-12">
-                            <table class="table table-bordered">
-                                <thead  class="thead-light">
                                     <tr>
-                                        <th class="text-center" colspan=2>PRODUITS</th>
+                                        <td colspan=2 class="font-weight-bold">PRODUITS D'EXPLOITATION</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {% set totalP = 0 %}
-                                    {% for compte in donnees.produit %}
+                                    {% set tProduit = 0 %}
+                                    {% for rubrique in chiffreAffaireNet %}          
                                         <tr>
-                                            <td title="{{ compte.poste }}" data-toggle="tooltip">{{ compte.titre }}</td>
-                                            <td>{{ compte.solde|number_format(2,',',' ') }}</td> {% set totalP = totalP + compte.solde %}
+                                            <td {% if rubrique[0] != 0 %}class="pl-4 font-italic"{% endif %}>{{ rubrique[1] }}</td>
+                                            <td>{% if rubrique[2] is defined and rubrique[2] != 0 %}{{ rubrique[2]|number_format(2,',',' ') }} {% set tProduit = tProduit + rubrique[2] %}{% endif %}</td>
                                         </tr>
+                                        {% if loop.last %}
+                                        <tr>
+                                            <td class="text-right font-weight-bold font-italic">Chiffre d'affaires net</td>
+                                            <td>{% if tProduit != 0 %}{{ tProduit|number_format(2,',',' ') }}{% endif %}</td>
+                                        </tr>
+                                        {% endif %}           
                                     {% endfor %}
-                                    
-                                </tbody>
-                                <tfoot>
-                                    <tr class="table-active">
-                                        <th>TOTAL DES PRODUITS</th>
-                                        <td>{{ totalP|number_format(2,',',' ') }}</td>
+
+                                    {% for rubrique in productionExploitation %}          
+                                        <tr>
+                                            <td {% if rubrique[0] != 0 %}class="pl-4 font-italic"{% endif %}>{{ rubrique[1] }}</td>
+                                            <td>{% if rubrique[2] is defined and rubrique[2] != 0 %}{{ rubrique[2]|number_format(2,',',' ') }} {% set tProduit = tProduit + rubrique[2] %}{% endif %}</td>
+                                        </tr>
+                                        {% if loop.last %}
+                                        <tr>
+                                            <td class="text-right font-weight-bold">TOTAL PRODUITS D'EXPLOITATION (I)</td>
+                                            <td>{% if tProduit != 0 %}{{ tProduit|number_format(2,',',' ') }}{% endif %}</td>
+                                        </tr>
+                                        {% endif %}           
+                                    {% endfor %}
+
+                                    <tr>
+                                        <td colspan=2 class="font-weight-bold">CHARGES D'EXPLOITATION</td>
                                     </tr>
-                                </tfoot>
+                                    {% set tCharge = 0 %}
+                                    {% for rubrique in chargesExploitation %}          
+                                        <tr>
+                                            <td {% if rubrique[0] != 0 %}class="pl-4 font-italic"{% endif %}>{{ rubrique[1] }}</td>
+                                            <td>{% if rubrique[2] is defined and rubrique[2] != 0 %}{{ rubrique[2]|number_format(2,',',' ') }} {% set tCharge = tCharge + rubrique[2] %}{% endif %}</td>
+                                        </tr>
+                                        {% if loop.last %}
+                                        <tr>
+                                            <td class="text-right font-weight-bold">TOTAL CHARGES D'EXPLOITATION (II)</td>
+                                            <td>{% if tCharge != 0 %}{{ tCharge|number_format(2,',',' ') }}{% endif %}</td>
+                                        </tr>
+                                        {% endif %}           
+                                    {% endfor %}
+                                    <tr class="table-blue">
+                                        <td class="text-center font-weight-bold">1 - RESULTAT D'EXPLOITATION (I-II)</td>
+                                        <td>{% if tCharge != tProduit %}{{ (tProduit + tCharge)|number_format(2,',',' ') }}{% endif %}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td colspan=2 class="font-weight-bold">OPERATIONS EN COMMUN</td>
+                                    </tr>
+                                    {% set III = 0 %}
+                                    {% set IV = 0 %}
+                                    {% for rubrique in operationCommun %}          
+                                        <tr>
+                                            <td {% if rubrique[0] != 0 %}class="pl-4 font-italic"{% endif %}>{{ rubrique[1] }}</td>
+                                            <td>{% if rubrique[2] is defined and rubrique[2] != 0 %}{{ rubrique[2]|number_format(2,',',' ') }} {% if loop.index == 1 %} {% set III = rubrique[2] %} {% else %} {% set IV = rubrique[2] %} {% endif %}{% endif %}</td>
+                                            
+                                        </tr>          
+                                    {% endfor %}
+
+                                    <tr>
+                                        <td colspan=2 class="font-weight-bold">PRODUITS FINANCIERS</td>
+                                    </tr>
+                                    {% set tPFinancier = 0 %}
+                                    {% for rubrique in produitsFinanciers %}          
+                                        <tr>
+                                            <td {% if rubrique[0] != 0 %}class="pl-4 font-italic"{% endif %}>{{ rubrique[1] }}</td>
+                                            <td>{% if rubrique[2] is defined and rubrique[2] != 0 %}{{ rubrique[2]|number_format(2,',',' ') }} {% set tPFinancier = tPFinancier + rubrique[2] %}{% endif %}</td>
+                                        </tr>
+                                        {% if loop.last %}
+                                        <tr>
+                                            <td class="text-right font-weight-bold">TOTAL PRODUITS FINANCIERS (V)</td>
+                                            <td>{% if tPFinancier != 0 %}{{ tPFinancier|number_format(2,',',' ') }}{% endif %}</td>
+                                        </tr>
+                                        {% endif %}           
+                                    {% endfor %}
+
+                                    <tr>
+                                        <td colspan=2 class="font-weight-bold">CHARGES FINANCIERS</td>
+                                    </tr>
+                                    {% set tCFinancier = 0 %}
+                                    {% for rubrique in chargesFinanciers %}          
+                                        <tr>
+                                            <td {% if rubrique[0] != 0 %}class="pl-4 font-italic"{% endif %}>{{ rubrique[1] }}</td>
+                                            <td>{% if rubrique[2] is defined and rubrique[2] != 0 %}{{ rubrique[2]|number_format(2,',',' ') }} {% set tCFinancier = tCFinancier + rubrique[2] %}{% endif %}</td>
+                                        </tr>
+                                        {% if loop.last %}
+                                        <tr>
+                                            <td class="text-right font-weight-bold">TOTAL CHARGES FINANCIERS (VI)</td>
+                                            <td>{% if tCFinancier != 0 %}{{ tCFinancier|number_format(2,',',' ') }}{% endif %}</td>
+                                        </tr>
+                                        {% endif %}           
+                                    {% endfor %}
+
+                                    <tr class="table-blue">
+                                        <td class="text-center font-weight-bold">2 - RESULTAT FINANCIER (V-VI)</td>
+                                        <td>{% if tPFinancier != tCFinancier %}{{ (tCFinancier + tCFinancier)|number_format(2,',',' ') }}{% endif %}</td>
+                                    </tr>
+                                    <tr class="table-blue">
+                                        <td class="text-center font-weight-bold">3 - RESULTAT COURANT AVANT IMPOTS (I-II+III-IV+V-VI)</td>
+                                        <td>{{ (tProduit + tCharge + III + IV + tCFinancier + tCFinancier)|number_format(2,',',' ') }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td colspan=2 class="font-weight-bold">PRODUITS EXCEPTIONNELS</td>
+                                    </tr>
+                                    {% set tPException = 0 %}
+                                    {% for rubrique in produitsExceptionnels %}          
+                                        <tr>
+                                            <td {% if rubrique[0] != 0 %}class="pl-4 font-italic"{% endif %}>{{ rubrique[1] }}</td>
+                                            <td>{% if rubrique[2] is defined and rubrique[2] != 0 %}{{ rubrique[2]|number_format(2,',',' ') }} {% set tPException = tPException + rubrique[2] %}{% endif %}</td>
+                                        </tr>
+                                        {% if loop.last %}
+                                        <tr>
+                                            <td class="text-right font-weight-bold">TOTAL PRODUITS EXCEPTIONNELS (VII)</td>
+                                            <td>{% if tPException != 0 %}{{ tPException|number_format(2,',',' ') }}{% endif %}</td>
+                                        </tr>
+                                        {% endif %}           
+                                    {% endfor %}
+
+                                    <tr>
+                                        <td colspan=2 class="font-weight-bold">CHARGES EXCEPTIONNELLES</td>
+                                    </tr>
+                                    {% set tCException = 0 %}
+                                    {% for rubrique in chargesExceptionnels %}          
+                                        <tr>
+                                            <td {% if rubrique[0] != 0 %}class="pl-4 font-italic"{% endif %}>{{ rubrique[1] }}</td>
+                                            <td>{% if rubrique[2] is defined and rubrique[2] != 0 %}{{ rubrique[2]|number_format(2,',',' ') }} {% set tCException = tCException + rubrique[2] %}{% endif %}</td>
+                                        </tr>
+                                        {% if loop.last %}
+                                        <tr>
+                                            <td class="text-right font-weight-bold">TOTAL CHARGES EXCEPTIONNELLES (VIII)</td>
+                                            <td>{% if tCException != 0 %}{{ tCException|number_format(2,',',' ') }}{% endif %}</td>
+                                        </tr>
+                                        {% endif %}           
+                                    {% endfor %}
+
+                                    <tr class="table-blue">
+                                        <td class="text-center font-weight-bold">4 - RESULTAT EXCEPTIONNEL (VII-VIII)</td>
+                                        <td>{% if tPException != tCException %}{{ (tCException + tCException)|number_format(2,',',' ') }}{% endif %}</td>
+                                    </tr>
+
+                                    {% set tImpots = 0 %}
+                                    {% for rubrique in impots %}          
+                                        <tr>
+                                            <td {% if rubrique[0] != 0 %}class="pl-4 font-italic"{% endif %}>{{ rubrique[1] }}</td>
+                                            <td>{% if rubrique[2] is defined and rubrique[2] != 0 %}{{ rubrique[2]|number_format(2,',',' ') }} {% set tImpots = tImpots + rubrique[2] %}{% endif %}</td>
+                                        </tr>          
+                                    {% endfor %}
+
+                                    <tr class="table-light">
+                                        <td class="text-center font-weight-bold">TOTAL DES PRODUITS (I+III+V+VII)</td>
+                                        {% set totauxProduits = tProduit + III + tPFinancier + tPException %}
+                                        <td>{{ totauxProduits|number_format(2,',',' ') }}</td>
+                                    </tr>
+
+                                    <tr class="table-light">
+                                        <td class="text-center font-weight-bold">TOTAL DES CHARGES (II+IV+VI+VII+IX+X)</td>
+                                        {% set totauxCharges = tCharge + IV + tCFinancier + tCException + tImpots %}
+                                        <td>{{ totauxCharges|number_format(2,',',' ') }}</td>
+                                    </tr>
+
+                                    <tr class="table-blue">
+                                        <td class="text-center font-weight-bold">5 - BENEFICE OU PERTE</td>
+                                        <td>{{ (totauxCharges + totauxProduits)|number_format(2,',',' ') }}</td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12">
-                            {% set resultat = totalP - totalC %}
-                            <div class="alert {% if resultat >= 0 %}alert-success{% else %}alert-danger{% endif %} " role="alert">
-                                RESULTAT DE L'EXERCICE = {{totalP|number_format(2,',',' ')}} - {{totalC|number_format(2,',',' ')}} = {{ (totalP - totalC)|number_format(2,',',' ') }}
-                            </div>
-                        </div>
-                        
                     </div>
                 </div>
             </div>

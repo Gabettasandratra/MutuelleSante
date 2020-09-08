@@ -110,7 +110,7 @@ class Compte
                 $this->classe = "1-COMPTES DE CAPITAUX";
                 break;
             case '2':
-                $this->classe = "'2-COMPTES D\'IMMOBILISATIONS'";
+                $this->classe = "2-COMPTES D'IMMOBILISATIONS";
                 break;
             case '3':
                 $this->classe = "3-COMPTES DE STOCKS ET EN-COURS";

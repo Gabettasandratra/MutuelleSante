@@ -81,6 +81,44 @@ class CompteRepository extends ServiceEntityRepository
         return $retour;
     }
 
+    /**
+     * Cherche la somme des soldes dans le postes données
+     */
+    public function findSoldes($postes = [], Exercice $exercice)
+    {
+        $solde = 0;
+        foreach ($postes as $poste) {
+            $comptes = $this->_em->createQuery('select c from App\Entity\Compte c where c.poste like :p')
+                                ->setParameter('p', $poste.'%')                      
+                                ->getResult();
+            foreach ($comptes as $compte) {
+                if (strpos($compte->getPoste(), '6') != 0 && strpos($compte->getPoste(), '7') != 0) {
+                    $debit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteDebit = :cp and a.date < :dateFin')
+                                ->setParameter('cp', $compte) 
+                                ->setParameter('dateFin', $exercice->getDateFin())                     
+                                ->getSingleScalarResult();
+                    $credit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteCredit = :cp and a.date < :dateFin')
+                                ->setParameter('cp', $compte)   
+                                ->setParameter('dateFin', $exercice->getDateFin())                   
+                                ->getSingleScalarResult();
+                } else {
+                    $debit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteDebit = :cp and a.date between :dateDebut and :dateFin')
+                                ->setParameter('cp', $compte) 
+                                ->setParameter('dateDebut', $exercice->getDateDebut())                     
+                                ->setParameter('dateFin', $exercice->getDateFin())                     
+                                ->getSingleScalarResult();
+                    $credit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteCredit = :cp and a.date between :dateDebut and :dateFin')
+                                ->setParameter('cp', $compte)   
+                                ->setParameter('dateDebut', $exercice->getDateDebut())
+                                ->setParameter('dateFin', $exercice->getDateFin())                                        
+                                ->getSingleScalarResult();
+                }             
+                $solde = $solde + $debit - $credit;
+            }
+        }
+        return $solde;
+    }
+
     // Cumul de tous les exercices
     public function findBilanActif(Exercice $exercice)
     {

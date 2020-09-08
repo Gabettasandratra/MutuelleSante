@@ -83,9 +83,9 @@
                         <div class="row">                                                  
                             <div class="col-12">
                                 {{ form_start(form) }}
+                                {{ form_row(form.rubrique, { 'label': 'Rubrique :' }) }} 
                                 {{ form_row(form.poste, { 'label': 'N° du compte :' }) }} 
                                 {{ form_row(form.titre, { 'label': 'Intitulé du compte :' }) }}
-                                {{ form_row(form.note, { 'label': 'Notes :' }) }}
                                 <div class="form-row">
                                     <div class="col-12 text-right">
                                         <button type="submit" class="btn btn-success btn-sm">Créer</i></button>
@@ -102,4 +102,10 @@
 {% block javascripts %}
     <script src="{{ asset('assets/libs/datatable/dist/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('dist/js/pages/datatable/datatable-basic.init.js') }}"></script>
+    <script>
+        $(document).ready(function() { 
+            
+        });
+    </script>
 {% endblock %}
+

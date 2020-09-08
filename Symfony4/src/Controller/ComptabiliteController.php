@@ -8,6 +8,7 @@ use App\Entity\Exercice;
 use App\Form\CompteType;
 use App\Form\ArticleType;
 use App\Service\ImportExcel;
+use App\Service\ConfigEtatFi;
 use Doctrine\ORM\EntityRepository;
 use App\Repository\CompteRepository;
 use App\Repository\ArticleRepository;
@@ -17,9 +18,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -28,7 +30,6 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Validator\Constraints\Length;
 
 class ComptabiliteController extends AbstractController
 {
@@ -191,7 +192,6 @@ class ComptabiliteController extends AbstractController
     public function balance(ArticleRepository $repositoryArticle, SessionInterface $session)
     {
         $exercice = $session->get('exercice');
-
         return $this->render('comptabilite/balance.html.twig', [
             'donnees' => $repositoryArticle->findBalance($exercice)
         ]);
@@ -203,7 +203,20 @@ class ComptabiliteController extends AbstractController
     public function plan(CompteRepository $repositoryCompte, Request $request, EntityManagerInterface $manager)
     {
         $compte = new Compte();     
-        $form = $this->createFormBuilder($compte)     
+        $form = $this->createFormBuilder($compte) 
+                    ->add('rubrique', EntityType::class, [
+                        'class' => Compte::class,
+                        'mapped' => false,
+                        'query_builder' => function (EntityRepository $er) {
+                            return $er->createQueryBuilder('c')
+                                    ->andWhere('length(c.poste) < 6')
+                                    ->orderBy('c.poste', 'ASC');
+                        },
+                        'choice_label' => function ($c) {
+                            return $c->getPoste().' | '.$c->getTitre();
+                        },
+
+                    ])    
                      ->add('poste', TextType::class, [
                         'constraints' => [
                             new Length([
@@ -212,7 +225,6 @@ class ComptabiliteController extends AbstractController
                         ]
                      ])
                      ->add('titre')
-                     ->add('note')
                      ->getForm();       
         $form->handleRequest($request);
 
@@ -257,27 +269,77 @@ class ComptabiliteController extends AbstractController
     /**
      * @Route("/comptabilite/bilan", name="comptabilite_bilan")
      */
-    public function bilan(CompteRepository $repositoryCompte, SessionInterface $session)
+    public function bilan(ConfigEtatFi $etatFi, CompteRepository $repo, SessionInterface $session)
     {
-        $exercice = $session->get('exercice');      
-        $donnees['actif'] = $repositoryCompte->findBilanActif($exercice);
-        $donnees['passif'] = $repositoryCompte->findBilanPassif($exercice);
-        return $this->render('comptabilite/bilan.html.twig', [
-            'donnees' => $donnees,
+        $exercice = $session->get('exercice'); 
+        $actifNonCourant = $etatFi->actifNonCourant();  
+        $actifCourant = $etatFi->actifCourant();  
+        $capitaux = $etatFi->capitauxPropres();
+        $passifsNonCourants = $etatFi->passifNonCourant();
+        $passifsCourants = $etatFi->passifCourant();
+        
+        return $this->render('comptabilite/bilanExercice.html.twig', [
+            'actifsNonCourants' => $this->getBilan($exercice, $repo, $actifNonCourant),
+            'actifsCourants' => $this->getBilan($exercice, $repo, $actifCourant),
+            'capitaux' => $this->getBilan($exercice, $repo, $capitaux),
+            'passifsNonCourants' => $this->getBilan($exercice, $repo, $passifsNonCourants),
+            'passifsCourants' => $this->getBilan($exercice, $repo, $passifsCourants)
         ]);
+    }
+
+    private function getBilan($exercice, $repo, $groupes)
+    {
+        $anc = [];
+        foreach ($groupes as $rubrique) {
+            if (count($rubrique) == 4) {
+                $anc[] = [ $rubrique[0], $rubrique[1], $repo->findSoldes($rubrique[2], $exercice), $repo->findSoldes($rubrique[3], $exercice)];
+            } else {
+                $anc[] = $rubrique;
+            }
+        }
+        return $anc;
     }
 
     /**
      * @Route("/comptabilite/resultat", name="comptabilite_resultat")
      */
-    public function resultat(CompteRepository $repositoryCompte, SessionInterface $session)
+    public function resultat(ConfigEtatFi $etatFi, CompteRepository $repo, SessionInterface $session)
     {
         $exercice = $session->get('exercice');
-        $donnees['charge'] = $repositoryCompte->findGestionCharge($exercice);
-        $donnees['produit'] = $repositoryCompte->findGestionProduit($exercice);
+        $chiffreAffaireNet = $etatFi->chiffreAffaireNet();  
+        $productionExploitation = $etatFi->productionExploitation();
+        $chargesExploitation = $etatFi->chargeExploitation();
+        $op = $etatFi->operationEnCommmun();
+        $pFinanciers = $etatFi->productionsFinanciers();
+        $cFinanciers = $etatFi->chargesFinanciers();
+        $pException = $etatFi->produitExceptionnel();
+        $cException = $etatFi->chargeExceptionnel();
+        $impots = $etatFi->impots();
+
         return $this->render('comptabilite/resultat.html.twig', [
-            'donnees' => $donnees,
+            'chiffreAffaireNet' => $this->getResultat($exercice, $repo, $chiffreAffaireNet),
+            'productionExploitation' => $this->getResultat($exercice, $repo, $productionExploitation),
+            'chargesExploitation' => $this->getResultat($exercice, $repo, $chargesExploitation),
+            'operationCommun' => $this->getResultat($exercice, $repo, $op),
+            'produitsFinanciers' => $this->getResultat($exercice, $repo, $pFinanciers),
+            'chargesFinanciers' => $this->getResultat($exercice, $repo, $cFinanciers),
+            'produitsExceptionnels' => $this->getResultat($exercice, $repo, $pException),
+            'chargesExceptionnels' => $this->getResultat($exercice, $repo, $cException),
+            'impots' => $this->getResultat($exercice, $repo, $impots)
         ]);
+    }
+
+    private function getResultat($exercice, $repo, $groupes)
+    {
+        $anc = [];
+        foreach ($groupes as $rubrique) {
+            if (count($rubrique) == 3) {
+                $anc[] = [ $rubrique[0], $rubrique[1], $repo->findSoldes($rubrique[2], $exercice)];
+            } else {
+                $anc[] = $rubrique;
+            }
+        }
+        return $anc;
     }
 
     private function journal_exist($codeJournaux, $code)

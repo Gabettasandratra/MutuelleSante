@@ -100,8 +100,10 @@ class PrestationController extends AbstractController
     /**
      * @Route("/prestation/beneficiaire/{id}/decompte/save", name="prestation_beneficiaire_save_decompte", requirements={"id"="\d+"}, methods={"POST"})
      */
-    public function saveJsonDecompte(Pac $pac, Request $request, ValidatorInterface $validator, ComptaService $comptaService, EntityManagerInterface $manager)
+    public function saveJsonDecompte(Pac $pac, Request $request, ValidatorInterface $validator, ComptaService $comptaService, EntityManagerInterface $manager, SessionInterface $session)
     {
+        $exercice = $session->get('exercice');
+
         $data = json_decode( $request->getContent(), true);
         $prestations = $data['prestations'];
         if (!$prestations) {
@@ -124,13 +126,17 @@ class PrestationController extends AbstractController
             $prestation->setDecompte($data['numero']);
     
             $errors = $validator->validate($prestation);
-            if (0 === count($errors)) {
+            if (0 === count($errors) && $exercice->check($prestation->getDate())) {
                 $manager->persist($prestation);
             } else {    
                 $retour['hasError'] = true;
                 $retour['ErrorMessages'][] = "Les données de la prestation #". ($key+1) ." est invalide"; 
                 foreach ($errors as $error) {
                     $retour['ErrorMessages'][] = $error->getMessage();
+                }
+
+                if (!$exercice->check($prestation->getDate())) {
+                    $retour['ErrorMessages'][] = "La date ". $prestation->getDate()->format('d/m/Y')." n'appartient pas à l'exercice " . $exercice->getAnnee();
                 }
                 return new JsonResponse($retour);
             }

@@ -7,6 +7,15 @@ ul.border-bottom-white li {
     padding: 0.5rem;
 }
 
+.table.no-padding-3 td,
+.table.no-padding-3 th {
+    padding: 0.16rem;
+}
+
+.table.no-padding-3 td {
+    padding-left: 10px;
+}
+
 .table tbody {
     border-bottom: 1px solid #dee2e6!important;
 }
