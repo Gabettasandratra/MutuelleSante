@@ -45,12 +45,6 @@ class Exercice
     private $cotAncien;
 
     /**
-     * @ORM\Column(type="float")
-     * @Assert\Positive
-     */
-    private $droitAdhesion;
-
-    /**
      * @ORM\Column(type="datetime")
      */
     private $dateDebut;
@@ -63,7 +57,6 @@ class Exercice
     public function __construct()
     {
         $this->isCloture = false;   
-        $this->droitAdhesion = 0;   
         $this->historiqueCotisations = new ArrayCollection();
     }
 
@@ -116,18 +109,6 @@ class Exercice
     public function setCotAncien(float $cotAncien): self
     {
         $this->cotAncien = $cotAncien;
-
-        return $this;
-    }
-
-    public function getDroitAdhesion(): ?float
-    {
-        return $this->droitAdhesion;
-    }
-
-    public function setDroitAdhesion(float $droitAdhesion): self
-    {
-        $this->droitAdhesion = $droitAdhesion;
 
         return $this;
     }

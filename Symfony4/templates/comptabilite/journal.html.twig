@@ -30,25 +30,23 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Journal {{ journal.titre }}</h4>
+                    <h4 class="card-title">Journal des {{ journal.titre }}</h4>
                     <hr>                           
                     <div class="row">
                         <div class="col-md-12 table-responsive">
-                            <table class="table" id="scroll_no_order">
+                            <table class="table table-hover border no-padding">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th scope="col">Date</th>
-                                        <th scope="col">N° article</th>
-                                        <th scope="col">Libellé écriture</th>
-                                        <th scope="col">Montant</th>
-                                        <th scope="col">Réference</th>
-                                        <th scope="col">Compte débité</th>
-                                        <th scope="col">Compte crédité</th>
-                                        <th scope="col">Compte analytique</th>
-                                        {% if journal.codeJournal and not app.session.get('exercice').isCloture %}
-                                        <th scope="col">Action</th>
-                                        {% else %}
-                                        <th scope="col">Journal</th> 
+                                        <th scope="col" style="width: 5%">Date</th>
+                                        <th scope="col" style="width: 2%">N°id</th>
+                                        <th scope="col" style="width: 5%">Débité</th>
+                                        <th scope="col" style="width: 5%">Crédité</th>
+                                        <th scope="col" style="width: 35%">Libellé</th>
+                                        <th scope="col" style="width: 15%">Montant</th>
+                                        <th scope="col" style="width: 15%">Réference</th>
+                                        <th scope="col" style="width: 15%">Dest</th>
+                                        {% if  not app.session.get('exercice').isCloture %}
+                                        <th scope="col" style="width: 1%"></th>
                                         {% endif %}
                                     </tr>
                                 </thead>
@@ -57,16 +55,14 @@
                                         <tr>
                                             <td>{{ article.date |date('d/m/Y') }}</td>
                                             <td>{{ article.id }}</td>
+                                            <td title="{{ article.compteDebit.titre }}" data-toggle="tooltip">{{ article.compteDebit.poste }}</td>
+                                            <td title="{{ article.compteCredit.titre }}" data-toggle="tooltip">{{ article.compteCredit.poste }}</td>
                                             <td>{{ article.libelle }}</td>
                                             <td>{{ article.montant|number_format(2,',',' ') }}</td>
                                             <td>{{ article.piece }}</td>
-                                            <td title="{{ article.compteDebit.titre }}" data-toggle="tooltip">{{ article.compteDebit.poste }}</td>
-                                            <td title="{{ article.compteCredit.titre }}" data-toggle="tooltip">{{ article.compteCredit.poste }}</td>
                                             <td>{{ article.analytique }}</td>
-                                            {% if journal.codeJournal and not app.session.get('exercice').isCloture %}
-                                            <td>{% if article.isFerme %}<span class="label label-rounded btn-secondary label-secondary disabled">Modifier</span>{% else %}<a href="{{ path('comptabilite_modifier_article', {'id': article.id, 'journal': article.categorie}) }}" class="label label-rounded btn-primary label-primary">Modifier</a>{% endif %}</td>
-                                            {% else %}
-                                            <th scope="col">{{article.categorie}}</th>
+                                            {% if not app.session.get('exercice').isCloture %}
+                                            <td>{% if not article.isFerme %}<a href="{{ path('comptabilite_modifier_article', {'id': article.id, 'journal': article.categorie}) }}" class="label label-rounded btn-primary label-primary"><i class="mdi mdi-grease-pencil"></i></a>{% endif %}</td>
                                             {% endif %}
                                         </tr>
                                     {% endfor %}
@@ -78,10 +74,10 @@
                     <div class="row mt-4">
                         <div class="col-md-12 text-right">
                             {% if journal.codeJournal and not app.session.get('exercice').isCloture %}           
-                            <a href="{{ path('comptabilite_saisie', { 'journal': journal.codeJournal }) }}" class="btn btn-success"><i class="mdi mdi-receipt"></i> Saisie écriture comptable</a>
+                            <a href="{{ path('comptabilite_saisie', { 'journal': journal.codeJournal }) }}" class="btn btn-sm btn-success"><i class="mdi mdi-receipt"></i> Saisie article</a>
                             {% endif %}
-                            <a href="{{ path('export_rapport_journal', {code: journal.codeJournal}) }}" class="btn btn-info"><i class="mdi mdi-printer"></i> Exporter</a>
-                            <a href="{{ path('comptabilite_select_journal') }}" class="btn btn-secondary"><i class="mdi mdi-close-circle-outline"></i> Fermer</a>
+                            <a href="{{ path('export_rapport_journal', {code: journal.codeJournal}) }}" class="btn btn-sm btn-info"><i class="mdi mdi-printer"></i> Exporter</a>
+                            <a href="{{ path('comptabilite_select_journal') }}" class="btn btn-sm btn-secondary"><i class="mdi mdi-close-circle-outline"></i> Fermer</a>
                         </div>
                     </div>
                 
@@ -89,9 +85,4 @@
             </div>
         </div>
     </div>
-{% endblock %}
-
-{% block javascripts %}
-    <script src="{{ asset('assets/libs/datatable/dist/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('dist/js/pages/datatable/datatable-basic.init.js') }}"></script>
 {% endblock %}

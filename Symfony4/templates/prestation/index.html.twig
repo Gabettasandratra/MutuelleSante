@@ -29,14 +29,14 @@
                     <h4 class="card-title">Choisissez le béneficiaire parmi la liste</h4>
                     <hr>
                     <div class="table-responsive">
-                        <table id="order" class="table">
+                        <table id="order" class="table table-hover border no-padding">
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Congrégation</th>
-                                    <th scope="col">N°matricule</th>
-                                    <th scope="col">Nom et prénom</th>
-                                    <th scope="col">Actions</th>
+                                    <th scope="col">N°Matricule</th>
+                                    <th scope="col">Nom & prénom</th>
+                                    <th scope="col"></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -46,7 +46,7 @@
                                     <td>{{ pac.adherent.nom }}</td>
                                     <td>{{ pac.matricule }}</td>
                                     <td>{{ pac.nom }} {{ pac.prenom }}</td>
-                                    <td><a href="{{ path('prestation_beneficiaire', {'id': pac.id}) }}"class="label  label-rounded btn-primary label-primary">Selectionner</a></td>           
+                                    <td><a href="{{ path('prestation_beneficiaire', {'id': pac.id}) }}"class="label  label-rounded btn-primary label-primary"><i class="mdi mdi-cursor-default"></i></a></td>           
                                 </tr>                                                                                    
                                 {% endfor %}
                             </tbody>

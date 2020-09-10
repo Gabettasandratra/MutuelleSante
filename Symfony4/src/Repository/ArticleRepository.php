@@ -78,28 +78,41 @@ class ArticleRepository extends ServiceEntityRepository
                                     ->getResult();          
             
             foreach ($comptes as $compte) {
-                if (strpos($compte->getPoste(), '6') != 0 && strpos($compte->getPoste(), '7') != 0) {
-                    $debit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteDebit = :cp and a.date < :dateFin')
+                /* Ajoute le solde initiale */
+                $soldeInit = 0; 
+                if ($compte->getClasse() != '6-COMPTES DE CHARGES' && $compte->getClasse() != '7-COMPTES DE PRODUITS') {
+                    $debitI = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteDebit = :cp and a.date < :dateFin')
                                 ->setParameter('cp', $compte) 
-                                ->setParameter('dateFin', $exercice->getDateFin())                     
+                                ->setParameter('dateFin', $exercice->getDateDebut())                     
                                 ->getSingleScalarResult();
-                    $credit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteCredit = :cp and a.date < :dateFin')
+                    $creditI = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteCredit = :cp and a.date < :dateFin')
                                 ->setParameter('cp', $compte)   
-                                ->setParameter('dateFin', $exercice->getDateFin())                   
+                                ->setParameter('dateFin', $exercice->getDateDebut())                   
                                 ->getSingleScalarResult();
+                    $soldeInit = $debitI - $creditI;
+                } 
+
+                $debit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteDebit = :cp and a.date between :dateDebut and :dateFin')
+                            ->setParameter('cp', $compte) 
+                            ->setParameter('dateDebut', $exercice->getDateDebut())                     
+                            ->setParameter('dateFin', $exercice->getDateFin())                     
+                            ->getSingleScalarResult();
+                $credit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteCredit = :cp and a.date between :dateDebut and :dateFin')
+                            ->setParameter('cp', $compte)   
+                            ->setParameter('dateDebut', $exercice->getDateDebut())
+                            ->setParameter('dateFin', $exercice->getDateFin())                                        
+                            ->getSingleScalarResult();
+                     
+                // On ajoute le solde initiale
+                if ($soldeInit < 0) {
+                    $credit -= $soldeInit;
                 } else {
-                    $debit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteDebit = :cp and a.date between :dateDebut and :dateFin')
-                                ->setParameter('cp', $compte) 
-                                ->setParameter('dateDebut', $exercice->getDateDebut())                     
-                                ->setParameter('dateFin', $exercice->getDateFin())                     
-                                ->getSingleScalarResult();
-                    $credit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteCredit = :cp and a.date between :dateDebut and :dateFin')
-                                ->setParameter('cp', $compte)   
-                                ->setParameter('dateDebut', $exercice->getDateDebut())
-                                ->setParameter('dateFin', $exercice->getDateFin())                                        
-                                ->getSingleScalarResult();
-                }             
-                $retour[$str][] = ['poste' => $compte->getPoste(), 'titre' => $compte->getTitre(), 'debit' => $debit, 'credit' => $credit, 'solde' => ($debit - $credit)];               
+                    $debit += $soldeInit;
+                }
+
+                // On n'affiche pas les soldes zero
+                if ($debit != 0 || $credit != 0)
+                    $retour[$str][] = ['poste' => $compte->getPoste(), 'titre' => $compte->getTitre(), 'debit' => $debit, 'credit' => $credit, 'solde' => ($debit - $credit)];               
             }
             
         }
@@ -109,12 +122,12 @@ class ArticleRepository extends ServiceEntityRepository
     public function findJournal(Exercice $exercice, $journal = null)
     {
         if ($journal === null) {
-            return $this->_em->createQuery('select a from App\Entity\Article a where a.date between :dateDebut and :dateFin order by a.date DESC, a.id DESC')
+            return $this->_em->createQuery('select a from App\Entity\Article a where a.date between :dateDebut and :dateFin order by a.date ASC, a.id ASC')
                             ->setParameter('dateDebut', $exercice->getDateDebut())
                             ->setParameter('dateFin', $exercice->getDateFin())
                             ->getResult(); 
         }
-        return $this->_em->createQuery('select a from App\Entity\Article a where a.categorie = :cat and a.date between :dateDebut and :dateFin order by a.date DESC, a.id DESC')
+        return $this->_em->createQuery('select a from App\Entity\Article a where a.categorie = :cat and a.date between :dateDebut and :dateFin order by a.date ASC, a.id ASC')
                             ->setParameter('cat', $journal)                      
                             ->setParameter('dateDebut', $exercice->getDateDebut())
                             ->setParameter('dateFin', $exercice->getDateFin())

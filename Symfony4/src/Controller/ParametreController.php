@@ -109,6 +109,7 @@ class ParametreController extends AbstractController
         
         $dateDernier = $repository->findFinExercice();        
         if ($dateDernier) {
+            $exercice->setAnnee((int)$dateDernier->format('Y') + 1);
             $exercice->setDateDebut($dateDernier->add(new \DateInterval('P1D') ));
             $exercice->setDateFin( $dateDernier->add(new \DateInterval('P1Y') ));
         }

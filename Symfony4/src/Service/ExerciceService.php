@@ -45,7 +45,7 @@ class ExerciceService
 
     public function cloturerExercice(Exercice $exercice)
     {
-        $comptes_gestions = $this->compteRepo->findBy(['categorie' => 'COMPTES DE GESTION']);
+        $comptes_gestions = $this->compteRepo->findBy(['classe' => ['7-COMPTES DE PRODUITS','6-COMPTES DE CHARGES']]);
         // le resulat de l'exercice
         $result = $this->exerciceRepo->findResult($exercice);
         
@@ -63,7 +63,7 @@ class ExerciceService
                         ->setAnalytique('-')
                         ->setLibelle('Solde des comptes de gestion - '. $exercice->getAnnee())
                         ->setPiece($exercice->getAnnee() .' '. date('dmY'))
-                        ->setDate(new \DateTime())
+                        ->setDate($exercice->getDateFin())
                         ->setMontant(abs($solde))
                         ->setIsFerme(true);
                 if ($solde >= 0) { // debiteur

@@ -150,8 +150,8 @@ class ConfigEtatFi {
     public function productionsFinanciers()
     {
         return array(
-            [0,"De participations",[755]],
-            [0,"D'autres valeurs mobilières et créances de l'actif immobilisé",[655]],
+            [0,"De participations",[761]],
+            [0,"D'autres valeurs mobilières et créances de l'actif immobilisé",[762]],
             [0,"Autres interêts et produits assimilés",[763,764,765,768]],
             [0,"Reprises sur dépréciations et transferts de charges",[786,796]],
             [0,"Différences positives de change",[766]],

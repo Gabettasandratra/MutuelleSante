@@ -84,6 +84,8 @@
                                                         <td class="text-center">{{ credit|number_format(2,',',' ') }}</td>
                                                     </tr>    
                                                 {% endfor %}
+                                            {% else %}
+                                                <tr><td colspan=6>Aucun opération comptable enregistrés pendant cette exercice</td></tr>
                                             {% endfor %}        
                                         </tbody>
                                     {% else %}

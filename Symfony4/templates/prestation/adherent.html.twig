@@ -29,24 +29,24 @@
                     <h4 class="card-title">Choisissez la congrégation parmi la liste</h4>
                     <hr>
                     <div class="table-responsive">
-                        <table id="zero_config" class="table">
-                            <thead>
+                        <table id="zero_config" class="table table-hover border no-padding">
+                            <thead class="thead-light">
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Code</th>
-                                    <th scope="col">Nom de la congrégation</th>
-                                    <th scope="col">Paiement en attente</th>
-                                    <th scope="col">Actions</th>
+                                    <th scope="col">Congrégation</th>
+                                    <th scope="col">En attente de paiement</th>
+                                    <th scope="col"></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for adherent in adherents %}
                                     <tr>
                                         <th scope="row">{{ loop.index }}</th>
-                                        <th>{{ adherent.numero }}</th>
+                                        <td>{{ adherent.numero }}</td>
                                         <td>{{ adherent.nom }}</td>                                            
                                         <td>{{ adherent.attente }}</td>
-                                        <td><a href="{{ path('prestation_adherent_show', {'id': adherent.id}) }}"class="label label-rounded btn-primary label-primary">Selectionner</a></td>
+                                        <td><a href="{{ path('prestation_adherent_show', {'id': adherent.id}) }}"class="label label-rounded btn-primary label-primary"><i class="mdi mdi-cursor-default"></a></td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

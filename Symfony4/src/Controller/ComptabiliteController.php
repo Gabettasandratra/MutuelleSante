@@ -124,12 +124,13 @@ class ComptabiliteController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             // Verifier la date
             $date = $form->get('date')->getData();
-            if ($session->get('exercice')->check($date)) {
+            $exercice = $session->get('exercice');
+            if ($exercice->check($date)) {
                 // protect against negative solde
                 $montant = $form->get('montant')->getData();
                 $cCredit = $form->get('compteCredit')->getData();
                 if ($cCredit->getIsTresor()) { // Trésorerie
-                    $solde = $repositoryCompte->findSolde($cCredit);
+                    $solde = $repositoryCompte->findSoldes([$cCredit->getPoste()], $exercice);
                     if ($montant <= $solde) {
                         $manager->persist($article);
                         $manager->flush();

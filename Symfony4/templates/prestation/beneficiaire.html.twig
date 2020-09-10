@@ -160,9 +160,9 @@
                                 {% set tRemb = 0 %}
 
                                 {% for prestation in prestations %}
-                                {% set title = "" %}
-                                {% if prestation.prestataire %}{% set title = 'Prestataire : ' ~ prestation.prestataire %}{% endif %}
-                                {% if prestation.facture %}{% set title = title ~ ' | Facture : ' ~ prestation.facture %}{% endif %}
+                                    {% set title = "" %}
+                                    {% if prestation.prestataire %}{% set title = 'Prestataire : ' ~ prestation.prestataire %}{% endif %}
+                                    {% if prestation.facture %}{% set title = title ~ ' | Facture : ' ~ prestation.facture %}{% endif %}
 
                                     <tr {% if title != "" %} data-toggle="tooltip" title="{{ title }}"{% endif %}>
                                         <th scope="row">{{ loop.index }}</th>
@@ -202,6 +202,9 @@
                                             </tr>
                                         </tfoot>
                                     {% endif %}
+                                
+                                {% else %}
+                                    <tr><td colspan=8>Aucun prestation enregistré pendant cet exercice</td></tr>                           
                                 {% endfor %}                                                        
                         </table>
                     </div>
