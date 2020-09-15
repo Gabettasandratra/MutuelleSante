@@ -16,6 +16,7 @@
     
     <link href="{{ asset('dist/css/style.min.css') }}" rel="stylesheet">
     <link href="{{ asset('dist/css/custom.css') }}" rel="stylesheet">
+    <link href="{{ asset('dist/css/bootstrap-datepicker.css') }}" rel="stylesheet">
     <!-- Custom CSS -->
     {% block stylesheets %}{% endblock %}
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -133,7 +134,7 @@
                             <li class="nav-small-cap"><span class="hide-menu">Gestion mutuelle</span></li>
                             <li class="sidebar-item"> 
                                 <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-account-multiple"></i><span class="hide-menu"> Adhesion </span></a>
-                                <ul aria-expanded="false" class="collapse first-level">
+                                <ul aria-expanded="false" class="pl-2 collapse first-level">
                                     {% if app.session.get('exercice') and app.session.get('exercice').isCurrent and not app.session.get('exercice').isCloture %}
                                     <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('adhesion_new') }}" class="sidebar-link"><i class="mdi mdi-account-plus"></i><span class="hide-menu"> Inscrire congrégation </span></a></li>
                                     {% endif %}
@@ -145,14 +146,14 @@
                         
                             <li class="sidebar-item"> 
                                 <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-calculator"></i><span class="hide-menu"> Cotisation </span></a>
-                                <ul aria-expanded="false" class="collapse first-level">
+                                <ul aria-expanded="false" class="pl-2 collapse first-level">
                                     <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('cotisation') }}" class="sidebar-link"><i class="mdi mdi-calendar-check"></i><span class="hide-menu"> Fiche de cotistation </span></a></li>
                                     <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('export_rapport_cotisations') }}" class="sidebar-link"><i class="mdi mdi-newspaper"></i><span class="hide-menu"> Rapport de cotisation </span></a></li>
                                 </ul>
                             </li>
                             <li class="sidebar-item"> 
                                 <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-security-home"></i><span class="hide-menu"> Prestation </span></a>
-                                <ul aria-expanded="false" class="collapse first-level">
+                                <ul aria-expanded="false" class="pl-2 collapse first-level">
                                     <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('prestation') }}" class="sidebar-link"><i class="mdi mdi-verified"></i><span class="hide-menu"> Prestation béneficiaire </span></a></li>
                                     <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('prestation_adherent') }}" class="sidebar-link"><i class="mdi mdi-clipboard-outline"></i><span class="hide-menu"> Fiche de prestation</span></a></li>
                                     <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('export_rapport_prestations') }}" class="sidebar-link"><i class="mdi mdi-newspaper"></i><span class="hide-menu"> Rapport de prestation </span></a></li>
@@ -160,45 +161,41 @@
                             </li>
                         {% endif %}
                         {% if is_granted('ROLE_COMPTABLE') %}
-                            <li class="nav-small-cap"><span class="hide-menu">Gestion fincancier</span></li>
+                            <li class="nav-small-cap"><span class="hide-menu">Gestion fincancière</span></li>
                             <li class="sidebar-item"> 
-                                <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-scale-balance"></i><span class="hide-menu"> Comptabilité </span></a>
-                                <ul aria-expanded="false" class="collapse first-level">
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('comptabilite_select_journal') }}" class="sidebar-link"><i class="mdi mdi-clipboard-outline"></i><span class="hide-menu"> Journal </span></a></li>
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('comptabilite_livre') }}" class="sidebar-link"><i class="mdi mdi-book-open-page-variant"></i><span class="hide-menu"> Grand livre </span></a></li>
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('comptabilite_balance') }}" class="sidebar-link"><i class="mdi mdi-scale-balance"></i><span class="hide-menu"> Balance </span></a></li>
+                                <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-keyboard"></i><span class="hide-menu"> Saisie des écritures </span></a>
+                                <ul aria-expanded="false" class="pl-2 collapse first-level">
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="#modal-journaux" data-toggle="modal" data-backdrop="static" class="sidebar-link"><i class="mdi mdi-pen"></i><span class="hide-menu"> Saisie des écritures </span></a></li>
                                     <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('comptabilite_plan') }}" class="sidebar-link"><i class="mdi mdi-view-list"></i><span class="hide-menu"> Plan comptable </span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('tresorerie') }}" class="sidebar-link"><i class="mdi mdi-bank"></i><span class="hide-menu"> Trésorerie</span></a></li>                                
                                 </ul>
                             </li>
                             <li class="sidebar-item"> 
-                                <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-cash-multiple"></i><span class="hide-menu"> Etats financiers </span></a>
-                                <ul aria-expanded="false" class="collapse first-level">
+                                <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-cash-multiple"></i><span class="hide-menu"> Etats comptables </span></a>
+                                <ul aria-expanded="false" class="pl-2 collapse first-level">
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="#modal-journaux" data-toggle="modal" data-backdrop="static" class="sidebar-link"><i class="mdi mdi-clipboard-outline"></i><span class="hide-menu"> Journal </span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="#modal-livre" data-toggle="modal" data-backdrop="static" class="sidebar-link"><i class="mdi mdi-book-open-page-variant"></i><span class="hide-menu"> Grand livre </span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('comptabilite_balance') }}" class="sidebar-link"><i class="mdi mdi-scale-balance"></i><span class="hide-menu"> Balance </span></a></li>
                                     <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('comptabilite_bilan') }}" class="sidebar-link"><i class="mdi mdi-chart-arc"></i><span class="hide-menu"> Bilan comptable</span></a></li>
                                     <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('comptabilite_resultat') }}" class="sidebar-link"><i class="mdi mdi-chart-bar"></i><span class="hide-menu"> Compte de résultat </span></a></li>
                                 </ul>
                             </li>
-                            <li class="sidebar-item"> 
-                                <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-bank"></i><span class="hide-menu"> Trésorerie </span></a>
-                                <ul aria-expanded="false" class="collapse first-level">
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('tresorerie') }}" class="sidebar-link"><i class="mdi mdi-cube"></i><span class="hide-menu"> Gestion de trésorerie</span></a></li>
-                                    
-                                </ul>
-                            </li>
+            
                         {% endif %}
                         {% if is_granted('ROLE_ADMIN') %}
                             <li class="nav-small-cap"><span class="hide-menu">Paramètres</span></li>
                             <li class="sidebar-item"> 
                                 <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-account-box"></i><span class="hide-menu"> Utilisateur </span></a>
-                                <ul aria-expanded="false" class="collapse first-level">
+                                <ul aria-expanded="false" class="pl-2 collapse first-level">
                                     <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('user_profile', {id: app.user.id}) }}" class="sidebar-link"><i class="mdi mdi-account"></i><span class="hide-menu"> Profile utilisateur </span></a></li>
                                     <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('user_all') }}" class="sidebar-link"><i class="mdi mdi-account-multiple"></i><span class="hide-menu"> Tous les utilisateurs </span></a></li>
                                 </ul>
                             </li>
                             <li class="sidebar-item  mb-5"> 
                                 <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-settings"></i><span class="hide-menu"> Configuration </span></a>
-                                <ul aria-expanded="false" class="collapse first-level">
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('parametre_mutuelle') }}" class="sidebar-link"><i class="mdi mdi-settings"></i><span class="hide-menu"> Configurations mutuelle</span></a></li>
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('parametre_exercice') }}" class="sidebar-link"><i class="mdi mdi-settings"></i><span class="hide-menu"> Configurations exercice</span></a></li>
+                                <ul aria-expanded="false" class="pl-2 collapse first-level">
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('parametre_mutuelle') }}" class="sidebar-link"><i class="mdi mdi-settings"></i><span class="hide-menu"> Mutuelle</span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('parametre_exercice') }}" class="sidebar-link"><i class="mdi mdi-settings"></i><span class="hide-menu"> Exercice</span></a></li>
                                 </ul>
                             </li>
                         {% endif %}
@@ -213,7 +210,7 @@
         <!-- ============================================================== -->
         <!-- End Left Sidebar - style you can find in sidebar.scss  -->
         <!-- ============================================================== -->
-        
+        {{ render(controller('App\\Controller\\ComptabiliteController::renderModalJournal')) }}
         <!-- ============================================================== -->
         <!-- Page wrapper  -->
         <!-- ============================================================== -->
@@ -294,6 +291,18 @@
     <!--Custom JavaScript -->
     <script src="{{ asset('dist/js/custom.js') }}"></script>
     <!-- ============================================================== -->
+    <script src="{{ asset('dist/js/bootstrap-datepicker.min.js') }}"></script>
+    <script src="{{ asset('dist/js/datepicker.js') }}"></script>
+    <script>
+        $('.datepicker').datepicker({
+            language: 'fr',
+            orientation: "bottom",
+            autoclose: true,
+            dateFormat: "dd/mm/yy",
+            minDate: new Date('{{ app.session.get('exercice').dateDebut|date('d/m/Y') }}'),
+            maxDate: new Date('{{ app.session.get('exercice').dateFin|date('d/m/Y') }}')
+        });
+    </script>
 
     {% block javascripts %}{% endblock %}
 
@@ -302,5 +311,4 @@
         $(".preloader").fadeOut();
     </script>
 </body>
-
 </html>

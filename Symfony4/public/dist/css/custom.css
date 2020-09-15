@@ -32,6 +32,11 @@ ul.border-bottom-white li {
     overflow-y: auto;
 }
 
+.titre-rapport {
+    font-size: 1.5rem;
+    font-weight: 200;
+}
+
 
 /* TEXT COLOR */
 
@@ -89,11 +94,18 @@ ul.border-bottom-white li {
 .table-blue,
 .table-blue>td,
 .table-blue>th {
-    background-color: #c8d3dde5;
+    background-color: #c8cddd38;
 }
 
 .table-gris,
 .table-gris>td,
 .table-gris>th {
-    background-color: #b4bbc1;
+    background-color: #bec4c977;
+}
+
+
+/* Pre format white space */
+
+.pre-space {
+    white-space: pre;
 }

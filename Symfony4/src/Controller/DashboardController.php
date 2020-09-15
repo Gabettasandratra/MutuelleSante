@@ -5,6 +5,7 @@ namespace App\Controller;
 use Fpdf\Fpdf;
 use App\Pdf\Pdf;
 use App\Entity\Adherent;
+use App\Repository\ArticleRepository;
 use App\Repository\AdherentRepository;
 use App\Repository\PrestationRepository;
 use App\Repository\RemboursementRepository;
@@ -402,6 +403,30 @@ class DashboardController extends AbstractController
         $pdf->Cell(120,6, 'Totaux',1,0,'R');
         $pdf->Cell(40,6, number_format($tR, 2, ",", " "),1,0,'C');
 
+        return new Response(
+            $pdf->Output('file.pdf', 'I'),
+            Response::HTTP_OK,
+            array('content-type' => 'application/pdf')
+        );
+    }
+
+    /**
+     * @Route("/header", name="exp")
+     */
+    public function ExampleHeader(ArticleRepository $repositoryArticle, SessionInterface $session)
+    {
+        $exercice = $session->get('exercice');
+        $periode = ['debut' => $exercice->getDateDebut(), 'fin' => $exercice->getDateFin()];
+
+        #$jourx = $repositoryArticle->findJournal('CAI', $exercice->getDateDebut(), $exercice->getDateFin());
+        $donnees = $repositoryArticle->findGrandLivre($periode['debut'], $periode['fin']);
+
+        $pdf = new Pdf($periode, 'Grand-livre des comptes');
+        $pdf->AliasNbPages();
+        $pdf->AddPage('P', 'A4');
+
+        $pdf->livreTable($donnees);
+        
         return new Response(
             $pdf->Output('file.pdf', 'I'),
             Response::HTTP_OK,

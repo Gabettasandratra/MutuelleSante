@@ -23,77 +23,80 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">BILAN ACTIF</h4>
+
+                    <!-- En tete du rapport-->
+                    {% include "comptabilite/reportHeader.html.twig" with {
+                        title: "Bilan actif"
+                    } %}
+
                     <hr>
                     <div class="row">
-                        <div class="col-md-12 border-right">
-                            <table class="table table-bordered no-padding-3">
-                                <thead class="thead-light text-center">
+                        <table class="table table-bordered no-padding-3">
+                            <thead class="thead-light text-center">
+                                <tr>
+                                    <th rowspan=2 class="align-middle">POSTES D'ACTIF</th>
+                                    <th>Valeurs brutes</th>
+                                    <th>Amort/perte de valeur</th>
+                                    <th>Valeurs nettes</th>
+                                </tr>                
+                            </thead>
+                            <tbody>
+                                {% set tANCb = 0 %}{% set tANCa = 0 %} 
+                                {% for rubrique in actifsNonCourants %}
+                                    {% if loop.first %}
                                     <tr>
-                                        <th rowspan=2 class="align-middle">POSTES D'ACTIF</th>
-                                        <th>Valeurs brutes</th>
-                                        <th>Amort/perte de valeur</th>
-                                        <th>Valeurs nettes</th>
-                                    </tr>                
-                                </thead>
-                                <tbody>
-                                    {% set tANCb = 0 %}{% set tANCa = 0 %} 
-                                    {% for rubrique in actifsNonCourants %}
-                                        {% if loop.first %}
-                                        <tr>
-                                            <td class="font-weight-bold">ACTIFS NON COURANTS</td>
-                                            <td></td><td></td>
-                                        </tr>
-                                        {% endif %}        
-                                        <tr>
-                                            <td {% if rubrique[0] != 0 %}class="pl-4 font-italic"{% endif %}>{{ rubrique[1] }}</td>
-                                            <td>{% if rubrique[2] is defined and rubrique[2] != 0 %}{{ rubrique[2]|number_format(2,',',' ') }} {% set tANCb = tANCb + rubrique[2] %}{% endif %}</td>
-                                            <td>{% if rubrique[3] is defined and rubrique[3] != 0 %}{{ (0 - rubrique[3])|number_format(2,',',' ') }} {% set tANCa = tANCa + rubrique[3] %}{% endif %}</td>
-                                            <td>{% if rubrique[3] is defined and (rubrique[3]+ rubrique[2]) != 0 %}{{ (rubrique[3]+ rubrique[2])|number_format(2,',',' ') }} {% endif %}</td>
-                                        </tr>
-                                        {% if loop.last %}
-                                        <tr>
-                                            <td class="text-right font-weight-bold">TOTAL ACTIFS NON COURANTS</td>
-                                            <td>{% if tANCb != 0 %}{{ tANCb|number_format(2,',',' ') }}{% endif %}</td>
-                                            <td>{% if tANCa != 0 %}{{ (0- tANCa)|number_format(2,',',' ') }}{% endif %}</td>
-                                            <td>{% if (tANCa + tANCb) != 0 %}{{ (tANCa + tANCb)|number_format(2,',',' ') }}{% endif %}</td>
-                                        </tr>
-                                        {% endif %}           
-                                    {% endfor %}
-
-                                    {% set tACb = 0 %}{% set tACa = 0 %} 
-                                    {% for rubrique in actifsCourants %}
-                                        {% if loop.first %}
-                                        <tr>
-                                            <td class="font-weight-bold">ACTIFS COURANTS</td>
-                                            <td></td><td></td>
-                                        </tr>
-                                        {% endif %}        
-                                        <tr>
-                                            <td {% if rubrique[0] != 0 %}class="pl-4"{% endif %}>{{ rubrique[1] }}</td>
-                                            <td>{% if rubrique[2] is defined and rubrique[2] != 0 %}{{ rubrique[2]|number_format(2,',',' ') }} {% set tACb = tACb + rubrique[2] %}{% endif %}</td>
-                                            <td>{% if rubrique[3] is defined and rubrique[3] != 0 %}{{ (0 - rubrique[3])|number_format(2,',',' ') }} {% set tACa = tACa + rubrique[3] %}{% endif %}</td>
-                                            <td>{% if rubrique[3] is defined and (rubrique[3]+ rubrique[2]) != 0 %}{{ (rubrique[3]+ rubrique[2])|number_format(2,',',' ') }} {% endif %}</td>
-                                        </tr>
-                                        {% if loop.last %}
-                                        <tr>
-                                            <td class="text-right font-weight-bold">TOTAL ACTIFS COURANTS</td>
-                                            <td>{% if tACb != 0 %}{{ tACb|number_format(2,',',' ') }}{% endif %}</td>
-                                            <td>{% if tACa != 0 %}{{ (0- tACa)|number_format(2,',',' ') }}{% endif %}</td>
-                                            <td>{% if (tACa + tACb) != 0 %}{{ (tACa + tACb)|number_format(2,',',' ') }}{% endif %}</td>
-                                        </tr>
-                                        {% endif %}           
-                                    {% endfor %}
-                                    <tr>
-                                        {% set tb = tACb + tANCb %}{% set ta = tACa + tANCa %}
-                                        <td class="text-right font-weight-bold">TOTAL DES ACTIFS</td>
-                                        <td>{% if tb != 0 %}{{ tb|number_format(2,',',' ') }}{% endif %}</td>
-                                        <td>{% if ta != 0 %}{{ (0- ta)|number_format(2,',',' ') }}{% endif %}</td>
-                                        <td>{% if (ta+tb) != 0 %}{{ (ta+tb)|number_format(2,',',' ') }}{% endif %}</td>
+                                        <td class="font-weight-bold">ACTIFS NON COURANTS</td>
+                                        <td></td><td></td>
                                     </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                                    {% endif %}        
+                                    <tr>
+                                        <td {% if rubrique[0] != 0 %}class="pl-4 font-italic"{% endif %}>{{ rubrique[1] }}</td>
+                                        <td class="text-center">{% if rubrique[2] is defined and rubrique[2] != 0 %}{{ rubrique[2]|number_format(2,',',' ') }} {% set tANCb = tANCb + rubrique[2] %}{% endif %}</td>
+                                        <td class="text-center">{% if rubrique[3] is defined and rubrique[3] != 0 %}{{ (0 - rubrique[3])|number_format(2,',',' ') }} {% set tANCa = tANCa + rubrique[3] %}{% endif %}</td>
+                                        <td class="text-center">{% if rubrique[3] is defined and (rubrique[3]+ rubrique[2]) != 0 %}{{ (rubrique[3]+ rubrique[2])|number_format(2,',',' ') }} {% endif %}</td>
+                                    </tr>
+                                    {% if loop.last %}
+                                    <tr>
+                                        <td class="text-right font-weight-bold">TOTAL ACTIFS NON COURANTS</td>
+                                        <td class="text-center">{% if tANCb != 0 %}{{ tANCb|number_format(2,',',' ') }}{% endif %}</td>
+                                        <td class="text-center">{% if tANCa != 0 %}{{ (0- tANCa)|number_format(2,',',' ') }}{% endif %}</td>
+                                        <td class="text-center">{% if (tANCa + tANCb) != 0 %}{{ (tANCa + tANCb)|number_format(2,',',' ') }}{% endif %}</td>
+                                    </tr>
+                                    {% endif %}           
+                                {% endfor %}
+
+                                {% set tACb = 0 %}{% set tACa = 0 %} 
+                                {% for rubrique in actifsCourants %}
+                                    {% if loop.first %}
+                                    <tr>
+                                        <td class="font-weight-bold">ACTIFS COURANTS</td>
+                                        <td></td><td></td>
+                                    </tr>
+                                    {% endif %}        
+                                    <tr>
+                                        <td {% if rubrique[0] != 0 %}class="pl-4"{% endif %}>{{ rubrique[1] }}</td>
+                                        <td class="text-center">{% if rubrique[2] is defined and rubrique[2] != 0 %}{{ rubrique[2]|number_format(2,',',' ') }} {% set tACb = tACb + rubrique[2] %}{% endif %}</td>
+                                        <td class="text-center">{% if rubrique[3] is defined and rubrique[3] != 0 %}{{ (0 - rubrique[3])|number_format(2,',',' ') }} {% set tACa = tACa + rubrique[3] %}{% endif %}</td>
+                                        <td class="text-center">{% if rubrique[3] is defined and (rubrique[3]+ rubrique[2]) != 0 %}{{ (rubrique[3]+ rubrique[2])|number_format(2,',',' ') }} {% endif %}</td>
+                                    </tr>
+                                    {% if loop.last %}
+                                    <tr>
+                                        <td class="text-right font-weight-bold">TOTAL ACTIFS COURANTS</td>
+                                        <td class="text-center">{% if tACb != 0 %}{{ tACb|number_format(2,',',' ') }}{% endif %}</td>
+                                        <td class="text-center">{% if tACa != 0 %}{{ (0- tACa)|number_format(2,',',' ') }}{% endif %}</td>
+                                        <td class="text-center">{% if (tACa + tACb) != 0 %}{{ (tACa + tACb)|number_format(2,',',' ') }}{% endif %}</td>
+                                    </tr>
+                                    {% endif %}           
+                                {% endfor %}
+                                <tr>
+                                    {% set tb = tACb + tANCb %}{% set ta = tACa + tANCa %}
+                                    <td class="text-right font-weight-bold">TOTAL DES ACTIFS</td>
+                                    <td class="text-center">{% if tb != 0 %}{{ tb|number_format(2,',',' ') }}{% endif %}</td>
+                                    <td class="text-center">{% if ta != 0 %}{{ (0- ta)|number_format(2,',',' ') }}{% endif %}</td>
+                                    <td class="text-center">{% if (ta+tb) != 0 %}{{ (ta+tb)|number_format(2,',',' ') }}{% endif %}</td>
+                                </tr>
+                            </tbody>
+                        </table> 
                     </div>
                 </div>
             </div>
@@ -104,93 +107,95 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">BILAN CAPITAUX PROPRES ET PASSIFS</h4>
+                    <!-- En tete du rapport-->
+                    {% include "comptabilite/reportHeader.html.twig" with {
+                        title: "Bilan passif"
+                    } %}                   
+
                     <hr>
                     <div class="row">
-                        <div class="col-md-12 border-right">
-                            <table class="table table-bordered no-padding-3">
-                                <thead class="thead-light text-center">
+                        <table class="table table-bordered no-padding-3">
+                            <thead class="thead-light text-center">
+                                <tr>
+                                    <th rowspan=2 class="align-middle">CAPITAUX PROPRES ET PASSIFS</th>
+                                    <th colspan=2>Valeurs nettes</th>
+                                </tr>                
+                            </thead>
+                            <tbody>
+                                {% set tCa = 0 %}{% set tCs = 0 %} 
+                                {% for rubrique in capitaux %}
+                                    {% if loop.first %}
                                     <tr>
-                                        <th rowspan=2 class="align-middle">CAPITAUX PROPRES ET PASSIFS</th>
-                                        <th colspan=2>Valeurs nettes</th>
-                                    </tr>                
-                                </thead>
-                                <tbody>
-                                    {% set tCa = 0 %}{% set tCs = 0 %} 
-                                    {% for rubrique in capitaux %}
-                                        {% if loop.first %}
-                                        <tr>
-                                            <td class="font-weight-bold">CAPITAUX PROPRES</td>
-                                            <td></td>
-                                        </tr>
-                                        {% endif %}        
-                                        <tr>
-                                            <td {% if rubrique[0] != 0 %}class="pl-4"{% endif %}>{{ rubrique[1] }}</td>
-                                            <td>{% if rubrique[2] is defined and (rubrique[3] + rubrique[2]) != 0 %}{{ (-1*(rubrique[3] + rubrique[2]))|number_format(2,',',' ') }} {% set tCa = tCa + rubrique[2] %}{% endif %}</td>
-                                        </tr>         
-                                    {% endfor %}
-
+                                        <td class="font-weight-bold">CAPITAUX PROPRES</td>
+                                        <td></td>
+                                    </tr>
+                                    {% endif %}        
                                     <tr>
-                                        <td class="text-right font-weight-bold">TOTAL CAPITAUX PROPRES</td>
-                                        <td>{% if (tCs + tCa) != 0 %}{{ (-1*(tCs + tCa))|number_format(2,',',' ') }}{% endif %}</td>
-                                    </tr>
+                                        <td {% if rubrique[0] != 0 %}class="pl-4"{% endif %}>{{ rubrique[1] }}</td>
+                                        <td class="text-center">{% if rubrique[2] is defined and (rubrique[3] + rubrique[2]) != 0 %}{{ (-1*(rubrique[3] + rubrique[2]))|number_format(2,',',' ') }} {% set tCa = tCa + rubrique[2] %}{% endif %}</td>
+                                    </tr>         
+                                {% endfor %}
 
-                                    {% set tPNCa = 0 %}{% set tPNCs = 0 %} 
-                                    {% for rubrique in passifsNonCourants %}
-                                        {% if loop.first %}
-                                        <tr>
-                                            <td class="font-weight-bold">PASSIFS NON-COURANTS</td>
-                                            <td></td>
-                                        </tr>
-                                        {% endif %}        
-                                        <tr>
-                                            <td {% if rubrique[0] != 0 %}class="pl-4"{% endif %}>{{ rubrique[1] }}</td>
-                                            <td>{% if rubrique[2] is defined and (rubrique[3] + rubrique[2]) != 0 %}{{ (rubrique[3] + rubrique[2])|number_format(2,',',' ') }} {% set tPNCa = tPNCa + rubrique[2] %}{% endif %}</td>
-                                        </tr>
-                                        {% if loop.last %}
-                                        <tr>
-                                            <td class="text-right font-weight-bold">TOTAL PASSIFS NON-COURANTS</td>
-                                            <td>{% if (tPNCs + tPNCa) != 0 %}{{ (tPNCs + tPNCa)|number_format(2,',',' ') }}{% endif %}</td>
-                                        </tr>
-                                        {% endif %}           
-                                    {% endfor %}
+                                <tr>
+                                    <td class="text-right font-weight-bold">TOTAL CAPITAUX PROPRES</td>
+                                    <td class="text-center">{% if (tCs + tCa) != 0 %}{{ (-1*(tCs + tCa))|number_format(2,',',' ') }}{% endif %}</td>
+                                </tr>
 
-                                    {% set tPCa = 0 %}{% set tPCs = 0 %} 
-                                    {% for rubrique in passifsCourants %}
-                                        {% if loop.first %}
-                                        <tr>
-                                            <td class="font-weight-bold">PASSIFS COURANTS</td>
-                                            <td></td>
-                                        </tr>
-                                        {% endif %}        
-                                        <tr>
-                                            <td {% if rubrique[0] != 0 %}class="pl-4"{% endif %}>{{ rubrique[1] }}</td>
-                                            <td>{% if rubrique[2] is defined and (rubrique[3] + rubrique[2]) != 0 %}{{ (rubrique[3] + rubrique[2])|number_format(2,',',' ') }} {% set tPCa = tPCa + rubrique[2] %}{% endif %}</td>
-                                        </tr>
-                                        {% if loop.last %}
-                                        <tr>
-                                            <td class="text-right font-weight-bold">TOTAL PASSIFS COURANTS</td>
-                                            <td>{% if (tPCs + tPCa) != 0 %}{{ (tPCs + tPCa)|number_format(2,',',' ') }}{% endif %}</td>
-                                        </tr>
-                                        {% endif %}           
-                                    {% endfor %}
-
-                                    {% set totalCP = tCs + tCa + tPNCs + tPNCa + tPCs + tPCa %}
-                                    {% set totalA =  ta + tb %}
-                                    {# Resultat provisoire #}
-                                    {% if not app.session.get('exercice').isCloture %}
-                                    <tr class="font-italic font-weight-bold">
-                                        <td>Résultat provisoire de l'exercice</td>
-                                        <td>{{ (totalCP + totalA)|number_format(2,',',' ') }}</td>
-                                    </tr>
-                                    {% endif %}
+                                {% set tPNCa = 0 %}{% set tPNCs = 0 %} 
+                                {% for rubrique in passifsNonCourants %}
+                                    {% if loop.first %}
                                     <tr>
-                                        <td class="text-right font-weight-bold">TOTAL DES CAPITAUX PROPRES ET PASSIFS</td>
-                                        <td>{{ totalA|number_format(2,',',' ') }}</td>
+                                        <td class="font-weight-bold">PASSIFS NON-COURANTS</td>
+                                        <td></td>
                                     </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                                    {% endif %}        
+                                    <tr>
+                                        <td {% if rubrique[0] != 0 %}class="pl-4"{% endif %}>{{ rubrique[1] }}</td>
+                                        <td class="text-center">{% if rubrique[2] is defined and (rubrique[3] + rubrique[2]) != 0 %}{{ (rubrique[3] + rubrique[2])|number_format(2,',',' ') }} {% set tPNCa = tPNCa + rubrique[2] %}{% endif %}</td>
+                                    </tr>
+                                    {% if loop.last %}
+                                    <tr>
+                                        <td class="text-right font-weight-bold">TOTAL PASSIFS NON-COURANTS</td>
+                                        <td class="text-center">{% if (tPNCs + tPNCa) != 0 %}{{ (tPNCs + tPNCa)|number_format(2,',',' ') }}{% endif %}</td>
+                                    </tr>
+                                    {% endif %}           
+                                {% endfor %}
+
+                                {% set tPCa = 0 %}{% set tPCs = 0 %} 
+                                {% for rubrique in passifsCourants %}
+                                    {% if loop.first %}
+                                    <tr>
+                                        <td class="font-weight-bold">PASSIFS COURANTS</td>
+                                        <td></td>
+                                    </tr>
+                                    {% endif %}        
+                                    <tr>
+                                        <td {% if rubrique[0] != 0 %}class="pl-4"{% endif %}>{{ rubrique[1] }}</td>
+                                        <td class="text-center">{% if rubrique[2] is defined and (rubrique[3] + rubrique[2]) != 0 %}{{ (rubrique[3] + rubrique[2])|number_format(2,',',' ') }} {% set tPCa = tPCa + rubrique[2] %}{% endif %}</td>
+                                    </tr>
+                                    {% if loop.last %}
+                                    <tr>
+                                        <td class="text-right font-weight-bold">TOTAL PASSIFS COURANTS</td>
+                                        <td class="text-center">{% if (tPCs + tPCa) != 0 %}{{ (tPCs + tPCa)|number_format(2,',',' ') }}{% endif %}</td>
+                                    </tr>
+                                    {% endif %}           
+                                {% endfor %}
+
+                                {% set totalCP = tCs + tCa + tPNCs + tPNCa + tPCs + tPCa %}
+                                {% set totalA =  ta + tb %}
+                                {# Resultat provisoire #}
+                                {% if not app.session.get('exercice').isCloture %}
+                                <tr class="font-italic font-weight-bold">
+                                    <td>Résultat provisoire de l'exercice</td>
+                                    <td class="text-center">{{ (totalCP + totalA)|number_format(2,',',' ') }}</td>
+                                </tr>
+                                {% endif %}
+                                <tr>
+                                    <td class="text-right font-weight-bold">TOTAL DES CAPITAUX PROPRES ET PASSIFS</td>
+                                    <td class="text-center">{{ totalA|number_format(2,',',' ') }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

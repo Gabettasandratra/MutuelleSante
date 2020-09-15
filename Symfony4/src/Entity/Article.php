@@ -27,6 +27,7 @@ class Article
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank
+     * @Assert\Length(max="100", maxMessage="Le libellé d'ecriture ne doit pas dépassé le 100 caractères")
      */
     private $libelle;
 

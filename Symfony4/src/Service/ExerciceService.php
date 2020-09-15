@@ -25,6 +25,9 @@ class ExerciceService
 
     public function createNewExercice(Exercice $exercice)
     {
+        // Modify end date
+        $exercice->getDateFin()->setTime(23, 59, 59);
+
         $allAdherents = $this->adherentRepo->findAll();
         foreach ($allAdherents as $adherent) {
             $compteCotisation = new CompteCotisation($exercice, $adherent);

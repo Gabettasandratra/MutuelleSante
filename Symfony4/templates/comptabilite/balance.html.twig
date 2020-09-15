@@ -27,9 +27,12 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Balance des comptes</h4>
+                    {% include "comptabilite/reportHeader.html.twig" with {
+                        title: "Balance des comptes"
+                    } %}
+
                     <hr>                           
-                    <div class="table-responsive-lg">
+                    <div class="row">
                         <table class="table table-bordered no-padding">
                             <thead class="thead-light">
                                 <tr>
@@ -39,80 +42,92 @@
                                     <th scope="col" colspan=2 class="text-center">Soldes</th>
                                 </tr>
                                 <tr>
-                                    <th scope="col">Débit</th>
-                                    <th scope="col">Crédit</th>
-                                    <th scope="col">Débiteur</th>
-                                    <th scope="col">Créditeur</th>
+                                    <th scope="col" class="text-center">Débit</th>
+                                    <th scope="col" class="text-center">Crédit</th>
+                                    <th scope="col" class="text-center">Débiteur</th>
+                                    <th scope="col" class="text-center">Créditeur</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% set Tdebit = 0 %} {% set Tcredit = 0 %} {% set TsoldeD = 0 %} {% set TsoldeC = 0 %}
                                 {% for classe, comptes in donnees %}
                                     <tr><th colspan=6 class="table-blue">{{ classe }}</th></tr>
-                                    {% set debit = 0 %} {% set credit = 0 %} {% set solde = 0 %}
+                                    {% set debit = 0 %} {% set credit = 0 %} {% set soldeD = 0 %}{% set soldeC = 0 %}
                                     {% for compte in comptes %}
                                         <tr>
-                                            <td>{{ compte.poste }}</td>
+                                            <td title="Solde initial {{ compte.soldeInit }}" data-toggle="tooltip">{{ compte.poste }}</td>
                                             <td>{{ compte.titre }}</td>
-                                            <td>{% if compte.debit != 0 %}{{ compte.debit|number_format(2,',',' ') }}{% endif %}</td> {% set debit = debit + compte.debit %}
-                                            <td>{% if compte.credit != 0 %}{{ compte.credit|number_format(2,',',' ') }}{% endif %}</td> {% set credit = credit + compte.credit %}
-                                            {% if compte.solde > 0 %}
-                                                <td>{{ compte.solde|abs|number_format(2,',',' ') }}</td> 
-                                                <td></td>
-                                            {% else %}
-                                                {% if compte.solde == 0 %}
-                                                <td></td>
-                                                <td></td>
-                                                {% else %}
-                                                <td></td>
-                                                <td>{{ compte.solde|abs|number_format(2,',',' ') }}</td> 
-                                                {% endif %}
-                                            {% endif %}
-                                            {% set solde = solde + compte.solde %}
+                                            <td class="text-center">{% if compte.debit != 0 %}{{ compte.debit|number_format(2,',',' ') }}{% endif %}</td> {% set debit = debit + compte.debit %}
+                                            <td class="text-center">{% if compte.credit != 0 %}{{ compte.credit|number_format(2,',',' ') }}{% endif %}</td> {% set credit = credit + compte.credit %}
+
+                                            <td class="text-center">{% if compte.soldeD != 0 %}{{ compte.soldeD|number_format(2,',',' ') }}{% endif %}</td> {% set soldeD = soldeD + compte.soldeD %}
+                                            <td class="text-center">{% if compte.soldeC != 0 %}{{ compte.soldeC|number_format(2,',',' ') }}{% endif %}</td> {% set soldeC = soldeC + compte.soldeC %}
                                         </tr>                                        
                                     {% endfor %}
                                     <tr>
                                         <th colspan=2 class="text-right">TOTAL : {{ classe }}</th>
-                                        <td>{% if debit != 0 %}{{ debit|number_format(2,',',' ') }}{% endif %}</td> {% set Tdebit = Tdebit + debit %}
-                                        <td>{% if credit != 0 %}{{ credit|number_format(2,',',' ') }}{% endif %}</td> {% set Tcredit = Tcredit + credit %}
-        
-                                        {% if solde > 0 %}
-                                            <td>{{ solde|abs|number_format(2,',',' ') }}</td>
-                                            <td></td>
-                                            {% set TsoldeD = TsoldeD + solde|abs %}             
-                                        {% else %}
-                                            {% if solde == 0 %}
-                                                <td></td>
-                                                <td></td>
-                                            {% else %}
-                                            <td></td>
-                                            <td>{{ solde|abs|number_format(2,',',' ') }}</td>
-                                            {% endif %}
-                                            {% set TsoldeC = TsoldeC + solde|abs %}             
-                                        {% endif %} 
+                                        <td class="text-center">{% if debit != 0 %}{{ debit|number_format(2,',',' ') }}{% endif %}</td> {% set Tdebit = Tdebit + debit %}
+                                        <td class="text-center">{% if credit != 0 %}{{ credit|number_format(2,',',' ') }}{% endif %}</td> {% set Tcredit = Tcredit + credit %}
+
+                                        <td class="text-center">{% if soldeD != 0 %}{{ soldeD|number_format(2,',',' ') }}{% endif %}</td> {% set TsoldeD = TsoldeD + soldeD %}
+                                        <td class="text-center">{% if soldeC != 0 %}{{ soldeC|number_format(2,',',' ') }}{% endif %}</td> {% set TsoldeC = TsoldeD + soldeC %}
+                                         
                                     </tr>
                                 {% endfor %}
 
                                 <tr class="border-top table-gris">
                                     <th colspan=2 class="text-right">TOTAUX</th>
-                                    <td>{{ Tdebit|number_format(2,',',' ') }}</td>
-                                    <td>{{ Tcredit|number_format(2,',',' ') }}</td>
-                                    <td>{{ TsoldeD|abs|number_format(2,',',' ') }}</td>
-                                    <td>{{ TsoldeC|abs|number_format(2,',',' ') }}</td>                                 
+                                    <td class="text-center">{{ Tdebit|number_format(2,',',' ') }}</td>
+                                    <td class="text-center">{{ Tcredit|number_format(2,',',' ') }}</td>
+                                    <td class="text-center">{{ TsoldeD|abs|number_format(2,',',' ') }}</td>
+                                    <td class="text-center">{{ TsoldeC|abs|number_format(2,',',' ') }}</td>                                 
                                 </tr>       
                             </tbody>
                         </table>
                     </div>
-                    <div class="row mt-4">
-                        <div class="col-md-12">
-                            <a href="{{ path('export_rapport_balance') }}" class="btn btn-info"><i class="mdi mdi-printer"></i> Exporter</a>
-                        </div>
+
+                    <div class="row mt-2 btn-group">
+                        <a href="#modal-balance" data-toggle="modal" data-backdrop="static" class="btn btn-sm btn-primary mr-2"><i class="mdi mdi-pen"></i><span class="hide-menu"> Choisir le période </span></a>
+                        <a href="{{ path('export_rapport_balance') }}" class="btn btn-sm btn-info"><i class="mdi mdi-printer"></i> Imprimer</a>
                     </div>
+                    
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="modal fade" tabindex="-1" id="modal-balance" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Période de la balance</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="GET">
+                    <div class="form-group">
+                        <label class="col-form-label">Periode du:</label>
+                        <input type="text" value="{{ app.session.get('exercice').dateDebut|date('d/m/y') }}" class="form-control" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="col-form-label">Au:</label>
+                        <input type="text" name="fin" placeholder="jj/mm/aaaa" autocomplete="off" class="form-control datepicker" auto-fill="false">
+                    </div>
+                    <div class="form-group text-right">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-primary">OK</button>
+                    </div>
+                </form>
+            </div>
+            
+        </div>
+    </div>
+</div>
 {% endblock %}
+
 
 {% block javascripts %}
     <script src="{{ asset('assets/libs/datatable/dist/jquery.dataTables.min.js') }}"></script>

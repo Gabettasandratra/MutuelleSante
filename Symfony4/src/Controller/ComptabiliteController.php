@@ -34,38 +34,37 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class ComptabiliteController extends AbstractController
 {
     /**
-     * @Route("/comptabilite/journaux", name="comptabilite_select_journal")
+     * @Route("/comptabilite/journal", name="comptabilite_view_journal")
      */
-    public function selectJournal(CompteRepository $repositoryCompte)
-    {
-        return $this->render('comptabilite/selectJournal.html.twig', [
-            'codes' => $repositoryCompte->findCodeJournaux()
-        ]);
-    }
-
-    /**
-     * @Route("/comptabilite/journal/{journal}", name="comptabilite_journal")
-     */
-    public function journal($journal = null, ArticleRepository $repositoryArticle, CompteRepository $repositoryCompte, SessionInterface $session)
+    public function viewJournal(Request $request, CompteRepository $repositoryCompte, ArticleRepository $repositoryArticle, SessionInterface $session)
     {
         $exercice = $session->get('exercice');
-        $codeJournaux = $repositoryCompte->findCodeJournaux();
 
-        if ($journal == null) {
-            $articles = $repositoryArticle->findJournal($exercice);
-            $codeJournal = ['titre' => 'Génerale', 'codeJournal' => ''];
-        } else {
-            $codeJournal = $this->journal_exist($codeJournaux, $journal);
-            if ($codeJournal) {
-                $articles = $repositoryArticle->findJournal($exercice, $codeJournal['codeJournal']);
-            } else {
-                throw $this->createNotFoundException('Ce journal comptable n\'existe pas');
-            }           
+        $code = $request->query->get('code');
+
+        $debut = $request->query->get('debut');
+        $fin = $request->query->get('fin');
+
+        // Verifier si les deux dates sont compris sinon, l'exercice tous entier
+        $dateDebut = $exercice->getDateDebut(); 
+        $dateFin = $exercice->getDateFin();
+        if ($debut) {
+            $d = \DateTime::createFromFormat('d/m/Y', $debut);
+            if ($exercice->check($d))
+                $dateDebut = $d;
         }
-        
+        if ($fin) {
+            $d = \DateTime::createFromFormat('d/m/Y', $fin);
+            if ($exercice->check($d) && $d > $dateDebut)
+                $dateFin = $d;
+        }
+
+        $articles = $repositoryArticle->findJournal($code, $dateDebut, $dateFin);
+                    
         return $this->render('comptabilite/journal.html.twig', [
             'articles' => $articles,
-            'journal'  => $codeJournal
+            'code' => $repositoryCompte->findCodeJournaux($code),
+            'periode' => ['debut' => $dateDebut, 'fin' => $dateFin]
         ]);
     }
 
@@ -160,41 +159,69 @@ class ComptabiliteController extends AbstractController
      * @Route("/comptabilite/grandlivre", name="comptabilite_livre")
      * @Route("/comptabilite/grandlivre/{poste}", name="comptabilite_livre_aux")
      */
-    public function livre($poste = null, ArticleRepository $repositoryArticle, CompteRepository $repositoryCompte, SessionInterface $session)
+    public function livre(Request $request, ArticleRepository $repositoryArticle, CompteRepository $repositoryCompte, SessionInterface $session)
     {
         $exercice = $session->get('exercice');
+        $poste = $request->query->get('poste');
+        $debut = $request->query->get('debut');
+        $fin = $request->query->get('fin');
 
-        if ($poste === null) {
-            $donnees = $repositoryArticle->findGrandLivre($exercice);
-        } else {
-            $compte = $repositoryCompte->findOneByPoste($poste);
-            if ($compte) {
-                $articles = $repositoryArticle->findGrandLivreCompte($exercice, $compte);
-                $donnees['compte'] = $compte;
-                $donnees['articles'] = $articles;
-            } else {
-                throw $this->createNotFoundException("Le compte numéro $poste n'existe pas");
+        // Verifier si les deux dates sont compris sinon, l'exercice tous entier
+        $dateDebut = $exercice->getDateDebut(); 
+        $dateFin = $exercice->getDateFin();
+        if ($debut) {
+            $d = \DateTime::createFromFormat('d/m/Y', $debut);
+            if ($exercice->check($d)) {
+                $dateDebut = $d;
             }
         }
+
+        if ($fin) {
+            $d = \DateTime::createFromFormat('d/m/Y', $fin);
+            if ($exercice->check($d) && $d > $dateDebut) {
+                $dateFin = $d;
+            }
+        }
+
+        if ($poste == "") {
+            $donnees = $repositoryArticle->findGrandLivre($dateDebut, $dateFin);
+            $subtitle = "Complet";
+        } else {
+            $compte = $repositoryCompte->findOneByPoste($poste);
+            if ($compte)
+                $donnees = $repositoryArticle->findGrandLivreCompte($dateDebut, $dateFin, $compte);
+            else 
+                throw $this->createNotFoundException("Le compte numéro $poste n'existe pas");
+            $subtitle = $compte->getTitre();
+        }
     
-        $labelcomptes = $repositoryCompte->findPosteTitre();
-
         return $this->render('comptabilite/livre.html.twig', [
-            'labelComptes' => $labelcomptes,
             'donnees' => $donnees,
-            'isAux' => $poste != null,
-
+            'subtitle' => $subtitle,
+            'periode' => ['debut' => $dateDebut, 'fin' => $dateFin]
         ]);
     }
 
     /**
      * @Route("/comptabilite/balance", name="comptabilite_balance")
      */
-    public function balance(ArticleRepository $repositoryArticle, SessionInterface $session)
+    public function balance(Request $request, ArticleRepository $repositoryArticle, SessionInterface $session)
     {
         $exercice = $session->get('exercice');
+        $fin = $request->query->get('fin');
+
+        $dateDebut = $exercice->getDateDebut(); 
+        $dateFin = $exercice->getDateFin();
+        if ($fin) {
+            $d = \DateTime::createFromFormat('d/m/Y', $fin);
+            if ($exercice->check($d) && $d > $dateDebut) {
+                $dateFin = $d;
+            }
+        }
+
         return $this->render('comptabilite/balance.html.twig', [
-            'donnees' => $repositoryArticle->findBalance($exercice)
+            'donnees' => $repositoryArticle->findBalance($dateDebut, $dateFin),
+            'periode' => ['debut' => $dateDebut, 'fin' => $dateFin]
         ]);
     }
 
@@ -341,7 +368,7 @@ class ComptabiliteController extends AbstractController
     }
 
     /**
-     * @Route("/comptabilite/plan/importer", name="omport_plan_comptable")
+     * @Route("/comptabilite/plan/importer", name="import_plan_comptable")
      */
     public function importPlanComptable(Request $request, ImportExcel $importService)
     {
@@ -370,6 +397,23 @@ class ComptabiliteController extends AbstractController
         
         return $this->render('comptabilite/importPlanComptable.html.twig', [
             'form' => $form->createView()
+        ]);
+    }
+
+    public function renderModalJournal(CompteRepository $repositoryCompte, SessionInterface $session)
+    {
+        $exercice = $session->get('exercice');
+
+        $start    = ($exercice->getDateDebut())->modify('first day of this month');
+        $x = \DateTimeImmutable::createFromMutable($exercice->getDateFin());   
+        $end      = $x->modify('first day of next month');
+        $interval = \DateInterval::createFromDateString('1 month');
+        $periods   = new \DatePeriod($start, $interval, $end);
+
+        return $this->render('comptabilite/modalJournal.html.twig', [
+            'codes' => $repositoryCompte->findCodeJournaux(),
+            'periodes' => $periods,
+            'labelComptes' => $repositoryCompte->findPosteTitre()
         ]);
     }
 }

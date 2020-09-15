@@ -10,14 +10,6 @@ $(function() {
         monthsTitle: "Mois",
         clear: "Effacer",
         weekStart: 1,
-        format: "dd/mm/yyyy"
+        format: "dd/mm/yy"
     };
-
-
-    $('.datepicker').datepicker({
-        language: 'fr',
-        format: "dd/mm/yyyy",
-        orientation: "bottom",
-        autoclose: true
-    });
 });

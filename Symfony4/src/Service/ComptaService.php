@@ -109,7 +109,7 @@ class ComptaService
             $article = new Article();
             $article->setCompteDebit($compteRemboursement);        
             $article->setCompteCredit($compteRembDette); 
-            $label = "Préstation cong: ".$prestation->getAdherent()->getNom()." |bén: ".$prestation->getPac()->getMatricule();
+            $label = "Préstation bénéficiaire: ".$prestation->getPac()->getMatricule();
             $article->setLibelle($label);
             $article->setCategorie($journal);
 

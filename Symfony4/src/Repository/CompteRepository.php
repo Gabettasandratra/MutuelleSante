@@ -74,7 +74,7 @@ class CompteRepository extends ServiceEntityRepository
         if ($in) {
             foreach ($retour as $code) {
                 if ($code['codeJournal'] == $in) {
-                    return [$code];
+                    return $code;
                 }
             }
         }
@@ -82,7 +82,7 @@ class CompteRepository extends ServiceEntityRepository
     }
 
     /**
-     * Cherche la somme des soldes dans le postes données
+     * Cherche la somme des soldes dans le postes données (Etat financieres)
      */
     public function findSoldes($postes = [], Exercice $exercice)
     {
@@ -102,12 +102,14 @@ class CompteRepository extends ServiceEntityRepository
                                 ->setParameter('dateFin', $exercice->getDateFin())                   
                                 ->getSingleScalarResult();
                 } else {
-                    $debit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteDebit = :cp and a.date between :dateDebut and :dateFin')
+                    // Les comptes de gestion
+                    $debit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where (a.analytique is null or a.analytique != \'-\') and a.compteDebit = :cp and a.date between :dateDebut and :dateFin')
                                 ->setParameter('cp', $compte) 
                                 ->setParameter('dateDebut', $exercice->getDateDebut())                     
                                 ->setParameter('dateFin', $exercice->getDateFin())                     
-                                ->getSingleScalarResult();
-                    $credit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteCredit = :cp and a.date between :dateDebut and :dateFin')
+                                ->getSingleScalarResult();            
+                    
+                    $credit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where (a.analytique is null or a.analytique != \'-\') and a.compteCredit = :cp and a.date between :dateDebut and :dateFin')
                                 ->setParameter('cp', $compte)   
                                 ->setParameter('dateDebut', $exercice->getDateDebut())
                                 ->setParameter('dateFin', $exercice->getDateFin())                                        
