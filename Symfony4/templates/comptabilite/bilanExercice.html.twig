@@ -34,10 +34,10 @@
                         <table class="table table-bordered no-padding-3">
                             <thead class="thead-light text-center">
                                 <tr>
-                                    <th rowspan=2 class="align-middle">POSTES D'ACTIF</th>
-                                    <th>Valeurs brutes</th>
-                                    <th>Amort/perte de valeur</th>
-                                    <th>Valeurs nettes</th>
+                                    <th rowspan=2 class="align-middle">Détail des postes</th>
+                                    <th>Brut</th>
+                                    <th>Amort & Prov</th>
+                                    <th>Net</th>
                                 </tr>                
                             </thead>
                             <tbody>
@@ -46,7 +46,7 @@
                                     {% if loop.first %}
                                     <tr>
                                         <td class="font-weight-bold">ACTIFS NON COURANTS</td>
-                                        <td></td><td></td>
+                                        <td></td><td></td><td></td>
                                     </tr>
                                     {% endif %}        
                                     <tr>
@@ -117,8 +117,8 @@
                         <table class="table table-bordered no-padding-3">
                             <thead class="thead-light text-center">
                                 <tr>
-                                    <th rowspan=2 class="align-middle">CAPITAUX PROPRES ET PASSIFS</th>
-                                    <th colspan=2>Valeurs nettes</th>
+                                    <th class="align-middle">CAPITAUX PROPRES ET PASSIFS</th>
+                                    <th>Valeurs nettes</th>
                                 </tr>                
                             </thead>
                             <tbody>
@@ -151,12 +151,12 @@
                                     {% endif %}        
                                     <tr>
                                         <td {% if rubrique[0] != 0 %}class="pl-4"{% endif %}>{{ rubrique[1] }}</td>
-                                        <td class="text-center">{% if rubrique[2] is defined and (rubrique[3] + rubrique[2]) != 0 %}{{ (rubrique[3] + rubrique[2])|number_format(2,',',' ') }} {% set tPNCa = tPNCa + rubrique[2] %}{% endif %}</td>
+                                        <td class="text-center">{% if rubrique[2] is defined and (rubrique[3] + rubrique[2]) != 0 %}{{ (-1*(rubrique[3] + rubrique[2]))|number_format(2,',',' ') }} {% set tPNCa = tPNCa + rubrique[2] %}{% endif %}</td>
                                     </tr>
                                     {% if loop.last %}
                                     <tr>
                                         <td class="text-right font-weight-bold">TOTAL PASSIFS NON-COURANTS</td>
-                                        <td class="text-center">{% if (tPNCs + tPNCa) != 0 %}{{ (tPNCs + tPNCa)|number_format(2,',',' ') }}{% endif %}</td>
+                                        <td class="text-center">{% if (tPNCs + tPNCa) != 0 %}{{ (-1*(tPNCs + tPNCa))|number_format(2,',',' ') }}{% endif %}</td>
                                     </tr>
                                     {% endif %}           
                                 {% endfor %}
@@ -171,12 +171,12 @@
                                     {% endif %}        
                                     <tr>
                                         <td {% if rubrique[0] != 0 %}class="pl-4"{% endif %}>{{ rubrique[1] }}</td>
-                                        <td class="text-center">{% if rubrique[2] is defined and (rubrique[3] + rubrique[2]) != 0 %}{{ (rubrique[3] + rubrique[2])|number_format(2,',',' ') }} {% set tPCa = tPCa + rubrique[2] %}{% endif %}</td>
+                                        <td class="text-center">{% if rubrique[2] is defined and (rubrique[3] + rubrique[2]) != 0 %}{{ (-1*(rubrique[3] + rubrique[2]))|number_format(2,',',' ') }} {% set tPCa = tPCa + rubrique[2] %}{% endif %}</td>
                                     </tr>
                                     {% if loop.last %}
                                     <tr>
                                         <td class="text-right font-weight-bold">TOTAL PASSIFS COURANTS</td>
-                                        <td class="text-center">{% if (tPCs + tPCa) != 0 %}{{ (tPCs + tPCa)|number_format(2,',',' ') }}{% endif %}</td>
+                                        <td class="text-center">{% if (tPCs + tPCa) != 0 %}{{ (-1*(tPCs + tPCa))|number_format(2,',',' ') }}{% endif %}</td>
                                     </tr>
                                     {% endif %}           
                                 {% endfor %}
@@ -199,6 +199,18 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row mt-2 btn-group"> 
+                    <a href="{{ path('pdf_bilan') }}" class="btn btn-sm btn-secondary"><i class="mdi mdi-printer"></i> PDF</a>
+                </div>
+            </div>
+        </div>
         </div>
     </div>
 {% endblock %}

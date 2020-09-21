@@ -140,7 +140,7 @@
                                 </tr>
                                 <tr class="table-blue">
                                     <td class="text-center font-weight-bold">3 - RESULTAT COURANT AVANT IMPOTS (I-II+III-IV+V-VI)</td>
-                                    <td>{{ (-1*(tProduit + tCharge + III + IV + tCFinancier + tCFinancier))|number_format(2,',',' ') }}</td>
+                                    <td>{{ (-1*(tProduit + tCharge + III + IV + tPFinancier + tCFinancier))|number_format(2,',',' ') }}</td>
                                 </tr>
 
                                 <tr>
@@ -211,6 +211,17 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row mt-2 btn-group"> 
+                    <a href="{{ path('pdf_resultat') }}" class="btn btn-sm btn-secondary"><i class="mdi mdi-printer"></i> PDF</a>
+                </div>
+            </div>
+        </div>
         </div>
     </div>
 {% endblock %}

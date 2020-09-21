@@ -5,6 +5,7 @@ namespace App\Controller;
 use Fpdf\Fpdf;
 use App\Pdf\Pdf;
 use App\Entity\Adherent;
+use App\Pdf\PDFMutuelle;
 use App\Repository\ArticleRepository;
 use App\Repository\AdherentRepository;
 use App\Repository\PrestationRepository;
@@ -78,49 +79,6 @@ class DashboardController extends AbstractController
     }
 
     /**
-     * @Route("/dashboard/test", name="dashboard_test")
-     */
-    public function testPdf()
-    {
-
-        $pdf = new Fpdf(); 
-        $pdf->AddPage('L', 'A4');
-        $pdf->SetFont('Arial','B',16);// 
-        // Width
-        $width = $pdf->getPageWidth();
-        $pdf->setX(($width - 50)/2, 10);
-        $pdf->Cell(50,10,'Hello World!',1,0,'C');
-
-        // Table des congregations
-        // En tete table
-        $pdf->SetFillColor(232,232,232);
-        //Bold Font for Field Name
-        $pdf->SetFont('Arial','B',12);
-        $pdf->SetY(20);
-        $pdf->Cell(20,6,'CODE',1,0,'L',1);
-        $pdf->SetX(65);
-        $pdf->Cell(100,6,'NAME',1,0,'L',1);
-        $pdf->SetX(135);
-        $pdf->Cell(30,6,'PRICE',1,0,'R',1);
-        $pdf->Ln();
-
-        for ($i=0; $i < 10; $i++) { 
-            $pdf->Cell(20,6, "Row", 'LR', 0);
-            $pdf->SetX(65);
-            $pdf->Cell(100,6, $i ,'LR', 0);
-            $pdf->SetX(135);
-            $pdf->Cell(30,6, $i ,'LR', 0);
-            $pdf->Ln();
-        }
-
-        return new Response(
-            $pdf->Output('file.pdf', 'I'),
-            Response::HTTP_OK,
-            array('content-type' => 'application/pdf')
-        );
-    }
-
-    /**
      * @Route("/dashboard/pdf/cong", name="dashboard_test_congregation")
      */
     public function testPdfCongregation(SessionInterface $session, AdherentRepository $repo)
@@ -179,7 +137,7 @@ class DashboardController extends AbstractController
         $w = [20, 70, 10, 30, 40, 40, 30, 30];
 
         // Pdf file
-        $pdf = new Pdf();
+        $pdf = new PDFMutuelle();
         $pdf->AliasNbPages(); 
 
         $ancs = $repo->findAncien($exercice, $adherent);           
@@ -261,7 +219,7 @@ class DashboardController extends AbstractController
         $exercice = $session->get('exercice');
         $header = ['N°', 'Congrégation', 'Anciens', 'Nouveaux', 'Montant due', 'Montant percue', 'Reste à payé'];   
         
-        $pdf = new Pdf();
+        $pdf = new PDFMutuelle();
         $pdf->AliasNbPages();                     
         $pdf->AddPage('L', 'A4');
 
@@ -351,7 +309,7 @@ class DashboardController extends AbstractController
     public function printPdfRemboursement(SessionInterface $session, AdherentRepository $repo, CompteCotisationRepository $repoCot)
     {
         $exercice = $session->get('exercice');    
-        $pdf = new Pdf();
+        $pdf = new PDFMutuelle();
         $pdf->AliasNbPages();                     
         $pdf->AddPage('L', 'A4');
 
@@ -403,30 +361,6 @@ class DashboardController extends AbstractController
         $pdf->Cell(120,6, 'Totaux',1,0,'R');
         $pdf->Cell(40,6, number_format($tR, 2, ",", " "),1,0,'C');
 
-        return new Response(
-            $pdf->Output('file.pdf', 'I'),
-            Response::HTTP_OK,
-            array('content-type' => 'application/pdf')
-        );
-    }
-
-    /**
-     * @Route("/header", name="exp")
-     */
-    public function ExampleHeader(ArticleRepository $repositoryArticle, SessionInterface $session)
-    {
-        $exercice = $session->get('exercice');
-        $periode = ['debut' => $exercice->getDateDebut(), 'fin' => $exercice->getDateFin()];
-
-        #$jourx = $repositoryArticle->findJournal('CAI', $exercice->getDateDebut(), $exercice->getDateFin());
-        $donnees = $repositoryArticle->findGrandLivre($periode['debut'], $periode['fin']);
-
-        $pdf = new Pdf($periode, 'Grand-livre des comptes');
-        $pdf->AliasNbPages();
-        $pdf->AddPage('P', 'A4');
-
-        $pdf->livreTable($donnees);
-        
         return new Response(
             $pdf->Output('file.pdf', 'I'),
             Response::HTTP_OK,

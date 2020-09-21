@@ -7,10 +7,11 @@ use Fpdf\Fpdf;
 class Pdf extends Fpdf {
 
 
-    public function __construct($periode,$title) {
+    public function __construct($periode,$title,$subtitle=null) {
         parent::__construct();
         $this->periode = $periode;
         $this->title = $title;
+        $this->subtitle = $subtitle;
     }
 
     public function Header()
@@ -23,15 +24,16 @@ class Pdf extends Fpdf {
 
         $this->Cell(60,5,'CNPC Porte 14 Antanimena',0,0,'L');
         $this->SetFont('Arial','B',15);
-        $this->Cell(70,5,$this->title,0,0,'C');
+        $this->Cell(70,8,$this->title,0,0,'C');
         $this->SetFont('Arial','',10);
         $this->Cell(60,5,'Au '.$this->periode['fin']->format('d/m/Y'),0,1,'R'); // End
 
         $this->Cell(95,5,'034 10 776 69',0,0,'L');
         $this->Cell(95,5,'Tenue du compte : Ar ',0,1,'R'); // End
 
-        $this->Cell(95,5,'smutuellesante@yahoo.fr',0,0,'L');
-        $this->Cell(95,5,'Date de tirage : '.date('d/m/Y'),0,1,'R'); // End
+        $this->Cell(60,5,'smutuellesante@yahoo.fr',0,0,'L');
+        $this->Cell(70,5, $this->subtitle,0,0,'C');
+        $this->Cell(60,5,'Date de tirage : '.date('d/m/Y'),0,1,'R'); // End
 
         // Numéro de page
         //make a dummy empty cell as a vertical spacer
@@ -169,7 +171,7 @@ class Pdf extends Fpdf {
         $this->SetFont('Arial','B',10);
 
         $this->Cell(17,8,'Date', 1,0, 'C');
-        $this->Cell(8,8,'N°id', 'TBR',0, 'C');
+        $this->Cell(8,8,'N°', 'TBR',0, 'C');
         $this->Cell(16,8,'Débité', 'TBR',0, 'C');
         $this->Cell(16,8,'Crédité', 'TBR',0, 'C');
         $this->Cell(63,8,'Libellé écriture', 'TBR',0, 'C');
@@ -201,7 +203,7 @@ class Pdf extends Fpdf {
 
         $this->Cell(17,8,'Date', 1,0, 'C');
         $this->Cell(10,8,'C.j', 'TBR',0, 'C');
-        $this->Cell(8,8,'N°id', 'TBR',0, 'C');
+        $this->Cell(8,8,'N°', 'TBR',0, 'C');
         $this->Cell(70,8,'Libellé', 'TBR',0, 'C');
         $this->Cell(33,8,'Réference', 'TBR',0, 'C');
         $this->Cell(31,8,'Débit', 'TBR',0, 'C');
@@ -221,13 +223,13 @@ class Pdf extends Fpdf {
                 $this->SetFont('Arial','',9);
                 foreach ($articles as $article) {
                     $this->SetX(5);
-                    $this->Cell(17,7, $article['date']->format('d/m/y'), 1,0, 'C');
-                    $this->Cell(10,7, $article['categorie'], 'TBR',0, 'C');
-                    $this->Cell(8,7, $article['id'], 'TBR',0, 'C');
-                    $this->Cell(70,7, $article['libelle'], 'TBR',0, 'L');
-                    $this->Cell(33,7, $article['piece'], 'TBR',0, 'L');
-                    $this->Cell(31,7, $this->number_format($article['debit']), 'TBR',0, 'C'); $debit += $article['debit'];
-                    $this->Cell(31,7, $this->number_format($article['credit']), 'TBR',1, 'C'); $credit += $article['credit'];
+                    $this->Cell(17,6, $article['date']->format('d/m/y'), 1,0, 'C');
+                    $this->Cell(10,6, $article['categorie'], 'TBR',0, 'C');
+                    $this->Cell(8,6, $article['id'], 'TBR',0, 'C');
+                    $this->Cell(70,6, $article['libelle'], 'TBR',0, 'L');
+                    $this->Cell(33,6, $article['piece'], 'TBR',0, 'L');
+                    $this->Cell(31,6, $this->number_format($article['debit']), 'TBR',0, 'C'); $debit += $article['debit'];
+                    $this->Cell(31,6, $this->number_format($article['credit']), 'TBR',1, 'C'); $credit += $article['credit'];
                 }
                 $this->SetX(5);
                 $this->SetFont('Arial','BI',9);
@@ -240,6 +242,239 @@ class Pdf extends Fpdf {
 
     }
 
+    public function bilanActifTable($bilan)
+    {
+        $this->SetX(5);
+        $this->SetFont('Arial','B',10);
+
+        $this->Cell(101,8,'Détail des postes', 1,0, 'C');
+        $this->Cell(33,8,'Brut', 'TBR',0, 'C');
+        $this->Cell(33,8,'Amorts & Prov', 'TBR',0, 'C');
+        $this->Cell(33,8,'Net', 'TBR',1, 'C');
+
+        // Data
+        $anc = $this->printBilan('ACTIF NON COURANT', $bilan['anc']); // Actif non courant
+        $ac = $this->printBilan('ACTIF COURANT', $bilan['ac']); // Actif non courant
+        // Total des actifs
+        $this->SetX(5);
+        $this->SetFont('Arial','BI',9);
+        $this->Cell(101,6, 'TOTAL', 'LBR',0, 'R');  
+        $this->Cell(33,6, $this->number_format($anc['tB']+$ac['tB']), 'BR',0, 'C');
+        $this->Cell(33,6, $this->number_format(-1*($anc['tAmort']+$ac['tAmort'])), 'BR',0, 'C');
+        $this->Cell(33,6, $this->number_format($anc['tB']+$ac['tB']+$anc['tAmort']+$ac['tAmort']), 'BR',1, 'C');
+
+        // Change the title
+        $this->title = "Bilan passif";
+    }
+
+    public function bilanPassifTable($bilan)
+    {
+        $this->SetX(5);
+        $this->SetFont('Arial','B',10);
+
+        $this->Cell(160,8,'Détail des postes', 1,0, 'C');
+        $this->Cell(40,8,'Montant', 'TBR',1, 'C');
+        
+        // Data
+        $t = 0;
+        $t += $this->printBilanPassif('CAPITAUX PROPRES', $bilan['cp']); // Capitaux propres
+        $t += $this->printBilanPassif('PASSIF NON COURANT', $bilan['pnc']); // Actif non courant
+        $t += $this->printBilanPassif('PASSIF COURANT', $bilan['pc']); // Actif non courant
+
+        $this->SetX(5);
+        $this->SetFont('Arial','BI',9);
+        $this->Cell(160,6, 'TOTAL', 'LBR',0, 'R');  
+        $this->Cell(40,6, $this->number_format(-1*$t), 'BR',1, 'C');
+    }
+
+    public function printBilan($rubrique, $donnees)
+    {
+        $this->SetX(5);
+        $this->SetFont('Arial','BI',9);
+        $this->Cell(200,6, strtoupper($rubrique), 'LBR',1, 'L');  
+        $tB = 0; $tAmort = 0;
+        foreach ($donnees as $poste) {    
+            if ($poste[0] == 0) {
+                $this->SetX(5);
+                $this->SetFont('Arial','BI',9);
+                $this->Cell(101,6, $poste[1], 'LBR',0, 'L');
+                
+            } else {
+                $this->SetX(5);
+                $this->SetFont('Arial','',9);
+                $this->Cell(101,6, '  '.$poste[1], 'LBR',0, 'L');
+            }
+
+            $this->SetFont('Arial','',9);
+            if (count($poste) == 2) {
+                $this->Cell(33,6, '', 'BR',0, 'C');
+                $this->Cell(33,6, '', 'BR',0, 'C');
+                $this->Cell(33,6, '', 'BR',1, 'C');
+            } else {
+                $this->Cell(33,6, $this->number_format($poste[2]), 'BR',0, 'C'); $tB += $poste[2];
+                $this->Cell(33,6, $this->number_format(-1*$poste[3]), 'BR',0, 'C'); $tAmort += $poste[3];
+                $this->Cell(33,6, $this->number_format($poste[2]+$poste[3]), 'BR',1, 'C');
+            }
+        }
+        $this->SetX(5);
+        $this->SetFont('Arial','BI',9);
+        $this->Cell(101,6, 'TOTAL '.strtoupper($rubrique), 'LBR',0, 'R');  
+        $this->Cell(33,6, $this->number_format($tB), 'BR',0, 'C');
+        $this->Cell(33,6, $this->number_format(-1*$tAmort), 'BR',0, 'C');
+        $this->Cell(33,6, $this->number_format($tB+$tAmort), 'BR',1, 'C');
+
+        return ['tB' => $tB, 'tAmort' => $tAmort];
+    }
+
+    public function printBilanPassif($rubrique, $donnees)
+    {
+        $this->SetX(5);
+        $this->SetFont('Arial','BI',9);
+        $this->Cell(200,6, strtoupper($rubrique), 'LBR',1, 'L');  
+        $tB = 0; 
+        foreach ($donnees as $poste) {    
+            if ($poste[0] == 0) {
+                $this->SetX(5);
+                $this->SetFont('Arial','',9);
+                $this->Cell(160,6, $poste[1], 'LBR',0, 'L');
+                
+            } else {
+                $this->SetX(5);
+                $this->SetFont('Arial','I',9);
+                $this->Cell(160,6, '  '.$poste[1], 'LBR',0, 'L');
+            }
+
+            $this->SetFont('Arial','',9);
+            if (count($poste) == 2)
+                $this->Cell(40,6, '', 'BR',1, 'C');
+            else        
+                $this->Cell(40,6, $this->number_format(-1*$poste[2]), 'BR',1, 'C'); $tB += $poste[2];
+        }
+
+        $this->SetX(5);
+        $this->SetFont('Arial','BI',9);
+        $this->Cell(160,6, 'TOTAL '.strtoupper($rubrique), 'LBR',0, 'R');  
+        $this->Cell(40,6, $this->number_format(-1*$tB), 'BR',1, 'C');
+
+        return $tB;
+    }
+
+    public function compteResultatTable($donnees)
+    {       
+        $this->SetX(5);
+        $this->SetFont('Arial','B',10);
+
+        $this->Cell(160,8,'Détail des postes', 1,0, 'C');
+        $this->Cell(40,8,'Montant', 'TBR',1, 'C');
+
+        // charge financiers
+        $rE = 0; $op = 0; $rF = 0; $re = 0; $im = 0;
+        // Produit exploitation
+        $this->SetX(5);
+        $this->SetFont('Arial','BI',9);
+        $this->Cell(200,6, 'PRODUIT D\'EXPLOITATION', 'LBR',1, 'L'); 
+        $rE += $this->printDonneesResultat($donnees['ca']);
+        $this->SetX(5);
+        $this->SetFont('Arial','BI',9);
+        $this->Cell(160,6, "Chiffre d'affaire net" , 'LBR',0, 'R'); 
+        $this->Cell(40,6, $this->number_format(-1*$rE), 'BR',1, 'C');
+        $rE += $this->printDonneesResultat($donnees['pE']);
+        $this->SetX(5);
+        $this->SetFont('Arial','BI',9);
+        $this->Cell(160,6, "TOTAL PRODUIT D'EXPLOITATION (I)" , 'LBR',0, 'R'); 
+        $this->Cell(40,6, $this->number_format(-1*$rE), 'BR',1, 'C');
+
+        $rE += $this->printResultat('CHARGE D\'EXPLOITATION', $donnees['cE'],'II', false);
+        $this->printString('1 - RESULTAT D\'EXPLOITATION (I-II)', $rE);
+
+        $op += $this->printResultat('OPERATION EN COMMUN', $donnees['op'], 'III-IV'); 
+        $rF += $this->printResultat('PRODUIT FINANCIER', $donnees['pf'],'V'); 
+        $rF += $this->printResultat('CHARGE FINANCIER', $donnees['cf'],'VI', false);
+        $this->printString('2 - RESULTAT FINANCIER (V-VI)', $rF);
+
+        $this->printString('3 - RESULTAT COURANT AVANT IMPOT (I-II+III-IV+V-VI)', $rE+$rF+$op);
+        
+        $re += $this->printResultat('PRODUIT EXCEPTIONNEL', $donnees['pe'],'VII'); 
+        $re += $this->printResultat('CHARGE EXCEPTIONNEL', $donnees['ce'],'VIII', false); 
+        $this->printString('4 - RESULTAT EXCEPTIONNEL (VII-VIII)', $re);
+        $im += $this->printResultat('IMPOT', $donnees['im'],'IX+X', false); 
+
+        // Resutat final 
+        $r = $rE+$rF+$op+$re+$im;
+        $ben = ($r < 0)?"(BENEFICE)":"(PERTE)";
+        $this->printString("5 - RESULTAT DE L'EXERCICE ".$ben, $rE+$rF+$op+$re+$im);
+
+    }
+
+    public function printString($poste, $montant)
+    {
+        $this->SetX(5);
+        $this->SetFont('Arial','BI',9);
+        $this->Cell(160,8, strtoupper($poste), 'LBR',0, 'C'); 
+        $this->Cell(40,8, $this->number_format(-1*$montant), 'BR',1, 'C');
+    }
+
+    public function printResultat($rubrique, $donnees, $num = '', $produit = true)
+    {
+        $this->SetX(5);
+        $this->SetFont('Arial','BI',9);
+        $this->Cell(200,6, strtoupper($rubrique), 'LBR',1, 'L');  
+        $tB = 0; 
+        $c = ($produit)?-1:1; // 1 ou -1
+        foreach ($donnees as $poste) {    
+            if ($poste[0] == 0) {
+                $this->SetX(5);
+                $this->SetFont('Arial','',9);
+                $this->Cell(160,6, $poste[1], 'LBR',0, 'L');
+                
+            } else {
+                $this->SetX(5);
+                $this->SetFont('Arial','I',9);
+                $this->Cell(160,6, '  '.$poste[1], 'LBR',0, 'L');
+            }
+
+            $this->SetFont('Arial','',9);
+            
+            if (count($poste) == 2)
+                $this->Cell(40,6, '', 'BR',1, 'C');
+            else {
+                $tB += $poste[2];
+                if ($rubrique == 'OPERATION EN COMMUN') 
+                    $poste[2] = -1*abs($poste[2]);
+                $this->Cell(40,6, $this->number_format($c*$poste[2]), 'BR',1, 'C'); 
+            }
+        }
+        $this->SetX(5);
+        $this->SetFont('Arial','BI',9);
+        $this->Cell(160,6, 'TOTAL '.strtoupper($rubrique).' ('.$num.')' , 'LBR',0, 'R'); 
+        $this->Cell(40,6, $this->number_format($c*$tB), 'BR',1, 'C');
+
+        return $tB;
+    }
+
+    public function printDonneesResultat($donnees, $produit = true)
+    {
+        $tB = 0; 
+        $c = ($produit)?-1:1; // 1 ou -1
+        foreach ($donnees as $poste) {    
+            if ($poste[0] == 0) {
+                $this->SetX(5);
+                $this->SetFont('Arial','',9);
+                $this->Cell(160,6, $poste[1], 'LBR',0, 'L');              
+            } else {
+                $this->SetX(5);
+                $this->SetFont('Arial','I',9);
+                $this->Cell(160,6, '  '.$poste[1], 'LBR',0, 'L');
+            }
+            $this->SetFont('Arial','',9);          
+            if (count($poste) == 2)
+                $this->Cell(40,6, '', 'BR',1, 'C');
+            else {
+                $this->Cell(40,6, $this->number_format($c*$poste[2]), 'BR',1, 'C'); $tB += $poste[2];
+            }
+        }
+        return $tB;
+    }
     public function number_format($float)
     {
         if ($float != 0) 

@@ -297,8 +297,9 @@
         $('.datepicker').datepicker({
             language: 'fr',
             orientation: "bottom",
+            format: "dd/mm/yyyy",
             autoclose: true,
-            dateFormat: "dd/mm/yy",
+            dateFormat: "dd/mm/yyyy",
             minDate: new Date('{{ app.session.get('exercice').dateDebut|date('d/m/Y') }}'),
             maxDate: new Date('{{ app.session.get('exercice').dateFin|date('d/m/Y') }}')
         });

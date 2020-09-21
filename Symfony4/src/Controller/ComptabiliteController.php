@@ -157,7 +157,6 @@ class ComptabiliteController extends AbstractController
 
     /**
      * @Route("/comptabilite/grandlivre", name="comptabilite_livre")
-     * @Route("/comptabilite/grandlivre/{poste}", name="comptabilite_livre_aux")
      */
     public function livre(Request $request, ArticleRepository $repositoryArticle, CompteRepository $repositoryCompte, SessionInterface $session)
     {
@@ -197,6 +196,7 @@ class ComptabiliteController extends AbstractController
     
         return $this->render('comptabilite/livre.html.twig', [
             'donnees' => $donnees,
+            'poste' => $poste,
             'subtitle' => $subtitle,
             'periode' => ['debut' => $dateDebut, 'fin' => $dateFin]
         ]);
@@ -302,6 +302,9 @@ class ComptabiliteController extends AbstractController
         ]);
     }
 
+    /** 
+     * Convert bilan poste into solde
+     */
     private function getBilan($exercice, $repo, $groupes)
     {
         $anc = [];
