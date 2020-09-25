@@ -5,8 +5,6 @@ namespace App\Pdf;
 use Fpdf\Fpdf;
 
 class Pdf extends Fpdf {
-
-
     public function __construct($periode,$title,$subtitle=null) {
         parent::__construct();
         $this->periode = $periode;

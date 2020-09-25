@@ -88,22 +88,25 @@ class DashboardController extends AbstractController
         $congs = $repo->findByExercice($exercice);
 
         // En tete table
-        $header = ['N°', 'Congrégation', 'Date Inscr', 'Adresse', 'Tél', 'Email'];
+        $header = ['N°', 'Congrégation', 'Date adhésion', 'Adresse', 'Tél', 'Email'];
         // Width table
         $w = [10, 60, 30, 50, 50, 60];
 
         // Pdf file
-        $pdf = new Pdf();
+        $exercice = $session->get('exercice'); 
+        $periode = ['debut' => $exercice->getDateDebut(), 'fin' => $exercice->getDateFin()];
+
+        $pdf = new PDFMutuelle($periode, "Congrégation");
         $pdf->AliasNbPages();
         $pdf->AddPage('L', 'A4');
 
         // Write header
-        $pdf->SetFont('Arial','B',12);
+        $pdf->SetFont('Arial','B',9);
         for($i=0;$i<count($header);$i++)
             $pdf->Cell($w[$i],7,$header[$i],1,0,'C');
         $pdf->Ln();
 
-        $pdf->SetFont('Arial','',11);// 
+        $pdf->SetFont('Arial','',9);// 
         foreach($congs as $c)
         {
             $pdf->Cell($w[0],6,$c->getNumero(),'LR');
@@ -130,14 +133,14 @@ class DashboardController extends AbstractController
     {
         // Get list congregations
         $exercice = $session->get('exercice');
-
+        $periode = ['debut' => $exercice->getDateDebut(), 'fin' => $exercice->getDateFin()];
         // En tete table
         $header = ['N° Matri', 'Nom et Prénom', 'S', 'Date Nais', 'Tél', 'CIN', 'Date Entré', 'Fonction'];    
         // Width table
         $w = [20, 70, 10, 30, 40, 40, 30, 30];
 
         // Pdf file
-        $pdf = new PDFMutuelle();
+        $pdf = new PDFMutuelle($periode, "Beneficiaires");
         $pdf->AliasNbPages(); 
 
         $ancs = $repo->findAncien($exercice, $adherent);           

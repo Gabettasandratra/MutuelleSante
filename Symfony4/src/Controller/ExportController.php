@@ -4,11 +4,13 @@ namespace App\Controller;
 
 use App\Pdf\Pdf;
 use App\Entity\Adherent;
+use App\Pdf\PDFMutuelle;
 use App\Service\ExportExcel;
 use App\Entity\Remboursement;
 use App\Service\ConfigEtatFi;
 use App\Repository\CompteRepository;
 use App\Repository\ArticleRepository;
+use App\Repository\AdherentRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -117,6 +119,54 @@ class ExportController extends AbstractController
         return $this->file($filePath, $filename, ResponseHeaderBag::DISPOSITION_INLINE);
     }
 
+    /* LES PDFS DE LA MUTUELLE SANTE */
+    /**
+     * @Route("/pdf/adhesion/congregations", name="pdf_congregations")
+     */
+    public function pdfCongregation(SessionInterface $session, AdherentRepository $repo)
+    {
+        $exercice = $session->get('exercice');
+        $periode = ['debut' => $exercice->getDateDebut(), 'fin' => $exercice->getDateFin()];
+
+        $periode['debut'] = \DateTime::createFromFormat('dmY', '01011900');
+        $congs = $repo->findDateInscription($periode['debut'], $periode['fin']);
+
+        $pdf = new PDFMutuelle($periode, "Congrégation");
+        $pdf->AliasNbPages();
+        $pdf->AddPage('L', 'A4');
+        
+        $pdf->adhesionTable($congs);
+
+        return new Response(
+            $pdf->Output('file.pdf', 'I'),
+            Response::HTTP_OK,
+            array('content-type' => 'application/pdf')
+        );
+    }
+
+    /**
+     * @Route("/pdf/adhesion/beneficiaires", name="pdf_beneficiaire")
+     */
+    public function pdfBeneficiaires(SessionInterface $session, AdherentRepository $repo)
+    {
+        $exercice = $session->get('exercice');
+        $periode = ['debut' => $exercice->getDateDebut(), 'fin' => $exercice->getDateFin()];
+
+        $periode['debut'] = \DateTime::createFromFormat('dmY', '01011900');
+        $congs = $repo->findDateInscription($periode['debut'], $periode['fin']);
+
+        $pdf = new PDFMutuelle($periode, "Congrégation");
+        $pdf->AliasNbPages();
+        $pdf->AddPage('L', 'A4');
+        
+        $pdf->adhesionTable($congs);
+
+        return new Response(
+            $pdf->Output('file.pdf', 'I'),
+            Response::HTTP_OK,
+            array('content-type' => 'application/pdf')
+        );
+    }
 
     /* LES PDFS DE LA COMPTABILITE */
 

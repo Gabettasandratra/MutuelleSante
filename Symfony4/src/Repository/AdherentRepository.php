@@ -73,9 +73,17 @@ class AdherentRepository extends ServiceEntityRepository
 
     public function findByExercice(Exercice $exercice)
     {
-        return $this->_em->createQuery('select a from App\Entity\Adherent a where a.dateInscription < :dateFin ')
-                                    ->setParameter('dateFin', $exercice->getDateFin())
-                                    ->getResult();
+        return $this->_em->createQuery('select a from App\Entity\Adherent a where a.dateInscription <= :dateFin')
+                        ->setParameter('dateFin', $exercice->getDateFin())
+                        ->getResult();
+    }
+
+    public function findDateInscription(\DateTimeInterface $debut, \DateTimeInterface $fin)
+    {
+        return $this->_em->createQuery('select a from App\Entity\Adherent a where a.dateInscription between :deb and :fin')
+                        ->setParameter('deb', $debut)
+                        ->setParameter('fin', $fin)
+                        ->getResult();
     }
 
     public function findAncien(Exercice $exercice, Adherent $adherent)

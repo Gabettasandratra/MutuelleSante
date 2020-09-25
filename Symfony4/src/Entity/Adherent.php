@@ -295,6 +295,7 @@ class Adherent
         return null;
     }
 
+
     public function verifyPrevCompteCotisation(Exercice $exercice)
     {
         foreach ($this->compteCotisations as  $compteCotisation) {
@@ -357,7 +358,6 @@ class Adherent
                 $prestation->setAdherent(null);
             }
         }
-
         return $this;
     }
 
@@ -414,4 +414,10 @@ class Adherent
 
         return $this;
     } 
+
+    public function getNbBeneficiaires()
+    {
+        $compteCot = $this->getCurrentCompteCotisation();
+        return ($compteCot->getAncien() + $compteCot->getNouveau());
+    }
 }

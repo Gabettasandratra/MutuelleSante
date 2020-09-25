@@ -132,6 +132,15 @@ class AdhesionController extends AbstractController
     }
 
     /**
+     * @Route("/adhesion/rapport", name="adhesion_rapport")
+     * Rapport sur les adhérés
+     */
+    public function rapportAdhesion()
+    {
+        return $this->render('adhesion/rapportAdhesion.html.twig');       
+    }
+
+    /**
      * @Route("/adhesion/{id}/edit", name="adhesion_edit")
      */
     public function edit(Adherent $adherent = null, Request $request, EntityManagerInterface $manager)
