@@ -41,7 +41,6 @@ class ComptabiliteController extends AbstractController
         $exercice = $session->get('exercice');
 
         $code = $request->query->get('code');
-
         $debut = $request->query->get('debut');
         $fin = $request->query->get('fin');
 
@@ -60,10 +59,9 @@ class ComptabiliteController extends AbstractController
         }
 
         $articles = $repositoryArticle->findJournal($code, $dateDebut, $dateFin);
-                    
         return $this->render('comptabilite/journal.html.twig', [
             'articles' => $articles,
-            'code' => $repositoryCompte->findCodeJournaux($code),
+            'code' => $repositoryCompte->findCodeJournaux($code)[0],
             'periode' => ['debut' => $dateDebut, 'fin' => $dateFin]
         ]);
     }

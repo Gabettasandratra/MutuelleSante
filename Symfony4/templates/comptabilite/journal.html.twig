@@ -78,7 +78,7 @@
                         <a href="{{ path('comptabilite_saisie', { 'journal': code.codeJournal }) }}" class="btn btn-sm btn-success mr-1"><i class="mdi mdi-receipt"></i> Saisie article</a>
                         {% endif %}
                         <a href="#modal-journaux" data-toggle="modal" data-backdrop="static" class="btn btn-sm btn-primary mr-2"><i class="mdi mdi-pen"></i><span class="hide-menu"> Choisir le période </span></a>
-                        <a href="{{ path('export_rapport_journal', {code: code.codeJournal}) }}" class="btn btn-sm btn-success"><i class="mdi mdi-printer"></i> Excel</a>
+                        <a href="{{ path('export_rapport_journal') }}" class="btn btn-sm btn-success"><i class="mdi mdi-printer"></i> Excel</a>
                         <a href="{{ path('pdf_journal', { code: code.codeJournal, debut: periode['debut']|date('dmY'), fin: periode['fin']|date('dmY')}) }}" class="btn btn-sm btn-secondary"><i class="mdi mdi-printer"></i> PDF</a>
                     </div>
                 </div>

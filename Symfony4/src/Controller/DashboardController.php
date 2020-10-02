@@ -34,6 +34,8 @@ class DashboardController extends AbstractController
     public function index(AdherentRepository $repo, PrestationRepository $repoPre, SessionInterface $session)
     {
         $exercice = $session->get('exercice');
+
+        // Préparation sur les données à affichés
         $congregations = array_reverse($repo->findEvolutionCongregation($exercice->getAnnee()), true);         
         $beneficiaires = array_reverse($repo->findEvolutionBeneficiaire($exercice->getAnnee()), true);         
         
@@ -63,18 +65,15 @@ class DashboardController extends AbstractController
             'label' => ['Jan','Fev','Mar','Avr','Mai','Jui','Juil','Août','Sep','Oct','Nov','Dec'],
             'series' => [$m_frais, $m_remb]
         ]);
-
-        $percentSoins = $repoPre->findPercentActe($exercice->getAnnee());
-        $json_soins = json_encode([
-            'label' => array_keys($percentSoins),
-            'series' => array_values($percentSoins)
-        ]);
         
         return $this->render('dashboard/index.html.twig', [
             'congregations' => $json_congregation,
             'beneficiaires' => $json_beneficiaire,
             'prestations' => $json_prestations,
-            'soins' => $json_soins,
+            'soins' => $repoPre->findPercentActe($exercice),
+            'statPres' => $repoPre->findStatRemb($exercice),
+            'nbAdhPac' => $repo->findNbAdhAndPac($exercice),
+            'tauxAttente' => $repoPre->findTauxRemb($exercice),
         ]);
     }
 
@@ -222,7 +221,7 @@ class DashboardController extends AbstractController
         $exercice = $session->get('exercice');
         $header = ['N°', 'Congrégation', 'Anciens', 'Nouveaux', 'Montant due', 'Montant percue', 'Reste à payé'];   
         
-        $pdf = new PDFMutuelle();
+        $pdf = new Fpdf();
         $pdf->AliasNbPages();                     
         $pdf->AddPage('L', 'A4');
 
@@ -312,7 +311,7 @@ class DashboardController extends AbstractController
     public function printPdfRemboursement(SessionInterface $session, AdherentRepository $repo, CompteCotisationRepository $repoCot)
     {
         $exercice = $session->get('exercice');    
-        $pdf = new PDFMutuelle();
+        $pdf = new Fpdf();
         $pdf->AliasNbPages();                     
         $pdf->AddPage('L', 'A4');
 

@@ -13,6 +13,7 @@ class PDFMutuelle extends Fpdf {
         $this->subtitle = $subtitle;
     }
 
+    /*
     public function Header()
     {
         $this->RoundedRect(5, 5, 200, 30, 1);
@@ -34,7 +35,7 @@ class PDFMutuelle extends Fpdf {
         $this->Cell(70,5, $this->subtitle,0,0,'C');
         $this->Cell(60,5,'Date de tirage : '.date('d/m/Y'),0,1,'R'); // End
         $this->Cell(0,10,'',0,1);//end of line
-    }
+    }*/
 
     public function Footer()
     {

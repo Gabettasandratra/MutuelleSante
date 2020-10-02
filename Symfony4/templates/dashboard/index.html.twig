@@ -8,14 +8,92 @@
 
 {% block body %}
     <div class="row">
+            <!-- Earnings (Monthly) Card Example -->
+            <div class="col-xl-3 col-md-3 mb-4">
+              <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">congrégations</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{nbAdhPac.ad}}</div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-home fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Earnings (Monthly) Card Example -->
+            <div class="col-xl-3 col-md-3 mb-4">
+              <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-success text-uppercase mb-1">bénéficiaires</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{nbAdhPac.pac}}</div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Earnings (Monthly) Card Example -->
+            <div class="col-xl-3 col-md-3 mb-4">
+              <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Taux de remb </div>
+                      <div class="row no-gutters align-items-center">
+                        <div class="col-auto">
+                          <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{100*tauxAttente.taux}}%</div>
+                        </div>
+                        <div class="col">
+                          <div class="progress progress-sm mr-2">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: {{100*tauxAttente.taux}}%" aria-valuenow="{{100*tauxAttente.taux}}" aria-valuemin="0" aria-valuemax="100"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pending Requests Card Example -->
+            <div class="col-xl-3 col-md-3 mb-4">
+              <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Remb attente</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{tauxAttente.attente|number_format(2,',',' ')}} Ar</div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-hourglass-half fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+    <div class="row">
         {# Section des nombres de congregations #}
-        <div class="col-md-8 col-sm-12">
-            <div class="card">
+        <div class="col-md-6 col-sm-12">
+            <div class="card shadow">
                 <div class="card-body">
                     <div class="d-md-flex align-items-center">
                         <div>
-                            <h4 class="card-title">Effectif des Congrégations</h4>
-                            <h5 class="card-subtitle">Evolution</h5>
+                            <h5 class="card-title text-uppercase">Effectif des Congrégations</h5>
                         </div>
                         <div class="ml-auto d-flex no-block align-items-center">
                             <ul class="list-inline font-12 dl m-r-15 m-b-0">
@@ -31,15 +109,13 @@
                 </div>
             </div>
         </div>
-
-        {# Section des nombres de béneficiaire #}
-        <div class="col-md-8">
-            <div class="card">
+      {# Section des nombres de béneficiaire #}
+        <div class="col-md-6">
+            <div class="card shadow">
                 <div class="card-body">
                     <div class="d-md-flex align-items-center">
                         <div>
-                            <h4 class="card-title">Nombre Bénéficiaire</h4>
-                            <h5 class="card-subtitle"></h5>
+                            <h5 class="card-title text-uppercase">Nombre Bénéficiaire</h5>
                         </div>
                         <div class="ml-auto d-flex no-block align-items-center">
                             <ul class="list-inline font-12 dl m-r-15 m-b-0">
@@ -57,15 +133,17 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        {# Section des remboursements moyenne par bénéficiaires dans une exercice #}
+    {# Section des remboursements moyenne par bénéficiaires dans une exercice #}
+    <div class="row">
         <div class="col-md-8">
-            <div class="card">
+            <div class="card shadow">
                 <div class="card-body">
                     <div class="d-md-flex align-items-center">
                         <div>
-                            <h4 class="card-title">Coûts moyenne de remboursement</h4>
-                            <h5 class="card-subtitle">Année {{ app.session.get('exercice').annee }}</h5>
+                            <h5 class="card-title text-uppercase">Coûts moyenne de remboursement</h5>
+                            <h6 class="card-subtitle">Année {{ app.session.get('exercice').annee }}</h6>
                         </div>
                         <div class="ml-auto d-flex no-block align-items-center">
                             <ul class="list-inline font-12 dl m-r-15 m-b-0">
@@ -84,29 +162,64 @@
                 </div>
             </div>
         </div>
+        <div class="col-4">
+          <div class="card shadow">
+            <div class="card-body">
+              <h5 class="card-title text-uppercase">Prestation</h5>
+              <div class="row no-gutters align-items-center my-3 text-success">
+                <div class="col mr-2">
+                  <div class="text-xs font-weight-bold text-uppercase mb-1">Remboursé</div>
+                  <div class="h5 mb-0 font-weight-bold ">{{statPres.remb}}</div>
+                </div>
+                <div class="col-auto">
+                  <i class="fas fa-check-square fa-2x"></i>
+                </div>
+              </div>
+              <div class="row no-gutters align-items-center my-3 text-danger">
+                <div class="col mr-2">
+                  <div class="text-xs font-weight-bold  text-uppercase mb-1">Refusé</div>
+                  <div class="h5 mb-0 font-weight-bold">{{statPres.nonRemb}}</div>
+                </div>
+                <div class="col-auto">
+                  <i class="fas fa-ban fa-2x"></i>
+                </div>
+              </div>
+              <div class="row no-gutters align-items-center my-3 text-info">
+                <div class="col mr-2">
+                  <div class="text-xs font-weight-bold text-uppercase mb-1">En attente décision</div>
+                  <div class="h5 mb-0 font-weight-bold">{{statPres.nonDecide}}</div>
+                </div>
+                <div class="col-auto">
+                  <i class="fas fa-hourglass-half fa-2x"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
 
-        {# Section pourcentage des remboursements dans un exercice #}
+    {# Section pourcentage des remboursements dans un exercice #}
+    <div class="row">
         <div class="col-md-8">
-            <div class="card">
+            <div class="card shadow">
                 <div class="card-body">
                     <div class="d-md-flex align-items-center">
                         <div>
-                            <h4 class="card-title">Pourcentage des soins</h4>
-                            <h5 class="card-subtitle">Année {{ app.session.get('exercice').annee }}</h5>
-                        </div>
-                        <div class="ml-auto d-flex no-block align-items-center">
-                            <ul class="list-inline font-12 dl m-r-15 m-b-0">
-                                <li class="list-inline-item text-blue-chart"><i class="fa fa-circle"></i> Moyenne frais</li>
-                                <li class="list-inline-item text-red-chart"><i class="fa fa-circle"></i> Moyenne remb</li>
-                            </ul>
+                            <h5 class="card-title text-uppercase">Pourcentage des soins</h5>
+                            <h6 class="card-subtitle">Année {{ app.session.get('exercice').annee }}</h6>
                         </div>
                     </div>
                     <div class="row">
-                        <!-- column -->
-                        <div class="col-lg-7">
-                            <div id="soins" class="chart-pie ct-charts" style="height:200px;"></div>
+                        {% for soin in soins %}
+                        <div class="col-4 my-1">
+                          {{soin.description}}
                         </div>
-                        
+                        <div class="col-8 my-1">
+                          <div class="progress mb-2" style="height: 16px;">
+                            <div class="progress-bar bg-primary" role="progressbar" title="{{100*soin.value}}%" data-toggle="tooltip"{% if soin.value != 0 %}style="width:{{100*soin.value}}%"{% endif %} aria-valuenow="{{soin.value*100}}" aria-valuemin="0" aria-valuemax="100"><span class="font-12">{% if soin.value != 0 %}{{100*soin.value}}%{% endif %}</span></div>
+                          </div>     
+                        </div>                   
+                        {% endfor %}       
                     </div>
                 </div>
             </div>
@@ -128,10 +241,7 @@
         createChartLine('#beneficiaire', beneficiaires.label, [beneficiaires.series], 0, 500);
 
         var prestations = {{ prestations|raw }};
-        createChartBar('#prestation', prestations.label, prestations.series, 0, 100000);  
-
-        var soins = {{ soins|raw }};
-        createChartPie('#soins', soins.series);  
+        createChartBar('#prestation', prestations.label, prestations.series, 0, 100000);   
     });
     </script>
 {% endblock %}

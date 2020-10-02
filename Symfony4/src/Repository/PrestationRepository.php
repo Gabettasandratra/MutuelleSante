@@ -89,28 +89,60 @@ class PrestationRepository extends ServiceEntityRepository
         return $retour;  
     }
 
-    public function findPercentActe($annee)
+    public function findPercentActe($exercice)
     {
         # Total des prestations dans une anneé
-        $total = $this->_em->createQuery('select count(p) from App\Entity\Prestation p where year(p.date) = :year')
-                                ->setParameter('year', $annee)
+        $total = $this->_em->createQuery('select count(p) from App\Entity\Prestation p where p.date between :dateDebut and :dateFin')
+                                ->setParameter('dateDebut', $exercice->getDateDebut())
+                                ->setParameter('dateFin', $exercice->getDateFin())
                                 ->getSingleScalarResult();
         $listDesSoins = $this->_em->createQuery('select p.list from App\Entity\Parametre p where p.nom = \'soins_prestation\'')
                                 ->getOneOrNullResult();
         # A chaque soins
         $retour = [];
-        if (!$total) {
-            return $retour;
-        }
+        
         foreach ($listDesSoins['list'] as $code => $description) {
-            $nb = $this->_em->createQuery('select count(p) from App\Entity\Prestation p where year(p.date) = :year and p.designation = :code')
-                                ->setParameter('year', $annee)
+            $nb = $this->_em->createQuery('select count(p) from App\Entity\Prestation p where p.date between :dateDebut and :dateFin and p.designation = :code')
+                                ->setParameter('dateDebut', $exercice->getDateDebut())
+                                ->setParameter('dateFin', $exercice->getDateFin())
                                 ->setParameter('code', $code)
                                 ->getSingleScalarResult();
             
-            $retour[$code] = round($nb / $total, 4)* 100;
+            $value = ($total == 0)? 0: round($nb / $total, 4);
+            $retour[] = ['code'=>$code,'description'=>$description,'value'=>$value];
         }
-
         return $retour;
+    }
+
+    // utilisées seulement dans le dashboard
+    public function findTauxRemb($exercice)
+    {
+        //taux de remboursement moyenne, cela n'inclus pas les non remboursés
+        $taux =  $this->_em->createQuery('select sum(p.rembourse)/sum(p.frais) from App\Entity\Prestation p where p.status = 1 and p.date between :dateDebut and :dateFin')
+                            ->setParameter('dateDebut', $exercice->getDateDebut())
+                            ->setParameter('dateFin', $exercice->getDateFin())
+                            ->getSingleScalarResult();   
+        $enAttente =  $this->_em->createQuery('select sum(p.rembourse) from App\Entity\Prestation p where p.status = 1 and p.isPaye = false and p.date between :dateDebut and :dateFin')
+                                ->setParameter('dateDebut', $exercice->getDateDebut())
+                                ->setParameter('dateFin', $exercice->getDateFin())
+                                ->getSingleScalarResult();
+        return ['taux'=>$taux, 'attente'=>$enAttente];
+    }
+
+    public function findStatRemb($exercice)
+    {
+        $remb = $this->_em->createQuery('select count(p) from App\Entity\Prestation p where p.status = 1 and p.date between :dateDebut and :dateFin')
+                            ->setParameter('dateDebut', $exercice->getDateDebut())
+                            ->setParameter('dateFin', $exercice->getDateFin())
+                            ->getSingleScalarResult();
+        $nonRemb = $this->_em->createQuery('select count(p) from App\Entity\Prestation p where p.status = -1 and p.date between :dateDebut and :dateFin')
+                            ->setParameter('dateDebut', $exercice->getDateDebut())
+                            ->setParameter('dateFin', $exercice->getDateFin())
+                            ->getSingleScalarResult();
+        $nonDecide = $this->_em->createQuery('select count(p) from App\Entity\Prestation p where p.status = 0 and p.date between :dateDebut and :dateFin')
+                            ->setParameter('dateDebut', $exercice->getDateDebut())
+                            ->setParameter('dateFin', $exercice->getDateFin())
+                            ->getSingleScalarResult();   
+        return ['remb'=>$remb,'nonRemb'=>$nonRemb,'nonDecide'=>$nonDecide];                    
     }
 }

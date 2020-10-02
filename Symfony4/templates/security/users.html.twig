@@ -65,6 +65,45 @@
                 </div>
             </div>
 
+            <div class="card shadow mb-4">
+                <!-- Card Header - Accordion -->
+                <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                    <h6 class="m-0 font-weight-bold">Ajouter nouveau utilisateur</h6>
+                </a>
+                <!-- Card Content - Collapse -->
+                <div class="collapse show" id="collapseCardExample" style="">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                {{ form_start(form) }}
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {{ form_row(form.username, { label: "Login *" }) }}
+                                        {{ form_row(form.nom, { label: "Nom *" }) }}
+                                        {{ form_row(form.prenom, { label: "Prénom *" }) }}
+                                        {{ form_row(form.email, { label: "Email" }) }}
+                                        {{ form_row(form.phone, { label: "Numero téléphone *" }) }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form_row(form.password, { label: "Mot de passe *" }) }}
+                                        {{ form_row(form.confirm_password, { label: "Confirmation mot de passe *" }) }}
+                                        {{ form_row(form.fonction, { label: "Rôle dans la Mutuelle" }) }}
+                                        {{ form_row(form.photo, { label: "Photo de profil" }) }}
+                                    </div>
+                                </div>                      
+                                <div class="form-row">
+                                    <div class="col-12 text-right">
+                                        <button type="submit" class="btn btn-success"><i class="ti-save"></i> Enregistrer</button>
+                                    </div>
+                                </div>                                                     
+                                {{ form_end(form) }}
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {#
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Nouveau utilisateur</h4>
@@ -97,7 +136,7 @@
                         
                     </div>
                 </div>
-            </div>
+            </div>#}
         </div>
     </div>
 {% endblock %}

@@ -223,7 +223,7 @@ class ExportExcel
         $spreadsheet = new Spreadsheet();
         // Feuille 1
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('Détail remboursements '. $remboursement->getDate()->format('d_m_Y'));
+        $sheet->setTitle('Remb '. $remboursement->getDate()->format('d_m_Y'));
   
         $prestations = $remboursement->getPrestations();
 
@@ -263,16 +263,16 @@ class ExportExcel
     /*
      * Exportation journaux comptable
      */
-    public function exportJournaux($in = null)
+    public function exportJournaux()
     {
-        $codes = $this->manager->getRepository(Compte::class)->findCodeJournaux($in);
+        $codes = $this->manager->getRepository(Compte::class)->findCodeJournaux();
 
         $exercice = $this->session->get('exercice');
         $spreadsheet = new Spreadsheet();
         // Données
         $key = 0;
-        foreach ($codes as $code) {       
-            $articles = $this->manager->getRepository(Article::class)->findJournal($exercice, $code['codeJournal']);
+        foreach ($codes as $code) {  
+            $articles = $this->manager->getRepository(Article::class)->findJournal( $code['codeJournal'], $exercice->getDateDebut(), $exercice->getDateFin());
             if ($articles) {
                 if ($key != 0) {
                     $spreadsheet->createSheet();
@@ -303,9 +303,9 @@ class ExportExcel
             }
         }
 
-        $this->autoSizeColumns($spreadsheet);    
+        //$this->autoSizeColumns($spreadsheet);    
 
-        $filename = 'Journal '. $in.' '. $exercice->getAnnee() .'.xlsx';
+        $filename = 'Journaux comptables '. $exercice->getAnnee() .'.xlsx';
      
         return $this->saveTemp($spreadsheet, $filename);
     }
@@ -391,7 +391,7 @@ class ExportExcel
         $exercice = $this->session->get('exercice');
         $spreadsheet = new Spreadsheet();
         // Données
-        $balances = $this->manager->getRepository(Article::class)->findBalance($exercice);
+        $balances = $this->manager->getRepository(Article::class)->findBalance($exercice->getDateDebut(),$exercice->getDateFin());
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Balance des comptes '. $exercice->getAnnee());
   
@@ -405,7 +405,7 @@ class ExportExcel
             $sheet->setCellValueByColumnAndRow(1, $row, $classe)
                     ->getStyle('A'.$row)->getFont()->setBold(true);
 
-            $totalDebit = 0; $totalCredit = 0;
+            $totalDebit = 0; $totalCredit = 0; $totalSoldeD = 0; $totalSoldeC = 0;
             foreach ($comptes as $compte) {   
                 $row++;              
                 $sheet->setCellValueByColumnAndRow(1, $row, $compte['poste'])
@@ -421,20 +421,18 @@ class ExportExcel
                         ->getStyle('D'.$row)
                         ->getNumberFormat()
                         ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-
-                $solde_debiteur = ($compte['solde'] >= 0) ? $compte['solde'] : 0 ;
-                $solde_crediteur = ($compte['solde'] >= 0) ? 0 : $compte['solde'];
-                $sheet->setCellValueByColumnAndRow(5, $row, $solde_debiteur)
+                $sheet->setCellValueByColumnAndRow(5, $row, $compte['soldeD'])
                         ->getStyle('E'.$row)
                         ->getNumberFormat()
                         ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-                $sheet->setCellValueByColumnAndRow(6, $row, abs($solde_crediteur))
+                $sheet->setCellValueByColumnAndRow(6, $row, $compte['soldeC'])
                         ->getStyle('F'.$row)
                         ->getNumberFormat()
                         ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-                
                 $totalDebit += $compte['debit'];
                 $totalCredit += $compte['credit'];
+                $totalSoldeD += $compte['soldeD'];
+                $totalSoldeC += $compte['soldeC'];
             }
 
             $row++;
@@ -451,13 +449,11 @@ class ExportExcel
                         ->getStyle('D'.$row)
                         ->getNumberFormat()
                         ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-            $t_debiteur = (($totalDebit - $totalCredit) >= 0) ? ($totalDebit - $totalCredit) : 0 ;
-            $t_crediteur = (($totalDebit - $totalCredit) >= 0) ? 0 : ($totalDebit - $totalCredit);
-            $sheet->setCellValueByColumnAndRow(5, $row, $t_debiteur)
+            $sheet->setCellValueByColumnAndRow(5, $row, $totalSoldeD)
                         ->getStyle('E'.$row)
                         ->getNumberFormat()
                         ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-            $sheet->setCellValueByColumnAndRow(6, $row, abs($t_crediteur))
+            $sheet->setCellValueByColumnAndRow(6, $row, $totalSoldeC)
                         ->getStyle('F'.$row)
                         ->getNumberFormat()
                         ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);

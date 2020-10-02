@@ -130,4 +130,17 @@ class AdherentRepository extends ServiceEntityRepository
         }
         return $retour;      
     }
+
+
+    // seuelement utiliser dans le tableau de bord
+    public function findNbAdhAndPac(Exercice $exercice)
+    {
+        $nbAd = $this->_em->createQuery('select count(a) from App\Entity\Adherent a where a.dateInscription <= :dateFin')
+                        ->setParameter('dateFin', $exercice->getDateFin())
+                        ->getSingleScalarResult();
+        $nbPac = $this->_em->createQuery('select count(p) from App\Entity\Pac p where p.dateEntrer <= :dateFin and p.isSortie = false')
+                        ->setParameter('dateFin', $exercice->getDateFin())
+                        ->getSingleScalarResult();
+        return ['ad' => $nbAd, 'pac' => $nbPac];
+    }
 }

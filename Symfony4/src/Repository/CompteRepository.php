@@ -74,7 +74,7 @@ class CompteRepository extends ServiceEntityRepository
         if ($in) {
             foreach ($retour as $code) {
                 if ($code['codeJournal'] == $in) {
-                    return $code;
+                    return [$code];
                 }
             }
         }

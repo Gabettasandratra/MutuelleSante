@@ -109,3 +109,7 @@ ul.border-bottom-white li {
 .pre-space {
     white-space: pre;
 }
+
+.progress {
+    background-color: #d3d4d4;
+}

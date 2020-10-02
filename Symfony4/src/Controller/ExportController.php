@@ -55,11 +55,11 @@ class ExportController extends AbstractController
     }
 
     /**
-     * @Route("/export/rapport/journal/{code}", name="export_rapport_journal")
+     * @Route("/export/rapport/journal", name="export_rapport_journal")
      */
-    public function rapportJournal($code = null, ExportExcel $exportService)
+    public function rapportJournal(ExportExcel $exportService)
     {
-        $filename = $exportService->exportJournaux($code);
+        $filename = $exportService->exportJournaux();
         $filePath = $this->getParameter('export_temp_root_directory').'/'.$filename;
 
         return $this->file($filePath, $filename, ResponseHeaderBag::DISPOSITION_INLINE);

@@ -48,7 +48,6 @@
                                             <td>{{ compte.solde|number_format(2,',',' ') }}</td>
                                             <td>
                                                 <a href="{{ path('tresorerie_edit', {'id': compte.id}) }}" class="label  label-rounded btn-info label-info">Editer</a>
-                                                <a href="{{ path('comptabilite_journal', {'journal': compte.codeJournal}) }}" class="label  label-rounded btn-success label-success">Journal</a>                                                  
                                                 {% if compte.isCheque %}<a href="{{ path('tresorerie_cheque', {'id': compte.id}) }}" class="label  label-rounded btn-primary label-primary">Gérer les chèques</a>{% endif %}
                                             </td>           
                                         </tr>
