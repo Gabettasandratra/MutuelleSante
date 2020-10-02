@@ -38,4 +38,21 @@ class PacRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+
+    public function findByDateEnter($periode, Adherent $adherent = null)
+    {
+        $dql = 'select p from App\Entity\Pac p where p.dateEntrer between :deb and :fin';
+        if ($adherent) { 
+            $dql = $dql. ' and p.adherent = :ad';
+            return $this->_em->createQuery($dql)
+                        ->setParameter('deb', $periode['debut'])
+                        ->setParameter('fin', $periode['fin'])
+                        ->setParameter('ad', $adherent)
+                        ->getResult();
+        }
+        return $this->_em->createQuery($dql)
+                        ->setParameter('deb', $periode['debut'])
+                        ->setParameter('fin', $periode['fin'])
+                        ->getResult();
+    }
 }

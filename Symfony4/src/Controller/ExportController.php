@@ -8,9 +8,11 @@ use App\Pdf\PDFMutuelle;
 use App\Service\ExportExcel;
 use App\Entity\Remboursement;
 use App\Service\ConfigEtatFi;
+use App\Repository\PacRepository;
 use App\Repository\CompteRepository;
 use App\Repository\ArticleRepository;
 use App\Repository\AdherentRepository;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -123,15 +125,18 @@ class ExportController extends AbstractController
     /**
      * @Route("/pdf/adhesion/congregations", name="pdf_congregations")
      */
-    public function pdfCongregation(SessionInterface $session, AdherentRepository $repo)
+    public function pdfCongregation(SessionInterface $session, AdherentRepository $repo, Request $request)
     {
         $exercice = $session->get('exercice');
-        $periode = ['debut' => $exercice->getDateDebut(), 'fin' => $exercice->getDateFin()];
+        $fin = $request->query->get('fin');
+        $type = $request->query->get('type');
 
+        // Recupere la date de debut et fin
         $periode['debut'] = \DateTime::createFromFormat('dmY', '01011900');
+        $periode['fin'] = \DateTime::createFromFormat('d/m/Y', $fin);
         $congs = $repo->findDateInscription($periode['debut'], $periode['fin']);
 
-        $pdf = new PDFMutuelle($periode, "Congrégation");
+        $pdf = new PDFMutuelle($periode, "Liste des congrégations");
         $pdf->AliasNbPages();
         $pdf->AddPage('L', 'A4');
         
@@ -145,21 +150,30 @@ class ExportController extends AbstractController
     }
 
     /**
-     * @Route("/pdf/adhesion/beneficiaires", name="pdf_beneficiaire")
+     * @Route("/pdf/adhesion/beneficiaires", name="pdf_beneficiaires")
      */
-    public function pdfBeneficiaires(SessionInterface $session, AdherentRepository $repo)
+    public function pdfBeneficiaires(SessionInterface $session, AdherentRepository $repoAdh, PacRepository $repoPac, Request $request)
     {
         $exercice = $session->get('exercice');
-        $periode = ['debut' => $exercice->getDateDebut(), 'fin' => $exercice->getDateFin()];
+        $fin = $request->query->get('fin');
+        $deb = $request->query->get('deb');
+        $type = $request->query->get('type');
 
-        $periode['debut'] = \DateTime::createFromFormat('dmY', '01011900');
-        $congs = $repo->findDateInscription($periode['debut'], $periode['fin']);
+        $idAdherent = $request->query->get('adherent');
+        $adherent = null;
+        if ($idAdherent !== "all") {
+            $adherent = $repoAdh->find((int)$idAdherent);
+        }
 
-        $pdf = new PDFMutuelle($periode, "Congrégation");
+        $periode['fin'] = \DateTime::createFromFormat('d/m/Y', $fin);
+        $periode['debut'] = \DateTime::createFromFormat('d/m/Y', $deb);
+        $benefs = $repoPac->findByDateEnter($periode, $adherent);
+
+        $pdf = new PDFMutuelle($periode, "Liste de bénéficiaire");
         $pdf->AliasNbPages();
-        $pdf->AddPage('L', 'A4');
+        $pdf->AddPage('P', 'A4');
         
-        $pdf->adhesionTable($congs);
+        $pdf->beneficiaireTable($benefs);
 
         return new Response(
             $pdf->Output('file.pdf', 'I'),

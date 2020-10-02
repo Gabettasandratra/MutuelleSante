@@ -140,28 +140,28 @@ class PDFMutuelle extends Fpdf {
         $this->SetX(5);
         $this->SetFont('Arial','B',10);
 
-        $this->Cell(15,8,'N°Matr', 1,0, 'C');
-        $this->Cell(75,8,'Nom & prénom', 'TBR',0, 'C');
-        $this->Cell(4,8,'Genre', 'TBR',0, 'C');
-        $this->Cell(17,8,'Date Nais', 'TBR',0, 'C');
-        $this->Cell(60,8,'Tél', 'TBR',0, 'C');
-        $this->Cell(40,8,'CIN', 'TBR',0, 'C');
-        $this->Cell(60,8,'Date entré', 'TBR',1, 'C');
+        $this->Cell(17,8,'N°Matri', 1,0, 'C');
+        $this->Cell(70,8,'Nom & prénom', 'TBR',0, 'C');
+        $this->Cell(8,8,'G', 'TBR',0, 'C');
+        $this->Cell(20,8,'Date Nais', 'TBR',0, 'C');
+        $this->Cell(30,8,'Tél', 'TBR',0, 'C');
+        $this->Cell(35,8,'CIN', 'TBR',0, 'C');
+        $this->Cell(20,8,'Date entré', 'TBR',1, 'C');
         
         // Donnees
         $this->SetFont('Arial','',9);
         foreach ($beneficiaires as $ben) {
             $this->SetX(5);
-            $this->Cell(15,7, $ben->getMatricule(), 'LR',0, 'C');
-            $this->Cell(75,7, $ben->getNomComplet(), 'LR',0, 'L');
-            $this->Cell(4,7, $ben->getSexe()[0], 'LR',0, 'C');
-            $this->Cell(17,7, $ben->getDateNaissance()->format('d/m/Y'), 'LR',0, 'C');
-            $this->Cell(60,7, $ben->getTel(), 'LR',0, 'L');
-            $this->Cell(40,7, $ben->getCin(), 'LR',0, 'L');
-            $this->Cell(60,7, $ben->getDateEntrer()->format('d/m/Y'), 'LR',1, 'L');
+            $this->Cell(17,7, $ben->getMatricule(), 'LR',0, 'C');
+            $this->Cell(70,7, $ben->getNomComplet(), 'R',0, 'L');
+            $this->Cell(8,7, $ben->getSexe()[0], 'R',0, 'C');
+            $this->Cell(20,7, $ben->getDateNaissance()->format('d/m/Y'), 'R',0, 'C');
+            $this->Cell(30,7, $ben->getTel(), 'R',0, 'L');
+            $this->Cell(35,7, $ben->getCin(), 'R',0, 'L');
+            $this->Cell(20,7, $ben->getDateEntrer()->format('d/m/Y'), 'R',1, 'C');
         }
 
         $this->SetX(5);
-        $this->Cell(287,1,'','T',1);
+        $this->Cell(200,1,'','T',1);
     }
 }

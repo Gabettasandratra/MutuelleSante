@@ -29,7 +29,7 @@
                         <div class="col-md-6">
                             <div class="list-group list-group-flush">
                                 <a href="#modal-adhesion" data-toggle="modal" class="list-group-item">Liste des congrégations adhérées</a>
-                                <a class="list-group-item">Liste des bénéficiaires</a>
+                                <a href="#modal-benef" data-toggle="modal" class="list-group-item">Liste des bénéficiaires</a>
                                 <a class="list-group-item">Liste des bénéficiaires retirés</a>
                             </div>
                         </div>
@@ -43,32 +43,95 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Rapport d'adhésion</h4>
+                    <h4 class="modal-title">Rapport de liste de congrégation</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form id="prestation" action="">
+                <form id="prestation" action="{{ path('pdf_congregations') }}" method="get">
                     <div class="modal-body">
                         <div class="row">                                                  
                             <div class="col-12">
                                     <div class="form-group row">
-                                        <label for="rapport_date_deb" class="col-form-label col-sm-6 required">Date d'adhésion entre</label>
+                                        <label for="rapport_date_fin" class="col-form-label col-sm-6 required">Adhéré jusqu'à</label>
                                         <div class="col-sm-6">
-                                            <input type="text" id="rapport_date_deb" name="rapport[date_deb]" autocomplete="off" required="required" class="form-control datepicker" auto-fill="false">
+                                            <input type="text" id="rapport_date_fin" name="fin" value="{{ app.session.get('exercice').dateFin|date('d/m/Y') }}" autocomplete="off" required="required" class="form-control datepicker" auto-fill="false">
                                         </div>
                                     </div>
-                                    <div class="form-group row">
-                                        <label for="rapport_date_fin" class="col-form-label col-sm-6 required">Au</label>
-                                        <div class="col-sm-6">
-                                            <input type="text" id="rapport_date_fin" name="rapport[date_fin]" autocomplete="off" required="required" class="form-control datepicker" auto-fill="false">
+                                    <div class="form-group">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="type" id="inlineCheckbox1" value="pdf">
+                                            <label class="form-check-label" for="inlineCheckbox1">PDF</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="type" id="inlineCheckbox2" value="excel">
+                                            <label class="form-check-label" for="inlineCheckbox2">Excel</label>
                                         </div>
                                     </div>
-                                    
                                     <div class="form-row btn-list">
                                         <div class="col-12 text-right">
                                             <button type="reset" class="btn btn-danger mr-3" data-dismiss="modal" id="fermer"><i class="mdi mdi-close-circle-outline"></i> Fermer</button>
                                             <button type="submit" class="btn btn-info" id="Ajouter"><i class="mdi mdi-login-variant"></i> Ajouter</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>                       
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-benef" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Rapport liste de bénéficiaire</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="prestation" action="{{ path('pdf_beneficiaires') }}" method="get">
+                    <div class="modal-body">
+                        <div class="row">                                                  
+                            <div class="col-12">
+                                    <div class="form-group row">
+                                        <label for="adherents" class=" col-form-label col-sm-3 required">Congrégation </label>
+                                        <div class="col-sm-9">
+                                            <select name="adherent" id="adherents" required="required" class="form-control">
+                                                <option value="all" selected>Tous</option>
+                                                {% for adherent in adherents %}
+                                                    <option value="{{ adherent.id }}">{{ adherent.nom }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="rapport_date_deb" class="col-form-label col-sm-6 required">Inscrit entre la date de </label>
+                                        <div class="col-sm-6">
+                                            <input type="text" id="rapport_date_deb" name="deb" value="{{ app.session.get('exercice').dateDebut|date('d/m/Y') }}" autocomplete="off" required="required" class="form-control datepicker" auto-fill="false">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="rapport_date_fin" class="col-form-label col-sm-6 required"> et</label>
+                                        <div class="col-sm-6">
+                                            <input type="text" id="rapport_date_fin" name="fin" value="{{ app.session.get('exercice').dateFin|date('d/m/Y') }}" autocomplete="off" required="required" class="form-control datepicker" auto-fill="false">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="type" id="inlineCheckbox1" value="pdf">
+                                            <label class="form-check-label" for="inlineCheckbox1">PDF</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="type" id="inlineCheckbox2" value="excel">
+                                            <label class="form-check-label" for="inlineCheckbox2">Excel</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-row btn-list">
+                                        <div class="col-12 text-right">
+                                            <button type="reset" class="btn btn-danger mr-3" data-dismiss="modal" id="fermer"><i class="mdi mdi-close-circle-outline"></i> Fermer</button>
+                                            <button type="submit" class="btn btn-info" id="Ajouter"><i class="mdi mdi-login-variant"></i> Valider</button>
                                         </div>
                                     </div>
                                 </form>

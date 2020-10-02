@@ -135,9 +135,11 @@ class AdhesionController extends AbstractController
      * @Route("/adhesion/rapport", name="adhesion_rapport")
      * Rapport sur les adhérés
      */
-    public function rapportAdhesion()
+    public function rapportAdhesion(AdherentRepository $repo)
     {
-        return $this->render('adhesion/rapportAdhesion.html.twig');       
+        return $this->render('adhesion/rapportAdhesion.html.twig', [
+            'adherents' => $repo->findAll()
+        ]);       
     }
 
     /**
