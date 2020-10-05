@@ -113,3 +113,7 @@ ul.border-bottom-white li {
 .progress {
     background-color: #d3d4d4;
 }
+
+.datepicker {
+    padding: 6px;
+}

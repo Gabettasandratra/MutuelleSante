@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Saisie standard{% endblock %}
+
+{% block header %}
+    <div class="page-breadcrumb">
+        <div class="d-flex align-items-center">
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0"></h4>
+            <div class="ml-auto">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0 p-0">
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Comptabilité</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Saisie</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% form_theme form 'bootstrap_4_layout.html.twig' %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Saisie d'ecriture comptable</h4>
+                    <hr>
+                    {{ form_start(form) }}
+                    <div class="row"> 
+                        <div class="col-md-3">{{ form_row(form.categorie, { label: 'Journal'}) }}</div>
+                        <div class="col-md-3">{{ form_row(form.date) }}</div>
+                        <div class="offset-md-2 col-md-4">{{ form_row(form.piece, { label: 'N° de pièce',attr:{placeholder:"Réference"}}) }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">{{ form_row(form.montant) }}</div>
+                        <div class="col-md-9">{{ form_row(form.libelle, { label: 'Libellé',attr:{placeholder:"Description de l'opération"}}) }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">{{ form_row(form.compteDebit,{ label: 'N° de compte débit'}) }}</div>
+                        <div class="col-md-6">{{ form_row(form.compteCredit,{ label: 'N° de compte crédit'}) }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="offset-md-6 col-md-6">{{ form_row(form.analytique,{ label: 'Destination'}) }}</div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-12 text-right">
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-check-circle" aria-hidden="true"></i> Enregistrer</button>
+                        </div>
+                    </div>
+
+                    {{ form_end(form) }}
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

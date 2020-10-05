@@ -37,7 +37,7 @@
 
                     <hr>                           
                     <div class="row">
-                        <table class="table table-hover border no-padding">
+                        <table class="table table-hover border no-padding" id="scroll_ver">
                             <thead class="thead-light">
                                 <tr>
                                     <th scope="col" style="width: 5%">Date</th>
@@ -85,4 +85,8 @@
             </div>
         </div>
     </div>
+{% endblock %}
+{% block javascripts %}
+<script src="{{ asset('assets/libs/datatable/dist/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('dist/js/pages/datatable/datatable-basic.init.js') }}"></script>
 {% endblock %}

@@ -1,315 +1,516 @@
 <!DOCTYPE html>
 <html dir="ltr">
 
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <!-- Tell the browser to be responsive to screen width -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    {% block meta %}
-        <meta name="description" content="">
-        <meta name="author" content="Sandratra Ny Aina Rakotomalala">
-    {% endblock %}
-    <!-- Favicon icon -->
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('assets/images/favicon.png') }}">
-    <title>{% block title %}{% endblock %}</title>
-    
-    <link href="{{ asset('dist/css/style.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('dist/css/custom.css') }}" rel="stylesheet">
-    <link href="{{ asset('dist/css/bootstrap-datepicker.css') }}" rel="stylesheet">
-    <!-- Custom CSS -->
-    {% block stylesheets %}{% endblock %}
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-<![endif]-->
-</head>
+	<head>
+		<meta charset="utf-8">
+		<meta
+		http-equiv="X-UA-Compatible" content="IE=edge">
+		<!-- Tell the browser to be responsive to screen width -->
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		{% block meta %}
+			<meta name="description" content="">
+			<meta name="author" content="Sandratra Ny Aina Rakotomalala">
+		{% endblock %}
+		<!-- Favicon icon -->
+		<link rel="icon" type="image/png" sizes="16x16" href="{{ asset('assets/images/favicon.png') }}">
+		<title>
+			{% block title %}{% endblock %}
+		</title>
 
-<body>
-    <div class="preloader">
-        <div class="lds-ripple">
-            <div class="lds-pos"></div>
-            <div class="lds-pos"></div>
-        </div>
-    </div>
-        
-    <div id="main-wrapper" data-layout="vertical" data-navbarbg="skin5" data-sidebartype="full" data-sidebar-position="absolute" data-header-position="absolute" data-boxed-layout="full">
-        
-        {% block topbar %}
-            <header class="topbar" data-navbarbg="skin5">
-                <nav class="navbar top-navbar navbar-expand-md navbar-dark">
-                    <div class="navbar-header" data-logobg="skin5">
-                        <a class="navbar-brand" href="index.html">
-                            <!-- Logo icon -->
-                            <b class="logo-icon">
-                                <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
-                                <!-- Dark Logo icon -->
-                                <img src="{{ asset('assets/images/logo-icon.png') }}" alt="homepage" class="dark-logo" />
-                                <!-- Light Logo icon -->
-                                <img src="{{ asset('assets/images/logo-light-icon.png') }}" alt="homepage" class="light-logo" />
-                            </b>
-                            <!--End Logo icon -->
-                            <!-- Logo text -->
-                            <span class="logo-text">
-                                <!-- dark Logo text -->
-                                <img src="{{ asset('uploads/img/mutuelle-3.png') }}" alt="homepage" class="dark-logo" />
-                                <!-- Light Logo text -->    
-                                <img src="{{ asset('uploads/img/mutuelle-light-3.png') }}" class="light-logo" alt="homepage" />
-                            </span>
-                        </a>
-                       
-                        <!-- This is for the sidebar toggle which is visible on mobile only -->
-                        <a class="nav-toggler waves-effect waves-light d-block d-md-none" href="javascript:void(0)"><i class="ti-menu ti-close"></i></a>
-                    </div>
-                    <!-- ============================================================== -->
-                    <!-- End Logo -->
-                    <!-- ============================================================== -->
-                    <div class="navbar-collapse collapse" id="navbarSupportedContent" data-navbarbg="skin5">
-                        <!-- ============================================================== -->
-                        <!-- toggle and nav items -->
-                        <!-- ============================================================== -->
-                        <ul class="navbar-nav float-left mr-auto">
-                            
-                        </ul>
-                        <!-- ============================================================== -->
-                        <!-- Right side toggle and nav items -->
-                        <!-- ============================================================== -->
-                        <ul class="navbar-nav float-right">
-                            {% if app.user %} 
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark pro-pic" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="{{ asset(app.user.photo) }}" alt="user" class="rounded-circle" width="35" style="background-color: white;"></a>
-                                    <div class="dropdown-menu dropdown-menu-right user-dd animated">
-                                        <a class="dropdown-item" href="{{ path('user_profile', {id: app.user.id}) }}"><i class="fa fa-user m-r-5 m-l-5"></i> Mon Profil</a>
-                                        <a class="dropdown-item" href="{{ path('app_logout') }}"><i class="fa fa-power-off m-r-5 m-l-5"></i> Se deconnecter</a>
-                                    </div>
-                                </li>     
-                            {% endif %} 
-                            
-                        </ul>
-                    </div>
-                </nav>
-            </header>
-            <!-- ============================================================== -->
-            <!-- End Topbar header -->
-            <!-- ============================================================== -->
-        {% endblock %}
+		<link href="{{ asset('dist/css/style.min.css') }}" rel="stylesheet">
+		<link href="{{ asset('dist/css/bootstrap-datepicker.css') }}" rel="stylesheet">
+		<link href="{{ asset('dist/css/custom.css') }}" rel="stylesheet">
+		
+		<!-- Custom CSS -->
+		{% block stylesheets %}{% endblock %}
+		<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+																				    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+																				    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+																				<![endif]-->
+	</head>
 
-        
-        <!-- ============================================================== -->
-        <!-- Left Sidebar - style you can find in sidebar.scss  -->
-        <!-- ============================================================== -->
-        <aside class="left-sidebar" data-sidebarbg="skin6">
-            <!-- Sidebar scroll-->
-            <div class="scroll-sidebar">
-                <!-- Sidebar navigation-->
-                <nav class="sidebar-nav">
-                    <ul id="sidebarnav">
-                        <li>
-                            <!-- User Profile-->
-                            <div class="user-profile d-flex no-block dropdown m-t-20">
-                                <div class="user-pic"><img src="{{ asset(app.user.photo) }}" alt="users" class="rounded-circle" width="40" /></div>
-                                <div class="user-content hide-menu m-l-10">
-                                    <a href="javascript:void(0)" class="" id="Userdd" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <h5 class="m-b-0 user-name font-medium">{{ app.user.username }} <i class="fa fa-angle-down"></i></h5>
-                                        <span class="op-5 user-email">{{ app.user.fonction|title }}</span>
-                                    </a>
-                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="Userdd">
-                                        <a class="dropdown-item" href="{{ path('user_profile', {id: app.user.id}) }}"><i class="ti-user m-r-5 m-l-5"></i> Mon Profil</a>
-                                        <a class="dropdown-item" href="javascript:void(0)"><i class="ti-wallet m-r-5 m-l-5"></i> My Balance</a>
-                                        <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item" href="javascript:void(0)"><i class="ti-settings m-r-5 m-l-5"></i> Account Setting</a>
-                                        <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item" href="{{ path('app_logout') }}"><i class="fa fa-power-off m-r-5 m-l-5"></i> Se deconnecter</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- End User Profile-->
-                        </li>
+	<body>
+		<div class="preloader">
+			<div class="lds-ripple">
+				<div class="lds-pos"></div>
+				<div class="lds-pos"></div>
+			</div>
+		</div>
 
-                        {% block sidebarMenu %}
-                        <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ path('dashboard') }}"><i class="mdi mdi-view-dashboard"></i><span class="hide-menu"> Tableau de bord</span></a></li>
-                        {% if is_granted('ROLE_GESTIONNAIRE') %}
-                            <li class="nav-small-cap"><span class="hide-menu">Gestion mutuelle</span></li>
-                            <li class="sidebar-item"> 
-                                <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-account-multiple"></i><span class="hide-menu"> Adhesion </span></a>
-                                <ul aria-expanded="false" class="pl-2 collapse first-level">
-                                    {% if app.session.get('exercice') and app.session.get('exercice').isCurrent and not app.session.get('exercice').isCloture %}
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('adhesion_new') }}" class="sidebar-link"><i class="mdi mdi-account-plus"></i><span class="hide-menu"> Inscrire congrégation </span></a></li>
-                                    {% endif %}
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('adhesion') }}" class="sidebar-link"><i class="mdi mdi-account-search"></i><span class="hide-menu"> Fiche d'adhésion </span></a></li>
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('adhesion_beneficiaires') }}" class="sidebar-link"><i class="mdi mdi-format-list-bulleted"></i><span class="hide-menu"> Liste béneficiaires </span></a></li>
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('adhesion_rapport') }}" class="sidebar-link"><i class="mdi mdi-newspaper"></i><span class="hide-menu"> Rapport d'adhésion </span></a></li>
-                                </ul>
-                            </li>
-                        
-                            <li class="sidebar-item"> 
-                                <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-calculator"></i><span class="hide-menu"> Cotisation </span></a>
-                                <ul aria-expanded="false" class="pl-2 collapse first-level">
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('cotisation') }}" class="sidebar-link"><i class="mdi mdi-calendar-check"></i><span class="hide-menu"> Fiche de cotistation </span></a></li>
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('export_rapport_cotisations') }}" class="sidebar-link"><i class="mdi mdi-newspaper"></i><span class="hide-menu"> Rapport de cotisation </span></a></li>
-                                </ul>
-                            </li>
-                            <li class="sidebar-item"> 
-                                <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-security-home"></i><span class="hide-menu"> Prestation </span></a>
-                                <ul aria-expanded="false" class="pl-2 collapse first-level">
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('prestation') }}" class="sidebar-link"><i class="mdi mdi-verified"></i><span class="hide-menu"> Prestation béneficiaire </span></a></li>
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('prestation_adherent') }}" class="sidebar-link"><i class="mdi mdi-clipboard-outline"></i><span class="hide-menu"> Fiche de prestation</span></a></li>
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('export_rapport_prestations') }}" class="sidebar-link"><i class="mdi mdi-newspaper"></i><span class="hide-menu"> Rapport de prestation </span></a></li>
-                                </ul>
-                            </li>
-                        {% endif %}
-                        {% if is_granted('ROLE_COMPTABLE') %}
-                            <li class="nav-small-cap"><span class="hide-menu">Gestion fincancière</span></li>
-                            <li class="sidebar-item"> 
-                                <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-keyboard"></i><span class="hide-menu"> Saisie des écritures </span></a>
-                                <ul aria-expanded="false" class="pl-2 collapse first-level">
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="#modal-journaux" data-toggle="modal" data-backdrop="static" class="sidebar-link"><i class="mdi mdi-pen"></i><span class="hide-menu"> Saisie des écritures </span></a></li>
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('comptabilite_plan') }}" class="sidebar-link"><i class="mdi mdi-view-list"></i><span class="hide-menu"> Plan comptable </span></a></li>
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('tresorerie') }}" class="sidebar-link"><i class="mdi mdi-bank"></i><span class="hide-menu"> Trésorerie</span></a></li>                                
-                                </ul>
-                            </li>
-                            <li class="sidebar-item"> 
-                                <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-cash-multiple"></i><span class="hide-menu"> Etats comptables </span></a>
-                                <ul aria-expanded="false" class="pl-2 collapse first-level">
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="#modal-journaux" data-toggle="modal" data-backdrop="static" class="sidebar-link"><i class="mdi mdi-clipboard-outline"></i><span class="hide-menu"> Journal </span></a></li>
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="#modal-livre" data-toggle="modal" data-backdrop="static" class="sidebar-link"><i class="mdi mdi-book-open-page-variant"></i><span class="hide-menu"> Grand livre </span></a></li>
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('comptabilite_balance') }}" class="sidebar-link"><i class="mdi mdi-scale-balance"></i><span class="hide-menu"> Balance </span></a></li>
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('comptabilite_bilan') }}" class="sidebar-link"><i class="mdi mdi-chart-arc"></i><span class="hide-menu"> Bilan comptable</span></a></li>
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('comptabilite_resultat') }}" class="sidebar-link"><i class="mdi mdi-chart-bar"></i><span class="hide-menu"> Compte de résultat </span></a></li>
-                                </ul>
-                            </li>
-            
-                        {% endif %}
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <li class="nav-small-cap"><span class="hide-menu">Paramètres</span></li>
-                            <li class="sidebar-item"> 
-                                <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-account-box"></i><span class="hide-menu"> Utilisateur </span></a>
-                                <ul aria-expanded="false" class="pl-2 collapse first-level">
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('user_profile', {id: app.user.id}) }}" class="sidebar-link"><i class="mdi mdi-account"></i><span class="hide-menu"> Profile utilisateur </span></a></li>
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('user_all') }}" class="sidebar-link"><i class="mdi mdi-account-multiple"></i><span class="hide-menu"> Tous les utilisateurs </span></a></li>
-                                </ul>
-                            </li>
-                            <li class="sidebar-item  mb-5"> 
-                                <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-settings"></i><span class="hide-menu"> Configuration </span></a>
-                                <ul aria-expanded="false" class="pl-2 collapse first-level">
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('parametre_mutuelle') }}" class="sidebar-link"><i class="mdi mdi-settings"></i><span class="hide-menu"> Mutuelle</span></a></li>
-                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('parametre_exercice') }}" class="sidebar-link"><i class="mdi mdi-settings"></i><span class="hide-menu"> Exercice</span></a></li>
-                                </ul>
-                            </li>
-                        {% endif %}
-                        {% endblock %}
-                    </ul>
-                    
-                </nav>
-                <!-- End Sidebar navigation -->
-            </div>
-            <!-- End Sidebar scroll-->
-        </aside>
-        <!-- ============================================================== -->
-        <!-- End Left Sidebar - style you can find in sidebar.scss  -->
-        <!-- ============================================================== -->
-        {{ render(controller('App\\Controller\\ComptabiliteController::renderModalJournal')) }}
-        <!-- ============================================================== -->
-        <!-- Page wrapper  -->
-        <!-- ============================================================== -->
-        <div class="page-wrapper">
-            {% block header %}
-                <!-- ============================================================== -->
-                <!-- Bread crumb and right sidebar toggle -->
-                <!-- ============================================================== -->
-                <div class="page-breadcrumb">
-                    <div class="d-flex align-items-center">
-                        <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Tableau de bord</h4>
-                        <div class="ml-auto">
-                            <nav aria-label="breadcrumb">
-                                <ol class="breadcrumb m-0 p-0">
-                                    <li class="breadcrumb-item text-muted active" aria-current="page">Tableau de bord</li>
-                                </ol>
-                            </nav>
-                        </div>
-                    </div>
-                </div>
-                <!-- ============================================================== -->
-                <!-- End Bread crumb and right sidebar toggle -->
-                <!-- ============================================================== -->
-            {% endblock %}
-            <!-- ============================================================== -->
-            <!-- Container fluid  -->
-            <!-- ============================================================== -->
-            <div class="container-fluid">
-                {% block body %}
-                    <!-- ============================================================== -->
-                    <!-- Start Page Content -->
-                    <!-- ============================================================== -->
-  
-                    <!-- ============================================================== -->
-                    <!-- End PAge Content -->
-                    <!-- ============================================================== -->
-                {% endblock %}
-            </div>
-            <!-- ============================================================== -->
-            <!-- End Container fluid  -->
-            <!-- ============================================================== -->
-            <!-- ============================================================== -->
-            <!-- footer -->
-            <!-- ============================================================== -->
+		<div id="main-wrapper" data-layout="vertical" data-navbarbg="skin5" data-sidebartype="full" data-sidebar-position="absolute" data-header-position="absolute" data-boxed-layout="full">
 
-            {% block footer %}
-            <footer class="footer text-center">
-                <i class="fa fa-copyright" aria-hidden="true"></i> Copyright 2020 - Mutuelle santé - logiciel de gestion de mutuelle santé.
-            </footer>
-            {% endblock %}
-            <!-- ============================================================== -->
-            <!-- End footer -->
-            <!-- ============================================================== -->
-        </div>
-        <!-- ============================================================== -->
-        <!-- End Page wrapper  -->
-        <!-- ============================================================== -->
-    </div>
-    <!-- ============================================================== -->
-    <!-- End Wrapper -->
-    <!-- ============================================================== -->
+			{% block topbar %}
+				<header class="topbar" data-navbarbg="skin5">
+					<nav class="navbar top-navbar navbar-expand-md navbar-dark">
+						<div class="navbar-header" data-logobg="skin5">
+							<a
+								class="navbar-brand" href="index.html">
+								<!-- Logo icon -->
+								<b class="logo-icon">
+									<!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
+									<!-- Dark Logo icon -->
+									<img
+									src="{{ asset('assets/images/logo-icon.png') }}" alt="homepage" class="dark-logo"/> <!-- Light Logo icon -->
+									<img src="{{ asset('assets/images/logo-light-icon.png') }}" alt="homepage" class="light-logo"/>
+								</b>
+								<!--End Logo icon -->
+								<!-- Logo text -->
+								<span
+									class="logo-text">
+									<!-- dark Logo text -->
+									<img
+									src="{{ asset('uploads/img/mutuelle-3.png') }}" alt="homepage" class="dark-logo"/>
+									<!-- Light Logo text -->
+									<img src="{{ asset('uploads/img/mutuelle-light-3.png') }}" class="light-logo" alt="homepage"/>
+								</span>
+							</a>
 
-    
-    <!-- ============================================================== -->
-    <!-- All Required js -->
-    <!-- ============================================================== -->
-    <script src="{{ asset('assets/libs/jquery/dist/jquery.min.js') }}"></script>
-    <!-- Bootstrap tether Core JavaScript -->
-    <script src="{{ asset('assets/libs/popper.js/dist/umd/popper.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/bootstrap/dist/js/bootstrap.min.js') }}"></script>
-    <!-- ============================================================== -->
-    <!-- This page plugin js -->
-    <script src="{{ asset('dist/js/app-style-switcher.js') }}"></script>
-    <!--Wave Effects -->
-    <script src="{{ asset('dist/js/waves.js') }}"></script>
-    <!--Menu sidebar -->
-    <script src="{{ asset('dist/js/sidebarmenu.js') }}"></script>
-    <!--Custom JavaScript -->
-    <script src="{{ asset('dist/js/custom.js') }}"></script>
-    <!-- ============================================================== -->
-    <script src="{{ asset('dist/js/bootstrap-datepicker.min.js') }}"></script>
-    <script src="{{ asset('dist/js/datepicker.js') }}"></script>
-    <script>
-        $('.datepicker').datepicker({
-            language: 'fr',
-            orientation: "bottom",
-            format: "dd/mm/yyyy",
-            autoclose: true,
-            dateFormat: "dd/mm/yyyy",
-            minDate: new Date('{{ app.session.get('exercice').dateDebut|date('d/m/Y') }}'),
-            maxDate: new Date('{{ app.session.get('exercice').dateFin|date('d/m/Y') }}')
-        });
-    </script>
+							<!-- This is for the sidebar toggle which is visible on mobile only -->
+							<a class="nav-toggler waves-effect waves-light d-block d-md-none" href="javascript:void(0)">
+								<i class="ti-menu ti-close"></i>
+							</a>
+						</div>
+						<!-- ============================================================== -->
+						<!-- End Logo -->
+						<!-- ============================================================== -->
+							<div class="navbar-collapse collapse" id="navbarSupportedContent" data-navbarbg="skin5"> <!-- ============================================================== -->
+							<!-- toggle and nav items -->
+							<!-- ============================================================== --><ul class="navbar-nav float-left mr-auto"> </ul>
+							<!-- ============================================================== -->
+							<!-- Right side toggle and nav items -->
+							<!-- ============================================================== -->
+								<ul class="navbar-nav float-right"> {% if app.user %}
+									<li class="nav-item dropdown">
+										<a class="nav-link dropdown-toggle text-muted waves-effect waves-dark pro-pic" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="{{ asset(app.user.photo) }}" alt="user" class="rounded-circle" width="35" style="background-color: white;"></a>
+										<div class="dropdown-menu dropdown-menu-right user-dd animated">
+											<a class="dropdown-item" href="{{ path('user_profile', {id: app.user.id}) }}">
+												<i class="fa fa-user m-r-5 m-l-5"></i>
+												Mon Profil</a>
+											<a class="dropdown-item" href="{{ path('app_logout') }}">
+												<i class="fa fa-power-off m-r-5 m-l-5"></i>
+												Se deconnecter</a>
+										</div>
+									</li>
+								{% endif %}
 
-    {% block javascripts %}{% endblock %}
+							</ul>
+						</div>
+					</nav>
+				</header>
+				<!-- ============================================================== -->
+			<!-- End Topbar header -->
+				<!-- ============================================================== -->
+			{% endblock %}
 
-    <script>
-        $('[data-toggle="tooltip"]').tooltip();
-        $(".preloader").fadeOut();
-    </script>
-</body>
+
+			<!-- ============================================================== -->
+			<!-- Left Sidebar - style you can find in sidebar.scss  -->
+			<!-- ============================================================== -->
+				<aside
+				class="left-sidebar" data-sidebarbg="skin6"> <!-- Sidebar scroll-->
+				<div
+					class="scroll-sidebar">
+					<!-- Sidebar navigation-->
+					<nav class="sidebar-nav">
+						<ul id="sidebarnav">
+							<li>
+								<!-- User Profile-->
+								<div class="user-profile d-flex no-block dropdown m-t-20">
+									<div class="user-pic"><img src="{{ asset(app.user.photo) }}" alt="users" class="rounded-circle" width="40"/></div>
+									<div class="user-content hide-menu m-l-10">
+										<a href="javascript:void(0)" class="" id="Userdd" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+											<h5 class="m-b-0 user-name font-medium">{{ app.user.username }}
+												<i class="fa fa-angle-down"></i>
+											</h5>
+											<span class="op-5 user-email">{{ app.user.fonction|title }}</span>
+										</a>
+										<div class="dropdown-menu dropdown-menu-right" aria-labelledby="Userdd">
+											<a class="dropdown-item" href="{{ path('user_profile', {id: app.user.id}) }}">
+												<i class="ti-user m-r-5 m-l-5"></i>
+												Mon Profil</a>
+											<a class="dropdown-item" href="javascript:void(0)">
+												<i class="ti-wallet m-r-5 m-l-5"></i>
+												My Balance</a>
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item" href="javascript:void(0)">
+												<i class="ti-settings m-r-5 m-l-5"></i>
+												Account Setting</a>
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item" href="{{ path('app_logout') }}">
+												<i class="fa fa-power-off m-r-5 m-l-5"></i>
+												Se deconnecter</a>
+										</div>
+									</div>
+								</div>
+								<!-- End User Profile-->
+							</li>
+
+							{% block sidebarMenu %}
+								<li class="sidebar-item">
+									<a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ path('dashboard') }}">
+										<i class="mdi mdi-view-dashboard"></i>
+										<span class="hide-menu">
+											Tableau de bord</span>
+									</a>
+								</li>
+								{% if is_granted('ROLE_GESTIONNAIRE') %}
+									<li class="nav-small-cap">
+										<span class="hide-menu">Gestion mutuelle</span>
+									</li>
+									<li class="sidebar-item">
+										<a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+											<i class="mdi mdi-account-multiple"></i>
+											<span class="hide-menu">
+												Adhesion
+											</span>
+										</a>
+										<ul aria-expanded="false" class="pl-2 collapse first-level">
+											{% if app.session.get('exercice') and app.session.get('exercice').isCurrent and not app.session.get('exercice').isCloture %}
+												<li class="sidebar-item waves-effect waves-dark">
+													<a href="{{ path('adhesion_new') }}" class="sidebar-link">
+														<i class="mdi mdi-account-plus"></i>
+														<span class="hide-menu">
+															Inscrire congrégation
+														</span>
+													</a>
+												</li>
+											{% endif %}
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="{{ path('adhesion') }}" class="sidebar-link">
+													<i class="mdi mdi-account-search"></i>
+													<span class="hide-menu">
+														Fiche d'adhésion
+													</span>
+												</a>
+											</li>
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="{{ path('adhesion_beneficiaires') }}" class="sidebar-link">
+													<i class="mdi mdi-format-list-bulleted"></i>
+													<span class="hide-menu">
+														Liste béneficiaires
+													</span>
+												</a>
+											</li>
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="{{ path('adhesion_rapport') }}" class="sidebar-link">
+													<i class="mdi mdi-newspaper"></i>
+													<span class="hide-menu">
+														Rapport d'adhésion
+													</span>
+												</a>
+											</li>
+										</ul>
+									</li>
+
+									<li class="sidebar-item">
+										<a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+											<i class="mdi mdi-calculator"></i>
+											<span class="hide-menu">
+												Cotisation
+											</span>
+										</a>
+										<ul aria-expanded="false" class="pl-2 collapse first-level">
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="{{ path('cotisation') }}" class="sidebar-link">
+													<i class="mdi mdi-calendar-check"></i>
+													<span class="hide-menu">
+														Fiche de cotistation
+													</span>
+												</a>
+											</li>
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="{{ path('export_rapport_cotisations') }}" class="sidebar-link">
+													<i class="mdi mdi-newspaper"></i>
+													<span class="hide-menu">
+														Rapport de cotisation
+													</span>
+												</a>
+											</li>
+										</ul>
+									</li>
+									<li class="sidebar-item">
+										<a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+											<i class="mdi mdi-security-home"></i>
+											<span class="hide-menu">
+												Prestation
+											</span>
+										</a>
+										<ul aria-expanded="false" class="pl-2 collapse first-level">
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="{{ path('prestation') }}" class="sidebar-link">
+													<i class="mdi mdi-verified"></i>
+													<span class="hide-menu">
+														Prestation béneficiaire
+													</span>
+												</a>
+											</li>
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="{{ path('prestation_adherent') }}" class="sidebar-link">
+													<i class="mdi mdi-clipboard-outline"></i>
+													<span class="hide-menu">
+														Fiche de prestation</span>
+												</a>
+											</li>
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="{{ path('export_rapport_prestations') }}" class="sidebar-link">
+													<i class="mdi mdi-newspaper"></i>
+													<span class="hide-menu">
+														Rapport de prestation
+													</span>
+												</a>
+											</li>
+										</ul>
+									</li>
+								{% endif %}
+								{% if is_granted('ROLE_COMPTABLE') %}
+									<li class="nav-small-cap">
+										<span class="hide-menu">Gestion fincancière</span>
+									</li>
+									<li class="sidebar-item">
+										<a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+											<i class="mdi mdi-keyboard"></i>
+											<span class="hide-menu">
+												Saisie des écritures
+											</span>
+										</a>
+										<ul aria-expanded="false" class="pl-2 collapse first-level">
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="#modal-journaux" data-toggle="modal" data-backdrop="static" class="sidebar-link">
+													<i class="mdi mdi-pen"></i>
+													<span class="hide-menu">
+														Saisie des écritures
+													</span>
+												</a>
+											</li>
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="{{ path('comptabilite_plan') }}" class="sidebar-link">
+													<i class="mdi mdi-view-list"></i>
+													<span class="hide-menu">
+														Plan comptable
+													</span>
+												</a>
+											</li>
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="{{ path('tresorerie') }}" class="sidebar-link">
+													<i class="mdi mdi-bank"></i>
+													<span class="hide-menu">
+														Trésorerie</span>
+												</a>
+											</li>
+										</ul>
+									</li>
+									<li class="sidebar-item">
+										<a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+											<i class="mdi mdi-cash-multiple"></i>
+											<span class="hide-menu">
+												Etats comptables
+											</span>
+										</a>
+										<ul aria-expanded="false" class="pl-2 collapse first-level">
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="#modal-journaux" data-toggle="modal" data-backdrop="static" class="sidebar-link">
+													<i class="mdi mdi-clipboard-outline"></i>
+													<span class="hide-menu">
+														Journal
+													</span>
+												</a>
+											</li>
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="#modal-livre" data-toggle="modal" data-backdrop="static" class="sidebar-link">
+													<i class="mdi mdi-book-open-page-variant"></i>
+													<span class="hide-menu">
+														Grand livre
+													</span>
+												</a>
+											</li>
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="{{ path('comptabilite_balance') }}" class="sidebar-link">
+													<i class="mdi mdi-scale-balance"></i>
+													<span class="hide-menu">
+														Balance
+													</span>
+												</a>
+											</li>
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="{{ path('comptabilite_bilan') }}" class="sidebar-link">
+													<i class="mdi mdi-chart-arc"></i>
+													<span class="hide-menu">
+														Bilan comptable</span>
+												</a>
+											</li>
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="{{ path('comptabilite_resultat') }}" class="sidebar-link">
+													<i class="mdi mdi-chart-bar"></i>
+													<span class="hide-menu">
+														Compte de résultat
+													</span>
+												</a>
+											</li>
+										</ul>
+									</li>
+
+								{% endif %}
+								{% if is_granted('ROLE_ADMIN') %}
+									<li class="nav-small-cap">
+										<span class="hide-menu">Paramètres</span>
+									</li>
+									<li class="sidebar-item">
+										<a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+											<i class="mdi mdi-account-box"></i>
+											<span class="hide-menu">
+												Utilisateur
+											</span>
+										</a>
+										<ul aria-expanded="false" class="pl-2 collapse first-level">
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="{{ path('user_profile', {id: app.user.id}) }}" class="sidebar-link">
+													<i class="mdi mdi-account"></i>
+													<span class="hide-menu">
+														Profile utilisateur
+													</span>
+												</a>
+											</li>
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="{{ path('user_all') }}" class="sidebar-link">
+													<i class="mdi mdi-account-multiple"></i>
+													<span class="hide-menu">
+														Tous les utilisateurs
+													</span>
+												</a>
+											</li>
+										</ul>
+									</li>
+									<li class="sidebar-item  mb-5">
+										<a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+											<i class="mdi mdi-settings"></i>
+											<span class="hide-menu">
+												Configuration
+											</span>
+										</a>
+										<ul aria-expanded="false" class="pl-2 collapse first-level">
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="{{ path('parametre_mutuelle') }}" class="sidebar-link">
+													<i class="mdi mdi-settings"></i>
+													<span class="hide-menu">
+														Mutuelle</span>
+												</a>
+											</li>
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="{{ path('parametre_exercice') }}" class="sidebar-link">
+													<i class="mdi mdi-settings"></i>
+													<span class="hide-menu">
+														Exercice</span>
+												</a>
+											</li>
+										</ul>
+									</li>
+								{% endif %}
+							{% endblock %}
+						</ul>
+
+					</nav>
+					<!-- End Sidebar navigation -->
+				</div>
+				<!-- End Sidebar scroll-->
+			</aside>
+			<!-- ============================================================== -->
+			<!-- End Left Sidebar - style you can find in sidebar.scss  -->
+			<!-- ============================================================== -->
+			{{ render(controller('App\\Controller\\ComptabiliteController::renderModalJournal')) }}
+			<!-- ============================================================== -->
+			<!-- Page wrapper  -->
+				<!-- ============================================================== --> <div class="page-wrapper">{% block header %}
+					<!-- ============================================================== -->
+					<!-- Bread crumb and right sidebar toggle -->
+					<!-- ============================================================== -->
+						<div class="page-breadcrumb"> <div class="d-flex align-items-center">
+							<h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Tableau de bord</h4>
+							<div class="ml-auto">
+								<nav aria-label="breadcrumb">
+									<ol class="breadcrumb m-0 p-0">
+										<li class="breadcrumb-item text-muted active" aria-current="page">Tableau de bord</li>
+									</ol>
+								</nav>
+							</div>
+						</div>
+					</div>
+					<!-- ============================================================== -->
+				<!-- End Bread crumb and right sidebar toggle -->
+					<!-- ============================================================== -->
+				{% endblock %}
+				<!-- ============================================================== -->
+				<!-- Container fluid  -->
+				<!-- ============================================================== -->
+					<div class="container-fluid"> {% block body %}<!-- ============================================================== -->
+						<!-- Start Page Content -->
+						<!-- ============================================================== -->
+
+						<!-- ============================================================== -->
+						<!-- End PAge Content -->
+						<!-- ============================================================== -->
+					{% endblock %}
+				</div>
+				<!-- ============================================================== -->
+				<!-- End Container fluid  -->
+				<!-- ============================================================== -->
+				<!-- ============================================================== -->
+				<!-- footer -->
+				<!-- ============================================================== -->
+
+					{% block footer %}
+						<footer class="footer text-center"> <i class="fa fa-copyright" aria-hidden="true"></i>
+						Copyright 2020 - Mutuelle santé - logiciel de gestion de mutuelle santé.
+					</footer>
+				{% endblock %}
+				<!-- ============================================================== -->
+			<!-- End footer -->
+				<!-- ============================================================== -->
+			</div>
+			<!-- ============================================================== -->
+		<!-- End Page wrapper  -->
+			<!-- ============================================================== -->
+		</div>
+		<!-- ============================================================== -->
+		<!-- End Wrapper -->
+		<!-- ============================================================== -->
+
+
+		<!-- ============================================================== -->
+		<!-- All Required js -->
+		<!-- ============================================================== --><script src="{{ asset('assets/libs/jquery/dist/jquery.min.js') }}"> </script>
+		<!-- Bootstrap tether Core JavaScript -->
+		<script src="{{ asset('assets/libs/popper.js/dist/umd/popper.min.js') }}"></script>
+		<script src="{{ asset('assets/libs/bootstrap/dist/js/bootstrap.min.js') }}"></script>
+		<!-- ============================================================== -->
+		<!-- This page plugin js -->
+		<script src="{{ asset('dist/js/app-style-switcher.js') }}"></script>
+		<!--Wave Effects -->
+		<script src="{{ asset('dist/js/waves.js') }}"></script>
+		<!--Menu sidebar -->
+		<script src="{{ asset('dist/js/sidebarmenu.js') }}"></script>
+		<!--Custom JavaScript -->
+		<script src="{{ asset('dist/js/custom.js') }}"></script>
+		<!-- ============================================================== -->
+		<script src="{{ asset('dist/js/bootstrap-datepicker.min.js') }}"></script>
+		<script src="{{ asset('dist/js/datepicker.js') }}"></script>
+		<script>
+			$('.datepicker').datepicker({
+                language: 'fr',
+                orientation: "bottom",
+                format: "dd/mm/yyyy",
+                autoclose: true,
+                startDate: new Date('{{ app.session.get('exercice').dateDebut|date('m/d/Y') }}'),
+                endDate: new Date('{{ app.session.get('exercice').dateFin|date('m/d/Y') }}')
+            });
+		</script>
+
+		{% block javascripts %}{% endblock %}
+
+		<script>
+			$('[data-toggle="tooltip"]').tooltip();
+$(".preloader").fadeOut();
+		</script>
+	</body>
 </html>

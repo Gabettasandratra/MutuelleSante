@@ -69,8 +69,8 @@ class CompteRepository extends ServiceEntityRepository
             $code['type'] = 'trésorerie';
             $retour[] = $code;
         }
-        $retour[] = [ 'titre' => 'opération divers', 'codeJournal' => 'OD','type' => 'standard'];
-        $retour[] = [ 'titre' => 'prestations', 'codeJournal' => 'PRE' ,'type' => 'sortie'];
+        $retour[] = [ 'titre' => 'Opération divers', 'codeJournal' => 'OD','type' => 'standard'];
+        $retour[] = [ 'titre' => 'Prestations', 'codeJournal' => 'PRE' ,'type' => 'sortie'];
         if ($in) {
             foreach ($retour as $code) {
                 if ($code['codeJournal'] == $in) {
