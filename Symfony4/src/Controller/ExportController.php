@@ -224,7 +224,7 @@ class ExportController extends AbstractController
         // Le subtitle
         $codeJour = $repoCompte->findCodeJournaux($code);
 
-        $pdf = new Pdf($periode, 'Journal', $codeJour['codeJournal'].'  '.$codeJour['titre']);
+        $pdf = new Pdf($periode, 'Journal', $codeJour[0]['codeJournal'].'  '.$codeJour[0]['titre']);
         $pdf->AliasNbPages();
         $pdf->AddPage('P', 'A4');
 

@@ -37,7 +37,7 @@
 
                     <hr>                           
                     <div class="row">
-                        <table class="table table-hover border no-padding" id="scroll_ver">
+                        <table class="table table-hover border no-padding" id="zero_config">
                             <thead class="thead-light">
                                 <tr>
                                     <th scope="col" style="width: 5%">Date</th>
@@ -49,7 +49,7 @@
                                     <th scope="col" style="width: 15%">Réference</th>
                                     <th scope="col" style="width: 15%">Dest</th>
                                     {% if  not app.session.get('exercice').isCloture %}
-                                    <th scope="col" style="width: 1%"></th>
+                                    <th scope="col" style="width: 1%">Act</th>
                                     {% endif %}
                                 </tr>
                             </thead>
@@ -65,7 +65,9 @@
                                         <td>{{ article.piece }}</td>
                                         <td>{{ article.analytique }}</td>
                                         {% if not app.session.get('exercice').isCloture %}
-                                        <td>{% if not article.isFerme %}<a href="{{ path('comptabilite_modifier_article', {'id': article.id, 'journal': article.categorie}) }}" class="label label-rounded btn-primary label-primary"><i class="mdi mdi-grease-pencil"></i></a>{% endif %}</td>
+                                        <td>{% if not article.isFerme %}<a href="{{ path('comptabilite_saisie_edit',{'id': article.id}) }}" class="label btn-primary label-primary"><i class="mdi mdi-grease-pencil"></i></a>
+                                            {% else %}<span class="label label-warning"><i class="mdi mdi-lock"></i></span>{% endif %}
+                                        </td>
                                         {% endif %}
                                     </tr>
                                 {% endfor %}
@@ -74,10 +76,6 @@
                     </div>
 
                     <div class="row mt-2 btn-group">
-                        {% if not app.session.get('exercice').isCloture %}           
-                        <a href="{{ path('comptabilite_saisie', { 'journal': code.codeJournal }) }}" class="btn btn-sm btn-success mr-1"><i class="mdi mdi-receipt"></i> Saisie article</a>
-                        {% endif %}
-                        <a href="#modal-journaux" data-toggle="modal" data-backdrop="static" class="btn btn-sm btn-primary mr-2"><i class="mdi mdi-pen"></i><span class="hide-menu"> Choisir le période </span></a>
                         <a href="{{ path('export_rapport_journal') }}" class="btn btn-sm btn-success"><i class="mdi mdi-printer"></i> Excel</a>
                         <a href="{{ path('pdf_journal', { code: code.codeJournal, debut: periode['debut']|date('dmY'), fin: periode['fin']|date('dmY')}) }}" class="btn btn-sm btn-secondary"><i class="mdi mdi-printer"></i> PDF</a>
                     </div>

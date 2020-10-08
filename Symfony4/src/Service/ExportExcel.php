@@ -318,7 +318,7 @@ class ExportExcel
         $exercice = $this->session->get('exercice');
         $spreadsheet = new Spreadsheet();
         // Données
-        $grandlivres = $this->manager->getRepository(Article::class)->findGrandLivre($exercice);
+        $grandlivres = $this->manager->getRepository(Article::class)->findGrandLivre($exercice->getDateDebut(),$exercice->getDateFin());
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Grand livre des comptes '. $exercice->getAnnee());
   

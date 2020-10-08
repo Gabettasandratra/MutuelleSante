@@ -13,11 +13,11 @@
     <div class="col-4 text-right">
         <br>
         {% if periode is defined %}
-        <span>Période du {{ periode.debut|date('d/m/y') }}</span><br>
-        <span>au {{ periode.fin|date('d/m/y') }}</span> <br>
+        <span>Période du {{ periode.debut|date('d/m/Y') }}</span><br>
+        <span>au {{ periode.fin|date('d/m/Y') }}</span> <br>
         {% else %}
-        <span>Période du {{ app.session.get('exercice').dateDebut|date('d/m/y') }}</span> <br>
-        <span>au {{ app.session.get('exercice').dateFin|date('d/m/y') }}</span> <br>
+        <span>Période du {{ app.session.get('exercice').dateDebut|date('d/m/Y') }}</span> <br>
+        <span>au {{ app.session.get('exercice').dateFin|date('d/m/Y') }}</span> <br>
         {% endif %}
         <span>Tenue du compte : Ar </span> <br>
     </div>

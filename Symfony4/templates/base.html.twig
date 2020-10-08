@@ -238,14 +238,16 @@
 											</span>
 										</a>
 										<ul aria-expanded="false" class="pl-2 collapse first-level">
+											{% if app.session.get('exercice') and app.session.get('exercice').isCurrent and not app.session.get('exercice').isCloture %}
 											<li class="sidebar-item waves-effect waves-dark">
 												<a href="{{ path('prestation') }}" class="sidebar-link">
-													<i class="mdi mdi-verified"></i>
+													<i class="mdi mdi-keyboard"></i>
 													<span class="hide-menu">
-														Prestation béneficiaire
+														Saisie décompte
 													</span>
 												</a>
 											</li>
+											{% endif %}
 											<li class="sidebar-item waves-effect waves-dark">
 												<a href="{{ path('prestation_adherent') }}" class="sidebar-link">
 													<i class="mdi mdi-clipboard-outline"></i>
@@ -272,18 +274,21 @@
 										<a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
 											<i class="mdi mdi-keyboard"></i>
 											<span class="hide-menu">
-												Saisie des écritures
+												Gestion 
 											</span>
 										</a>
+										
 										<ul aria-expanded="false" class="pl-2 collapse first-level">
+											{% if app.session.get('exercice') and app.session.get('exercice').isCurrent and not app.session.get('exercice').isCloture %}
 											<li class="sidebar-item waves-effect waves-dark">
-												<a href="#modal-journaux" data-toggle="modal" data-backdrop="static" class="sidebar-link">
+												<a href="{{path('comptabilite_saisie_standard')}}" class="sidebar-link">
 													<i class="mdi mdi-pen"></i>
 													<span class="hide-menu">
-														Saisie des écritures
+														Saisie standard
 													</span>
 												</a>
 											</li>
+											{% endif %}
 											<li class="sidebar-item waves-effect waves-dark">
 												<a href="{{ path('comptabilite_plan') }}" class="sidebar-link">
 													<i class="mdi mdi-view-list"></i>

@@ -67,98 +67,12 @@ class ComptabiliteController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/comptabilite/journal/{journal}/saisie", name="comptabilite_saisie")
-     * @Route("/comptabilite/journal/{journal}/modifier/{id}", name="comptabilite_modifier_article")
-     */
-    public function saisie($journal, Article $article = null, Request $request, ParametreRepository $repositoryParametre, CompteRepository $repositoryCompte, EntityManagerInterface $manager, SessionInterface $session)
-    {
-        if (!$article) {
-            $article = new Article();
-            $article->setCompteDebit($repositoryCompte->findOneBy(['codeJournal' => $journal]))
-                    ->setCompteCredit($repositoryCompte->findOneBy(['codeJournal' => $journal]))
-                    ->setCategorie($journal);
-        }    
-        $plan_analytiques = $repositoryParametre->findOneBy(['nom' => 'plan_analytique'])->getList();
-        $choices['NULL'] = null;
-        foreach ($plan_analytiques as $key => $value) {
-            $choices[$key.' | '.$value] = $key;
-        } // reverse key value
-        $form = $this->createFormBuilder($article)
-                    ->add('date', DateType::class, [
-                        'data' => new \DateTime()
-                    ])
-                    ->add('montant', NumberType::class)
-                    ->add('libelle')
-                    ->add('piece')
-                    ->add('analytique', ChoiceType::class, [
-                        'choices' => $choices
-                    ])            
-                    ->add('compteDebit', EntityType::class, [
-                        'class' => Compte::class,
-                        'query_builder' => function (EntityRepository $er) {
-                            return $er->createQueryBuilder('c')
-                                    ->andWhere('length(c.poste) = 6')
-                                    ->orderBy('c.poste', 'ASC');
-                        },
-                        'choice_label' => function ($c) {
-                            return $c->getPoste().' | '.$c->getTitre();
-                        },
-                    ])
-                    ->add('compteCredit', EntityType::class, [
-                        'class' => Compte::class,
-                        'query_builder' => function (EntityRepository $er) {
-                            return $er->createQueryBuilder('c')
-                                    ->andWhere('length(c.poste) = 6')
-                                    ->orderBy('c.poste', 'ASC');
-                        },
-                        'choice_label' => function ($c) {
-                            return $c->getPoste().' | '.$c->getTitre();
-                        },
-                    ])
-                    ->getForm();
-
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Verifier la date
-            $date = $form->get('date')->getData();
-            $exercice = $session->get('exercice');
-            if ($exercice->check($date)) {
-                // protect against negative solde
-                $montant = $form->get('montant')->getData();
-                $cCredit = $form->get('compteCredit')->getData();
-                if ($cCredit->getIsTresor()) { // Trésorerie
-                    $solde = $repositoryCompte->findSoldes([$cCredit->getPoste()], $exercice);
-                    if ($montant <= $solde) {
-                        $manager->persist($article);
-                        $manager->flush();
-                        return $this->redirectToRoute('comptabilite_view_journal', ['journal' => $journal ]);
-                    } else {
-                        $form->get('montant')->addError(new FormError("Le solde negatif est interdit pour les trésoreries. Solde actuelle $solde"));
-                    }
-                }
-                else { // Operation divers
-                    $manager->persist($article);
-                    $manager->flush();
-                    return $this->redirectToRoute('comptabilite_journal', ['journal' => $journal ]);
-                }
-            } else {
-                $form->get('date')->addError(new FormError("La date ".$date->format('d/m/Y')." n'appartient pas à l'exercice courant"));
-            }
-        }
-
-        return $this->render('comptabilite/saisie.html.twig', [
-            'form' => $form->createView(),
-            'codeJournal' => $journal,
-            'editMode' => $article->getId() !== null,
-        ]);
-    }
-
     // SAISIE D'UNE ECRITURE COMPTABLE
     /**
      * @Route("/comptabilite/saisie", name="comptabilite_saisie_standard")
+     * @Route("/comptabilite/saisie/edit/{id}", name="comptabilite_saisie_edit")
      */
-    public function saisieStandard(Request $request, ParametreRepository $repositoryParametre, CompteRepository $repositoryCompte, EntityManagerInterface $manager, SessionInterface $session)
+    public function saisieStandard(Article $article = null, Request $request, ParametreRepository $repositoryParametre, CompteRepository $repositoryCompte, EntityManagerInterface $manager, SessionInterface $session)
     {
         // Affichage du plan analytique
         $plan_analytiques = $repositoryParametre->findOneBy(['nom' => 'plan_analytique'])->getList();
@@ -172,10 +86,14 @@ class ComptabiliteController extends AbstractController
             $cCodes[$code['titre'].' ('.$code['codeJournal'].')'] = $code['codeJournal'];
         }
 
+        $edit = true;
         // Article 
-        $article = new Article();
-        $article->setCategorie('OD');
-      
+        if ($article === null) {
+            $article = new Article();
+            $article->setCategorie('OD');
+            $edit = false;
+        }
+
         $form = $this->createFormBuilder($article)
                     ->add('categorie', ChoiceType::class, [
                         'choices' => $cCodes
@@ -232,14 +150,19 @@ class ComptabiliteController extends AbstractController
                     $solde = $repositoryCompte->findSoldes([$cCredit->getPoste()], $exercice);
                     if ($montant <= $solde) {
                         $manager->persist($article);
-                        $manager->flush();
+                        $manager->flush(); 
+                        $message = ($edit)?'La modification du mouvement de numéro '.$article->getId().' effectué':'Le numéro de mouvement de la pièce créé est '.$article->getId();
+                        $this->addFlash('success', $message);
+                        return $this->redirectToRoute('comptabilite_saisie_standard');
                     } else {
                         $form->get('montant')->addError(new FormError("Le solde negatif est interdit pour les trésoreries. Solde actuelle $solde"));
                     }
                 } else { // Operation divers
                     $manager->persist($article);
                     $manager->flush();
-                    return $this->redirectToRoute('comptabilite_journal', ['journal' => $journal ]);
+                    $message = ($edit)?'La modification du mouvement de numéro '.$article->getId().' effectué':'Le numéro de mouvement de la pièce créé est '.$article->getId();
+                    $this->addFlash('success', $message);
+                    return $this->redirectToRoute('comptabilite_saisie_standard');
                 }
             } else {
                 $form->get('date')->addError(new FormError("La date ".$date->format('d/m/Y')." n'appartient pas à l'exercice courant"));
@@ -247,6 +170,7 @@ class ComptabiliteController extends AbstractController
         }
         return $this->render('comptabilite/saisieStandard.html.twig', [
             'form' => $form->createView(),
+            'edit' => $article->getId()
         ]);
     }
 

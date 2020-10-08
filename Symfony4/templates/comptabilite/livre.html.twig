@@ -79,7 +79,7 @@
                     </div>
 
                     <div class="row mt-2 btn-group"> 
-                        <a href="#modal-livre" data-toggle="modal" data-backdrop="static" class="btn btn-sm btn-primary mr-2"><i class="mdi mdi-pen"></i><span class="hide-menu"> Choisir le période </span></a>
+                        <a href="#modal-livre" data-toggle="modal" data-backdrop="static" class="btn btn-sm btn-primary mr-2"><i class="mdi mdi-pen"></i><span class="hide-menu"> Changer le critère </span></a>
                         <a href="{{ path('export_rapport_grandlivre') }}" class="btn btn-sm btn-success"><i class="mdi mdi-printer"></i> Excel</a>
                         {% set p = (poste == "")? "all":poste %}
                         <a href="{{ path('pdf_livre', { poste: p, debut: periode['debut']|date('dmY'), fin: periode['fin']|date('dmY')}) }}" class="btn btn-sm btn-secondary"><i class="mdi mdi-printer"></i> PDF</a>

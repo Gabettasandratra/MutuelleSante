@@ -36,7 +36,7 @@
                         </div>
                         <div class="col-md-4 border rounded p-2 bg-light text-center" data-toggle="tooltip" title="Veuillez noté ce réference sur le décompte de présatations">
                             <span class="lead">Référence de décompte</span> <br>
-                            <span class="pl-3" style="font-size: 1.5rem;">{{ pac.adherent.numero }} / {{ app.session.get('exercice').annee }} / {{ numero }}</span>
+                            <span class="pl-3" style="font-size: 1.5rem;">{{ pac.adherent.numero }}/{{ pac.codeMutuelle }}/{{ app.session.get('exercice').annee }}/{{ numero }}</span>
                         </div>
                         <div class="col-md-4 text-right p-2">
                             <button class="btn btn-info" data-toggle="modal" href="#modal"><i class="mdi mdi-bookmark-plus-outline"></i> Ajouter prestation</button>
@@ -95,9 +95,6 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Saisie de prestation</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
                 </div>
                 <form id="prestation">
                     <div class="modal-body">
@@ -121,12 +118,19 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="form-group row">
+                                    <div class="form-group row" title="" data-toggle="tooltip" id="sous_group">
                                         <label for="prestation_frais" class="col-form-label col-sm-3 required">Frais *</label>
-                                        <div class="col-sm-9">
+                                        <div class="input-group col-sm-9">
+                                            
                                             <input type="number" id="prestation_frais" name="prestation[frais]" required="required" class="form-control">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-secondary" id="soustract" type="button"><i class="mdi mdi-minus-circle-outline"></i></button>
+                                            </div>
+                                            <span class="help-input"></span>
                                         </div>
                                     </div>
+                                    {# soustract opération #}
+                                    <div id="sous"></div>
                                     {# Pour selectionner le status de la prestation #}
                                     <div class="form-group row">
                                         <label for="prestation_status" class="col-form-label col-sm-3 required">Status *</label>
@@ -139,7 +143,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group row" id="remb_form">
+                                    <div class="form-group row" id="abc">
                                         <label for="prestation_rembourse" class="col-form-label col-sm-3 required">Remboursés *</label>
                                         <div class="input-group col-sm-3">    
                                             <input type="number" id="prestation_percent" value="{{ remb * 100 }}" required="required" class="form-control">
@@ -178,12 +182,11 @@
     </div>
 {% endblock %}
 
-{% block javascripts %}
-    <script src="{{ asset('dist/js/bootstrap-datepicker.min.js') }}"></script>
-    <script src="{{ asset('dist/js/datepicker.js') }}"></script>
+{% block javascripts %}  
     <script>
         $(document).ready(function() {            
             var prestations = new Array();
+            var frais_init = 0; // Frais initiale 
             
             $('#prestation').submit(function(e) {
                 e.preventDefault();
@@ -202,6 +205,14 @@
                 } else {
                     prestation.rembourse = $('#prestation_rembourse').val();
                 }
+                // Enregistre les refus
+                var refus = new Array();
+                $('.sous_form').each(function(){
+                    var x = parseFloat($(this).find('.sous_value').val());
+                    var desc = $(this).find('.sous_desc').val();  
+                    refus.push({'montant': x, 'detail': desc});
+                });
+                prestation.refus = refus;
 
                 if (index) {
                     prestations[index] = prestation;
@@ -210,10 +221,19 @@
                 }
                 refreshTable(prestations);
                 $('#prestation_index').val(null);
+                $('#sous').empty();
+                $('.help-input').text("");
+                $('.help-input').css("display", "none");
+                $('#abc').hide();
+                $('#prestation_percent').val({{remb*100}});
                 $('#prestation').trigger("reset");
             }); 
 
             $('#prestation_frais').change(function(e) {
+                // On charge le frais initiale
+                if (frais_init == 0) {
+                    frais_init = parseFloat($(this).val());
+                }
                 var percent = parseFloat($('#prestation_percent').val());
                 var frais =  parseFloat($(this).val());
                 $('#prestation_rembourse').val(Math.round(percent * frais / 100));
@@ -225,20 +245,14 @@
                 $('#prestation_rembourse').val(Math.round(percent * frais / 100));
             });
 
-            $('#prestation_rembourse').change(function(e) {
-                var rembourse = parseFloat($(this).val());
-                var frais = parseFloat($('#prestation_frais').val());
-                $('#prestation_percent').val(Math.round((rembourse/frais )*100));
-            });
-
             // When status changed
-            $('#remb_form').hide();  // First
+            $('#abc').hide();  // First
             $('#prestation_status').change(function(e) {
                 var status = $(this).val();
                 if (status == 1) {
-                   $('#remb_form').show("slow"); 
+                   $('#abc').show("slow"); 
                 } else {
-                   $('#remb_form').hide("slow");  
+                   $('#abc').hide("slow");  
                 }  
             });
 
@@ -251,10 +265,47 @@
 
             $('#fermer').click(function(e) {
                 e.preventDefault();
+                $('#sous').empty();
+                $('.help-input').text("");
+                $('.help-input').css("display", "none");
+                $('#abc').hide();
+                $('#prestation_percent').val({{remb*100}});
                 $('#prestation').trigger("reset");
                 $('#modal').modal('hide');
             });  
  
+            $('#soustract').click(function(e) {
+                e.preventDefault();
+                if ($('#prestation_frais').val()>0) {
+                    $('#sous').append(
+                        `<div class="form-group row text-danger sous_form">
+                            <label class="col-form-label col-sm-3 required">Montant enlevé</label>
+                            <div class="col-sm-3">    
+                                <input type="number" required style="color:red;" class="sous_value form-control">
+                            </div>
+                            <div class="input-group col-sm-5">    
+                                <input type="text" required style="color:red;" class="form-control sous_desc" placeholder="Description">
+                            </div>
+                            <div class="col-sm-1 py-1">
+                                <a href="#" class="rem">X</a>
+                            </div> 
+                        </div>`
+                    );
+                }
+            });
+
+            // A chaque fois qu'un sous-value chqnge
+            $(document).on("change", ".sous_value" ,function(e) {
+                calculateFrais(frais_init);
+            })
+
+            // On enleve le champ
+            $(document).on("click", ".rem" ,function(e) { 
+                e.preventDefault();
+                $(this).parent().parent().remove();
+                
+                calculateFrais(frais_init);
+            })            
 
             $("#formDecompte").submit(function(event){
                 event.preventDefault(); 
@@ -333,10 +384,34 @@
             $('#prestation_date').val(prestation.date);
             $('#prestation_designation').val(prestation.designation);
             $('#prestation_frais').val(prestation.frais);
-            $('#prestation_rembourse').val(prestation.rembourse);
-            $('#prestation_percent').val(Math.round((prestation.rembourse/prestation.frais)*100));
+            $('#prestation_status').val(prestation.status);
+            if (prestation.status == 1) {
+                $('#prestation_percent').val(Math.round((prestation.rembourse/prestation.frais)*100));
+                $('#prestation_rembourse').val(prestation.rembourse);
+                $('#abc').show(); 
+            } else {
+                $('#prestation_frais').trigger("change");
+            }
+            
             $('#prestation_prestataire').val(prestation.prestataire);
             $('#prestation_facture').val(prestation.facture);
+
+            prestation.refus.forEach(refus => {
+                $('#sous').append(
+                    `<div class="form-group row text-danger sous_form">
+                        <label class="col-form-label col-sm-3 required">Montant enlevé</label>
+                        <div class="col-sm-3">    
+                            <input type="number" value="`+ refus.montant +`" required style="color:red;" class="sous_value form-control">
+                        </div>
+                        <div class="input-group col-sm-5">    
+                            <input type="text" value="`+ refus.detail +`" required style="color:red;" class="form-control sous_desc" placeholder="Description">
+                        </div>
+                        <div class="col-sm-1 py-1">
+                            <a href="#" class="rem">X</a>
+                        </div> 
+                    </div>`
+                );
+            });
             $('#modal').modal('show');
         }
 
@@ -344,5 +419,21 @@
             $('#index_del').val(index);
             $('#del').click();
         } 
+
+        function calculateFrais(frais_init) {
+            var sous = 0;
+            var help = "";
+            $('.sous_value').each(function(){
+                var x = parseFloat(this.value);
+                if (!isNaN(x)) {
+                    sous += x;
+                    help += " - "+this.value;
+                }
+            });
+            $('#prestation_frais').val(frais_init-sous);
+            $('#prestation_frais').trigger("change");
+            $('.help-input').text("= "+frais_init+help);
+            $('.help-input').css("display", "block");
+        }
     </script>
 {% endblock %}

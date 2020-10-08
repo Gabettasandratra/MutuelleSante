@@ -1,8 +1,8 @@
 <div class="modal fade" tabindex="-1" id="modal-journaux" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Ouvrir journal/période</h5>
+            <div class="modal-header bg-primary text-light">
+                <h5 class="modal-title" id="exampleModalLabel">Afficher journal</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
                 </button>
@@ -10,26 +10,26 @@
             <div class="modal-body">
                 <form method="GET" action="{{ path('comptabilite_view_journal') }}">
                     <div class="form-group">
-                        <label for="recipient-name" class="col-form-label">Journal:</label>
+                        <label for="recipient-name" class="col-form-label">Journal</label>
                         <select class="form-control" name="code">
                             {% for code in codes %}
-                                <option value="{{code.codeJournal}}" class="pre-space">{{ "% -10.10s"|format(code.codeJournal) }}{{code.titre|capitalize}}</span></option>
+                                <option value="{{code.codeJournal}}" class="pre-space">{{code.titre}} ({{code.codeJournal}})</span></option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="form-group row" id="remb_form">
-                        <label class="col-form-label col-sm-3">Periode du</label>
-                        <div class="col-sm-3">    
+                        <label class="col-form-label col-sm-3">Période du</label>
+                        <div class="col-sm-4">    
                             <input type="text" name="debut" value="{{ app.session.get('exercice').dateDebut|date('d/m/Y') }}" placeholder="jj/mm/aaaa" autocomplete="off" class="form-control datepicker" auto-fill="false" required>
                         </div>
-                        <label class="col-form-label col-sm-1">Au</label>
+                        <label class="col-form-label col-sm-1">au</label>
                         <div class="col-sm-4">    
                             <input type="text" name="fin" value="{{ app.session.get('exercice').dateFin|date('d/m/Y') }}"  placeholder="jj/mm/aaaa" autocomplete="off" class="form-control datepicker" auto-fill="false" required>
                         </div>
                     </div>
 
                     <div class="form-group text-right">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Fermer</button>
                         <button type="submit" class="btn btn-primary">OK</button>
                     </div>
                 </form>
@@ -42,8 +42,8 @@
 <div class="modal fade" tabindex="-1" id="modal-livre" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Grand-livre des comptes</h5>
+            <div class="modal-header bg-primary text-light">
+                <h5 class="modal-title">Afficher Grand livre</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
                 </button>
@@ -51,7 +51,7 @@
             <div class="modal-body">
                 <form method="GET" action="{{ path('comptabilite_livre') }}">
                     <div class="form-group">
-                        <label class="col-form-label">Compte:</label>
+                        <label class="col-form-label">Compte générale</label>
                         <select name="poste" class="form-control">
                             <option value="">Tous les comptes</option>
                             {% for compte in labelComptes %}
@@ -60,18 +60,18 @@
                         </select>
                     </div>
                     <div class="form-group row" id="remb_form">
-                        <label class="col-form-label col-sm-3">Periode du</label>
-                        <div class="col-sm-3">    
+                        <label class="col-form-label col-sm-3">Période du</label>
+                        <div class="col-sm-4">    
                             <input type="text" name="debut" value="{{ app.session.get('exercice').dateDebut|date('d/m/Y') }}" placeholder="jj/mm/aaaa" autocomplete="off" class="form-control datepicker" auto-fill="false" required>
                         </div>
-                        <label class="col-form-label col-sm-1">Au</label>
+                        <label class="col-form-label col-sm-1">au</label>
                         <div class="col-sm-4">    
                             <input type="text" name="fin" value="{{ app.session.get('exercice').dateFin|date('d/m/Y') }}"  placeholder="jj/mm/aaaa" autocomplete="off" class="form-control datepicker" auto-fill="false" required>
                         </div>
                     </div>
 
                     <div class="form-group text-right">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Fermer</button>
                         <button type="submit" class="btn btn-primary">OK</button>
                     </div>
                 </form>

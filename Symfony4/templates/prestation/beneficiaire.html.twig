@@ -89,12 +89,6 @@
                                         <li class="my-3 ">
                                             <span class="font-weight-medium text-dark"> Total des montants remboursés</span>
                                         </li>
-                                        <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Remboursement plafond</span>
-                                        </li>
-                                        <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Reste de remboursement </span>
-                                        </li>
                                     </ul>
                                 </div>
                                 <div class="col-md-6">
@@ -102,12 +96,7 @@
                                         <li class="my-3 border-bottom">
                                             <span> {{ info.tRemb|number_format(0,',',' ') }} </span>
                                         </li>
-                                        <li class="my-3 border-bottom">
-                                            <span> {{ info.plafond|number_format(0,',',' ') }} </span>
-                                        </li>
-                                        <li class="my-3 border-bottom">
-                                            <span> {{ (info.plafond - info.tRemb)|number_format(0,',',' ') }} </span>
-                                        </li>
+                            
                                     </ul>
                                 </div>
                             </div>
@@ -117,15 +106,10 @@
                                 </div>
                             {% else %}
                                 <div class="alert alert-danger">
-                                    Ce personne  ne peut pas bénéficier de prestation 
+                                    Ce personne  ne peut pas bénéficier de prestation car sa congrégation n'a pas payé son cotisation 
                                 </div>
                             {% endif %}
 
-                            {% if info.plafond <= info.tRemb %}
-                                <div class="alert alert-warning">
-                                    Les remboursements de ce bénéficiaire dépasse le plafond définie
-                                </div>
-                            {% endif %}
                         </div>
                     </div>
                     <div class="row mt-4">

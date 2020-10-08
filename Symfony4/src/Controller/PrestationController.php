@@ -51,14 +51,12 @@ class PrestationController extends AbstractController
         $prestations = $repositoryPrestation->findPrestation($exercice, $pac);  
 
         $percentPrestation = (float) $repositoryParametre->findOneByNom('percent_prestation')->getValue();
-        $plafondPrestation = (float) $repositoryParametre->findOneByNom('plafond_prestation')->getValue();
+        
 
         /* Verifie si le béneficiaire possede le droit */
         $adherent = $pac->getAdherent();
         $compteCotisation = $repositoryCompteCotisation->findCompteCotisation($adherent, $exercice);
-        if ($compteCotisation->getPourcentagePaye() >= $percentPrestation) {
-            
-        }
+        
 
         $totalRembourse = 0;
         foreach ($prestations as $prestation) {
@@ -68,7 +66,6 @@ class PrestationController extends AbstractController
         $info = [
             'possedeDroit' => $compteCotisation->getPourcentagePaye() >= $percentPrestation,
             'tRemb' => $totalRembourse,
-            'plafond' => $exercice->getCotAncien() * $plafondPrestation
         ];
 
         return $this->render('prestation/beneficiaire.html.twig', [

@@ -117,3 +117,10 @@ ul.border-bottom-white li {
 .datepicker {
     padding: 6px;
 }
+
+.help-input {
+    display: none;
+    width: 100%;
+    margin-top: .25rem;
+    font-size: 80%;
+}
