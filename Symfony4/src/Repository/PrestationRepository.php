@@ -146,4 +146,43 @@ class PrestationRepository extends ServiceEntityRepository
                             ->getSingleScalarResult();   
         return ['remb'=>$remb,'nonRemb'=>$nonRemb,'nonDecide'=>$nonDecide];                    
     }
+
+    public function findDetailRemb(Remboursement $remb)
+    {
+
+        $bens = $this->_em->createQuery('select distinct identity(p.pac) as pac_id from App\Entity\Prestation p where p.remboursement = :remb')
+                            ->setParameter('remb', $remb)
+                            ->getResult();
+        // Soins
+        $pSoins = $this->_em->createQuery('select p from App\Entity\Parametre p where p.nom = :nom')
+                            ->setParameter('nom', 'soins_prestation')
+                            ->getOneOrNullResult();
+        $soins = $pSoins->getList();
+        dump($bens);
+
+        $beneficiaires = [];
+        
+        foreach ($bens as $ben) {
+            $pac =  $this->_em->createQuery('select p from App\Entity\Pac p where p.id = :id')
+                        ->setParameter('id', $ben['pac_id'])
+                        ->getOneOrNullResult();
+            $line['matricule'] = $pac->getMatricule();
+            $mont_remb = 0; $mont_frais = 0;
+            foreach ($soins as $code => $lib) {
+                $pre = $this->_em->createQuery('select sum(p.frais) as frais, sum(p.rembourse) as remb from App\Entity\Prestation p where p.remboursement = :remb and p.designation = :code and identity(p.pac) = :id')
+                            ->setParameter('id', $ben['pac_id'])
+                            ->setParameter('remb', $remb)
+                            ->setParameter('code', $code)
+                            ->getResult();
+                $line[$code] = (float) $pre[0]['frais'];
+                $mont_frais += (float) $pre[0]['frais'];
+                $mont_remb += $pre[0]['remb'];
+            }
+            $line['frais'] = (float) $mont_frais;
+            $line['rembourse'] = (float) $mont_remb;
+            $beneficiaires[] = $line;
+        }
+
+        return ['soins' => $soins, 'beneficiaires' => $beneficiaires];
+    }
 }

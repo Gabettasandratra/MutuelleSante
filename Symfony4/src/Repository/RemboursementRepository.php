@@ -35,15 +35,13 @@ class RemboursementRepository extends ServiceEntityRepository
     
     }
 
-    /*
-    public function findOneBySomeField($value): ?Remboursement
+    public function findTotalRemb(Exercice $exercice, Adherent $adherent)
     {
-        return $this->createQueryBuilder('r')
-            ->andWhere('r.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        return $this->_em->createQuery('select sum(r.montant) from App\Entity\Remboursement r where r.adherent = :ad and r.date between :dateDebut and :dateFin order by r.date DESC')
+                        ->setParameter('ad', $adherent)    
+                        ->setParameter('dateDebut', $exercice->getDateDebut())
+                        ->setParameter('dateFin', $exercice->getDateFin())                  
+                        ->getSingleScalarResult()
+        ; 
     }
-    */
 }

@@ -74,6 +74,44 @@
                             <a href="{{ path('prestation_adherent_show', {'id': adherent.id}) }}" class="btn btn-info"><i class="mdi mdi-close-circle-outline"></i> Fermer</a>
                         </div>
                     </div>  
+
+                    <h4 class="card-title my-4">Détaillé</h4>
+                    <hr>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>N°matricule</th>
+                                {% for soin, code in donnees.soins %}
+                                    <th>{{code}}</th>
+                                {% endfor %}
+                                <th>Total frais</th>
+                                <th>Remboursé</th>
+                                <th>%</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% set frais = 0 %}{% set rembourse = 0 %}
+                        {% for beneficiaire in donnees.beneficiaires %}
+                            <tr>
+                                <th>{{beneficiaire.matricule}}</th>
+                                {% for soin, code in donnees.soins %}
+                                    <td>{% if beneficiaire[soin] != 0 %}{{beneficiaire[soin]|number_format(2,',',' ')}}{% endif %}</td>
+                                {% endfor %}
+                                <td>{{beneficiaire.frais|number_format(2,',',' ')}}</td> {% set frais = frais+beneficiaire.frais %}
+                                <td>{{beneficiaire.rembourse|number_format(2,',',' ')}}</td> {% set rembourse = rembourse+beneficiaire.rembourse %}
+                                <td>{{(beneficiaire.rembourse/beneficiaire.frais*100)|round(3, 'floor')}}%</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>  
+                        <tfoot>
+                            <tr>
+                                <th colspan={{1+donnees.soins|length}}>Total</th>
+                                <td>{{frais|number_format(2,',',' ')}}</td>
+                                <td>{{rembourse|number_format(2,',',' ')}}</td>
+                                <td>{{(rembourse/frais*100)|round(3, 'floor')}}%</td>
+                            </tr>
+                        </tfoot>                       
+                    </table>
                 </div>
             </div>
         </div>

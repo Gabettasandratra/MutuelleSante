@@ -79,18 +79,26 @@ class PrestationController extends AbstractController
     /**
      * @Route("/prestation/beneficiaire/{id}/decompte", name="prestation_beneficiaire_decompte", requirements={"id"="\d+"})
      */
-    public function addDecompte(Pac $pac, PrestationRepository $repositoryPrestation, ParametreRepository $repositoryParametre, SessionInterface $session)
+    public function addDecompte(Pac $pac, PrestationRepository $repositoryPrestation, CompteCotisationRepository $repoCompte, ParametreRepository $repositoryParametre,RemboursementRepository $repoRemb, SessionInterface $session)
     {
         $exercice = $session->get('exercice');
         $generatedNumero = $repositoryPrestation->generateNumero($pac, $exercice);
         $soins = $repositoryParametre->findOneByNom('soins_prestation');
-        $remb = $repositoryParametre->findOneByNom('percent_rembourse_prestation');
+        $remb = $repositoryParametre->findOneByNom('percent_rembourse_prestation')->getValue();
+        $remb_plafond = $repositoryParametre->findOneByNom('percent_rembourse_prestation_plafond')->getValue();
 
+        // Calcul si le remboursement est normale ou plafoné
+        $coefPlafond = (float)$repositoryParametre->findOneByNom('plafond_prestation')->getValue();
+        $cotPaye = $repoCompte->findCompteCotisation($pac->getAdherent(), $exercice)->getPaye();
+        $plafond = $cotPaye * $coefPlafond;
+        $montRemb = $repoRemb->findTotalRemb($exercice, $pac->getAdherent()); // Montant remboursé
+        
+        $percent = ($plafond > $montRemb)?$remb:$remb_plafond;
         return $this->render('prestation/decompte.html.twig', [
             'pac' => $pac,
             'numero' => $generatedNumero,
-            'remb' => $remb->getValue(),
-            'soins' => $soins->getList(),
+            'remb' => $percent,
+            'soins' => $soins->getList()
         ]);
     }
 
@@ -120,8 +128,10 @@ class PrestationController extends AbstractController
             $prestation->setStatus($prestationJs['status']);
             $prestation->setPrestataire($prestationJs['prestataire']);
             $prestation->setFacture($prestationJs['facture']);
+            $prestation->setRefus($prestationJs['refus']);// Les details de refus
+            $prestation->setUser($this->getUser()); // Utilisateur qui l'a saisie
             $prestation->setDecompte($data['numero']);
-    
+            
             $errors = $validator->validate($prestation);
             if (0 === count($errors) && $exercice->check($prestation->getDate())) {
                 $manager->persist($prestation);
@@ -159,12 +169,15 @@ class PrestationController extends AbstractController
         $exercice = $session->get('exercice');
         $adherents = $repositoryAdherent->findAll();
         $retour = [];
+        
         foreach ($adherents as $adherent) {
+            $wait = $repositoryAdherent->findPrestationAttente($exercice, $adherent);
             $retour[] = [
                 'id' => $adherent->getId(),
                 'numero' => $adherent->getNumero(),
                 'nom' => $adherent->getNom(),
-                'attente' => $repositoryAdherent->findSommePrestationAttente($exercice, $adherent),
+                'attenteDecision' => $wait['nonDecide'],
+                'attentePaiement' => $wait['nonPaye'],
             ];
         }               
         return $this->render('prestation/adherent.html.twig', [
@@ -242,15 +255,14 @@ class PrestationController extends AbstractController
     }
 
     /**
-     * @Route("/prestation/adherent/{adh_id}/remboursement/{remb_id}", name="prestation_adherent_remboursement", requirements={"id"="\d+"})
-     * @ParamConverter("adherent", options={"mapping": {"adh_id":"id"}})
-     * @ParamConverter("remboursement", options={"mapping": {"remb_id":"id"}})
+     * @Route("/prestation/adherent/remboursement/{id}", name="prestation_adherent_remboursement", requirements={"id"="\d+"})
      */
-    public function detailRemboursement(Adherent $adherent, Remboursement $remboursement)
+    public function detailRemboursement(Remboursement $remboursement, PrestationRepository $repo)
     {
         return $this->render('prestation/detailRemboursement.html.twig', [
-            'adherent' => $adherent,
+            'adherent' => $remboursement->getAdherent(),
             'remboursement' => $remboursement,
+            'donnees' => $repo->findDetailRemb($remboursement)
         ]);
     }
 

@@ -35,8 +35,9 @@
                                     <th scope="col">#</th>
                                     <th scope="col">Code</th>
                                     <th scope="col">Congrégation</th>
-                                    <th scope="col">En attente de paiement</th>
-                                    <th scope="col"></th>
+                                    <th scope="col">Non décidé</th>
+                                    <th scope="col">Non payé</th>
+                                    <th scope="col">Select</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -45,7 +46,8 @@
                                         <th scope="row">{{ loop.index }}</th>
                                         <td>{{ adherent.numero }}</td>
                                         <td>{{ adherent.nom }}</td>                                            
-                                        <td>{{ adherent.attente }}</td>
+                                        <td>{{ adherent.attenteDecision }}</td>
+                                        <td>{{ adherent.attentePaiement }}</td>
                                         <td><a href="{{ path('prestation_adherent_show', {'id': adherent.id}) }}"class="label label-rounded btn-primary label-primary"><i class="mdi mdi-cursor-default"></a></td>
                                     </tr>
                                 {% endfor %}

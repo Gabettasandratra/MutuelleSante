@@ -33,6 +33,7 @@ class ParametreService
         $parametres[] = new Parametre('percent_prestation', 1);
         $parametres[] = new Parametre('plafond_prestation', 2);
         $parametres[] = new Parametre('percent_rembourse_prestation', 0.6);
+        $parametres[] = new Parametre('percent_rembourse_prestation_plafond', 0.25);
         $parametres[] = new Parametre('compte_dette_prestation');
         
         

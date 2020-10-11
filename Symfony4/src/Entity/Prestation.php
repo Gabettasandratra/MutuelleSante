@@ -90,6 +90,17 @@ class Prestation
      */
     private $dateDecision;
 
+    /**
+     * @ORM\Column(type="json", nullable=true)
+     */
+    private $refus = [];
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $user;
+
     public function __construct(Pac $pac)
     {
         $this->date = new \DateTime(); // Afin que la date d'aujourdui sera afficher par defaut
@@ -260,6 +271,30 @@ class Prestation
     public function setDateDecision(\DateTimeInterface $dateDecision): self
     {
         $this->dateDecision = $dateDecision;
+
+        return $this;
+    }
+
+    public function getRefus(): ?array
+    {
+        return $this->refus;
+    }
+
+    public function setRefus(?array $refus): self
+    {
+        $this->refus = $refus;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

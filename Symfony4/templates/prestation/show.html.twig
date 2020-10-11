@@ -149,7 +149,7 @@
                                             <td>{{ remboursement.montant|number_format(2,',',' ') }}</td>
                                             <td>{{ remboursement.tresorerie.titre }}</td>
                                             <td>{{ remboursement.reference }}</td>
-                                            <td><a href="{{ path('prestation_adherent_remboursement', { 'adh_id': adherent.id, 'remb_id': remboursement.id }) }}" class="label btn-primary label-primary">Voir</a></td>
+                                            <td><a href="{{ path('prestation_adherent_remboursement', {'id': remboursement.id }) }}" class="label btn-primary label-primary">Voir</a></td>
                                         </tr>
                                     {% else %}
                                         <tr>

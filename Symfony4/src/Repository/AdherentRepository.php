@@ -28,14 +28,21 @@ class AdherentRepository extends ServiceEntityRepository
         ;
     }
 
-    public function findSommePrestationAttente(Exercice $exercice, Adherent $adherent)
+    public function findPrestationAttente(Exercice $exercice, Adherent $adherent)
     {
-        return (int) $this->_em->createQuery('select sum(p.rembourse) as attente from App\Entity\Prestation p where p.adherent = :a and p.isPaye = false and p.date between :dateDebut and :dateFin ')
+        $montantEnAttentePaiement = floatval($this->_em->createQuery('select sum(p.rembourse) from App\Entity\Prestation p where p.adherent = :a and p.isPaye = false and p.date between :dateDebut and :dateFin ')
+                         ->setParameter('a', $adherent)
+                         ->setParameter('dateDebut', $exercice->getDateDebut())
+                         ->setParameter('dateFin', $exercice->getDateFin())
+                         ->getSingleScalarResult())
+        ;
+        $nbEnAttenteDecision = $this->_em->createQuery('select count(p) from App\Entity\Prestation p where p.adherent = :a and p.status = 0 and p.date between :dateDebut and :dateFin ')
                          ->setParameter('a', $adherent)
                          ->setParameter('dateDebut', $exercice->getDateDebut())
                          ->setParameter('dateFin', $exercice->getDateFin())
                          ->getSingleScalarResult()
         ;
+        return ['nonPaye' => $montantEnAttentePaiement, 'nonDecide' => $nbEnAttenteDecision];
     }
 
     public function findJoinPrestationAttente(Exercice $exercice)
