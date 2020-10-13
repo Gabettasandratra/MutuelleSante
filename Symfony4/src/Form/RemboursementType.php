@@ -19,8 +19,10 @@ class RemboursementType extends AbstractType
     {
         $builder
             ->add('date', DateType::class, [
-                'format' => 'ddMMMMyyyy',
-                'label' => 'Date de paiement',
+                'widget' => 'single_text',
+                'format' => 'dd/MM/yyyy',
+                'attr' => ['class' => 'datepicker','autocomplete' => 'off'],
+                'html5' => false,
             ])
             ->add('montant', NumberType::class, [
                 'attr' => [

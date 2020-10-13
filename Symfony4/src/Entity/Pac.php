@@ -98,6 +98,13 @@ class Pac
 
     /**
      * @ORM\Column(type="string", length=15, nullable=true, unique=true)
+     * @Assert\Length(
+     *      min = 12,
+     *      max = 12,
+     *      minMessage = "Le CIN doit representé {{ limit }} chiffre",
+     *      maxMessage = "Le CIN doit representé {{ limit }} chiffre",
+     *      allowEmptyString = true
+     * )
      */
     private $cin;
 
@@ -114,6 +121,7 @@ class Pac
     public function __construct()
     {
         $this->dateEntrer = new \DateTime();
+        $this->parente = 'Membre';
         $this->prestations = new ArrayCollection();
     }
 

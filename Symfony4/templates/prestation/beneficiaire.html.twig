@@ -106,18 +106,23 @@
                                 </div>
                             {% else %}
                                 <div class="alert alert-danger">
-                                    Ce personne  ne peut pas bénéficier de prestation car sa congrégation n'a pas payé son cotisation 
+                                    Ce personne ne peut pas bénéficier de prestation car sa congrégation n'a pas payé entierement son cotisation 
                                 </div>
                             {% endif %}
 
                         </div>
                     </div>
                     <div class="row mt-4">
-                        <div class="col-8">
+                        <div class="col-6">
                             <h4 class="card-title">Liste des prestations consommées</h4>
                         </div>
                         {% if info.possedeDroit and exercice.isCurrent and not exercice.isCloture %}
-                        <div class="col-4">
+                        <div class="col-3">
+                            <div class="text-right">
+                                <a href="#" class="btn btn-sm btn-success"><i class="mdi mdi-import"></i> Importer decompte de prestations</a>
+                            </div> 
+                        </div>
+                        <div class="col-3">
                             <div class="text-right">
                                 <a href="{{ path('prestation_beneficiaire_decompte', {'id' : pac.id}) }}" class="btn btn-sm btn-info"><i class="mdi mdi-hospital"></i> Saisir decompte de prestations</a>
                             </div> 
@@ -126,7 +131,7 @@
                     </div>
                     <hr>
                     <div class="table-responsive">
-                        <table class="table table-bordered">
+                        <table class="table table-bordered" id="zero_config">
                             <thead class="thead-light">
                                 <tr>
                                     <th scope="col">#</th>
@@ -164,7 +169,7 @@
                                             </td> {% set tRemb = tRemb + prestation.rembourse %}
 
                                         <td>{{ (prestation.rembourse / prestation.frais)|round(2, 'floor') * 100 }}%</td>
-                                        <td>{{ pac.adherent.numero ~ '/' ~ app.session.get('exercice').annee ~ '/' ~ prestation.decompte }}</td>
+                                        <td>{{ pac.matricule ~ '/' ~ app.session.get('exercice').annee ~ '/' ~ prestation.decompte }}</td>
                                         <td>
                                             {% if prestation.isPaye %}
                                                 <span class="label label-rounded label-success">Payé</span>

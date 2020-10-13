@@ -72,6 +72,22 @@ class ComptaService
         $label = str_replace('{a}', $remboursement->getExercice()->getAnnee(), $label);
         $label = str_replace('{c}', $remboursement->getAdherent()->getNom(), $label);
 
+        // Si c'est une modification quand on analyse
+        if ($remboursement->getArticle() != null) {
+            $anc_article = $remboursement->getArticle();
+            $article = new Article();
+            $article->setCompteDebit($anc_article->getCompteCredit());        
+            $article->setCompteCredit($anc_article->getCompteDebit());        
+            $article->setLibelle("Annulation article N°".$anc_article->getId());
+            $article->setCategorie($anc_article->getCategorie());
+            $article->setAnalytique($anc_article->getAnalytique()); // Le congrégation rembourser
+            $article->setMontant($anc_article->getMontant());
+            $article->setDate($remboursement->getDate());
+            $article->setPiece($anc_article->getPiece());
+            $article->setIsFerme(true);
+            $this->manager->persist($article);
+        }
+
         $article = new Article();
         $article->setCompteDebit($compteRemboursement);        
         $article->setCompteCredit($remboursement->getTresorerie());        
@@ -86,6 +102,49 @@ class ComptaService
         $remboursement->setArticle($article);
 
         $this->manager->persist($remboursement);
+        $this->manager->flush();    
+
+        return $remboursement;
+    }
+
+    /*
+    * Modification d'une remboursement éffectué (-Banque et Piece)
+    */
+    public function editRemboursement(Remboursement $remboursement)
+    {
+        $anc_article = $remboursement->getArticle();
+        // Annulation de l'article précedent
+        $article = new Article();
+        $article->setCompteDebit($anc_article->getCompteCredit());        
+        $article->setCompteCredit($anc_article->getCompteDebit());        
+        $article->setLibelle("Annulation article N°".$anc_article->getId());
+        $article->setCategorie($anc_article->getCategorie());
+        $article->setAnalytique($anc_article->getAnalytique()); // Le congrégation rembourser
+        $article->setMontant($anc_article->getMontant());
+        $article->setDate($remboursement->getDate());
+        $article->setPiece($anc_article->getPiece());
+        $article->setIsFerme(true);
+
+        // Nouveau écriture
+        $label = $this->paramService->getParametre('label_prestation');    
+        $label = str_replace('{a}', $remboursement->getExercice()->getAnnee(), $label);
+        $label = str_replace('{c}', $remboursement->getAdherent()->getNom(), $label);
+
+        $art_new = new Article();
+        $art_new->setCompteDebit($anc_article->getCompteDebit()); // Compte de dette       
+        $art_new->setCompteCredit($remboursement->getTresorerie());        
+        $art_new->setLibelle($label);
+        $art_new->setCategorie($remboursement->getTresorerie()->getCodeJournal());
+        $art_new->setAnalytique($remboursement->getAdherent()->getCodeAnalytique()); // Le congrégation rembourser
+        $art_new->setMontant($remboursement->getMontant());
+        $art_new->setDate($remboursement->getDate());
+        $art_new->setPiece($remboursement->getReference());
+        $art_new->setIsFerme(true); 
+
+        $remboursement->setArticle($art_new);
+
+        $this->manager->persist($remboursement);
+        $this->manager->persist($article);
         $this->manager->flush();    
 
         return $remboursement;

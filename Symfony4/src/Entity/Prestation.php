@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PrestationRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -101,12 +103,18 @@ class Prestation
      */
     private $user;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Detail::class, mappedBy="prestation", orphanRemoval=true)
+     */
+    private $details;
+
     public function __construct(Pac $pac)
     {
         $this->date = new \DateTime(); // Afin que la date d'aujourdui sera afficher par defaut
         $this->pac = $pac;
         $this->adherent = $pac->getAdherent();
         $this->isPaye = false;
+        $this->details = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -295,6 +303,37 @@ class Prestation
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Detail[]
+     */
+    public function getDetails(): Collection
+    {
+        return $this->details;
+    }
+
+    public function addDetail(Detail $detail): self
+    {
+        if (!$this->details->contains($detail)) {
+            $this->details[] = $detail;
+            $detail->setPrestation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDetail(Detail $detail): self
+    {
+        if ($this->details->contains($detail)) {
+            $this->details->removeElement($detail);
+            // set the owning side to null (unless already changed)
+            if ($detail->getPrestation() === $this) {
+                $detail->setPrestation(null);
+            }
+        }
 
         return $this;
     }

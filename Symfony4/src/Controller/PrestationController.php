@@ -9,6 +9,7 @@ use App\Entity\Exercice;
 use App\Entity\Parametre;
 use App\Entity\Prestation;
 use App\Form\PrestationType;
+use App\Service\ExcelReader;
 use App\Entity\Remboursement;
 use App\Service\ComptaService;
 use App\Form\RemboursementType;
@@ -25,6 +26,8 @@ use App\Repository\CompteCotisationRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -82,7 +85,7 @@ class PrestationController extends AbstractController
     public function addDecompte(Pac $pac, PrestationRepository $repositoryPrestation, CompteCotisationRepository $repoCompte, ParametreRepository $repositoryParametre,RemboursementRepository $repoRemb, SessionInterface $session)
     {
         $exercice = $session->get('exercice');
-        $generatedNumero = $repositoryPrestation->generateNumero($pac, $exercice);
+        $generatedNumero = $repositoryPrestation->generateNumero($pac->getAdherent(), $exercice);
         $soins = $repositoryParametre->findOneByNom('soins_prestation');
         $remb = $repositoryParametre->findOneByNom('percent_rembourse_prestation')->getValue();
         $remb_plafond = $repositoryParametre->findOneByNom('percent_rembourse_prestation_plafond')->getValue();
@@ -158,6 +161,41 @@ class PrestationController extends AbstractController
 
         return new JsonResponse([
             'hasError' => false
+        ]);
+    }
+
+    /**
+     * @Route("/prestation/beneficiaire/decompte/import", name="prestation_beneficiaire_import_decompte")
+     */
+    public function importDecompte(Request $request, ExcelReader $excelReader)
+    {
+        $form = $this->createFormBuilder()
+                    ->add('file', FileType::class, [
+                        'mapped' => false,
+                        'required' => true,
+                    ])
+                    ->add('save', SubmitType::class, ['label' => 'Importer xlsx'])
+                    ->getForm();
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            // read data from Excel file
+            $xlsxFile = $form->get('file')->getData();
+            if ($xlsxFile) {
+                $output = $excelReader->saveDecompte($xlsxFile);  
+                if ($output['hasError'] === false) {
+                    return $this->redirectToRoute('prestation_beneficiaire', ['id' => $pac->getId()]); 
+                } else {
+                    foreach ($output['ErrorMessages'] as $message) {
+                        $form->get('file')->addError(new FormError($message));
+                    }
+                }             
+            }
+            
+        }
+        
+        return $this->render('adhesion/addPacXlsx.html.twig', [
+            'form' => $form->createView(),
+            'adherent' => $adherent,
         ]);
     }
 
@@ -277,7 +315,6 @@ class PrestationController extends AbstractController
         $form = $this->createForm(RemboursementType::class, $remboursement);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-
             $montant = $form->get('montant')->getData();
             $tresorerie = $form->get('tresorerie')->getData();
             $solde = $repositoryCompte->findSolde($tresorerie);
@@ -302,7 +339,34 @@ class PrestationController extends AbstractController
 
         return $this->render('prestation/rembourser.html.twig', [
             'adherent' => $adherent,
+            'edit' => false,
             'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/prestation/adherent/remboursement/{id}/edit", name="prestation_adherent_remboursement_edit", requirements={"id"="\d+"})
+     */
+    public function editRemboursement(Remboursement $remboursement,Request $request,ComptaService $comptaService,CompteRepository $repositoryCompte)
+    {
+        $form = $this->createForm(RemboursementType::class, $remboursement);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $montant = $form->get('montant')->getData();
+            $tresorerie = $form->get('tresorerie')->getData();
+            $solde = $repositoryCompte->findSolde($tresorerie);
+            if ($montant <= $solde) {
+                $remboursement = $comptaService->payRemboursement($remboursement); // Modification
+                return $this->redirectToRoute('prestation_adherent_show', ['id' => $remboursement->getAdherent()->getId()]);
+            } else {
+                $form->get('tresorerie')->addError(new FormError("Le solde negatif est interdit pour les trésoreries. Solde actuelle $solde"));
+            }
+        }
+
+        return $this->render('prestation/rembourser.html.twig', [
+            'adherent' => $remboursement->getAdherent(),
+            'edit' => true,
+            'form' => $form->createView()
         ]);
     }
 }

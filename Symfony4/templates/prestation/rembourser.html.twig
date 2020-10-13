@@ -5,7 +5,8 @@
 {% block header %}
     <div class="page-breadcrumb">
         <div class="d-flex align-items-center">
-            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Enregistrer remboursement</h4>
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">{% if edit %}Modification {% else %}Paiement {% endif %}
+            </h4>
             <div class="ml-auto">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb m-0 p-0">
@@ -25,13 +26,13 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Remboursement de la congrégation {{ adherent.id ~ ' - ' ~ adherent.nom }}</h4>
+                    <h4 class="card-title">Remboursement pour la congrégation {{ adherent.id ~ ' - ' ~ adherent.nom }}</h4>
                     <hr>
                     <div class="row">
                         <div class="col-6">
                             {{ form_start(form) }}
                                 {{ form_widget(form) }}                           
-                                <button type="submit" class="btn btn-success">Enregistrer</button>
+                                <button type="submit" class="btn btn-success">Valider</button>
                             {{ form_end(form) }}
                         </div>
                     </div>
