@@ -93,18 +93,13 @@ class Prestation
     private $dateDecision;
 
     /**
-     * @ORM\Column(type="json", nullable=true)
-     */
-    private $refus = [];
-
-    /**
      * @ORM\ManyToOne(targetEntity=User::class)
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;
 
     /**
-     * @ORM\OneToMany(targetEntity=Detail::class, mappedBy="prestation", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=Detail::class, mappedBy="prestation", orphanRemoval=true,cascade={"persist"})
      */
     private $details;
 
@@ -114,6 +109,8 @@ class Prestation
         $this->pac = $pac;
         $this->adherent = $pac->getAdherent();
         $this->isPaye = false;
+        $this->rembourse = 0;
+        $this->status = 0;
         $this->details = new ArrayCollection();
     }
 
@@ -266,6 +263,7 @@ class Prestation
 
     public function setStatus(int $status): self
     {
+        $this->dateDecision = new \DateTime();
         $this->status = $status;
 
         return $this;
@@ -279,18 +277,6 @@ class Prestation
     public function setDateDecision(\DateTimeInterface $dateDecision): self
     {
         $this->dateDecision = $dateDecision;
-
-        return $this;
-    }
-
-    public function getRefus(): ?array
-    {
-        return $this->refus;
-    }
-
-    public function setRefus(?array $refus): self
-    {
-        $this->refus = $refus;
 
         return $this;
     }
@@ -313,6 +299,20 @@ class Prestation
     public function getDetails(): Collection
     {
         return $this->details;
+    }
+
+    public function getJsonDetails()
+    {
+        $json = [];
+        foreach ($this->details as $detail) {
+            $json[] = [
+                'id'=>$detail->getId(), 
+                'montant'=>$detail->getMontant(), 
+                'description'=>$detail->getNom(), 
+                'etat'=>$detail->getEtat() 
+            ];
+        }
+        return $json;
     }
 
     public function addDetail(Detail $detail): self

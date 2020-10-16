@@ -3,8 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Pac;
-use App\Entity\Adherent;
+use App\Entity\Detail;
 
+use App\Entity\Adherent;
 use App\Entity\Exercice;
 use App\Entity\Parametre;
 use App\Entity\Prestation;
@@ -15,6 +16,7 @@ use App\Service\ComptaService;
 use App\Form\RemboursementType;
 use App\Repository\PacRepository;
 use App\Repository\CompteRepository;
+use App\Repository\DetailRepository;
 use Symfony\Component\Form\FormError;
 use App\Repository\AdherentRepository;
 use App\Repository\ParametreRepository;
@@ -127,16 +129,18 @@ class PrestationController extends AbstractController
             $prestation->setDate(\DateTime::createFromFormat('d/m/Y', $prestationJs['date']));
             $prestation->setDesignation($prestationJs['designation']);
             $prestation->setFrais($prestationJs['frais']);
-            $prestation->setRembourse($prestationJs['rembourse']);
-            $prestation->setStatus($prestationJs['status']);
             $prestation->setPrestataire($prestationJs['prestataire']);
             $prestation->setFacture($prestationJs['facture']);
-            $prestation->setRefus($prestationJs['refus']);// Les details de refus
             $prestation->setUser($this->getUser()); // Utilisateur qui l'a saisie
             $prestation->setDecompte($data['numero']);
-            
+
             $errors = $validator->validate($prestation);
             if (0 === count($errors) && $exercice->check($prestation->getDate())) {
+                // Ajout de chaque detail
+                foreach ($prestationJs['details'] as $donnee) {
+                    $detail = new Detail($donnee['montant'], $donnee['detail']);
+                    $prestation->addDetail($detail);
+                }
                 $manager->persist($prestation);
             } else {    
                 $retour['hasError'] = true;
@@ -150,14 +154,8 @@ class PrestationController extends AbstractController
                 }
                 return new JsonResponse($retour);
             }
-
-            // If prestation is valid
-            $tot_remb += $prestation->getRembourse();
         }
         $manager->flush();
-
-        // Sauvegarde en tant que dette
-        $comptaService->updateDetteRemb();
 
         return new JsonResponse([
             'hasError' => false
@@ -249,8 +247,30 @@ class PrestationController extends AbstractController
             'reste' => $plafond - $totalRembourse,
         ];
 
+        // Serialization du prestation
         $prestationNotPayed = $repositoryPrestation->findNotPayed($adherent);
-        $percent = $repositoryParametre->findOneByNom('percent_rembourse_prestation')->getValue(); // pourcentage par defaut
+        $donnesSerialize = [];
+        foreach ($prestationNotPayed as $prestation) {
+            $donnesSerialize[] = [
+                'id'=>$prestation->getId(), 
+                'date'=>$prestation->getDate()->format('d/m/Y'), 
+                'pac'=>$prestation->getPac()->getMatricule(),
+                'designation'=>$prestation->getDesignation(),  
+                'frais'=>$prestation->getFrais(), 
+                'rembourse'=>$prestation->getRembourse(), 
+                'status'=>$prestation->getStatus(), 
+                'prestataire'=>$prestation->getPrestataire(),
+                'facture'=>$prestation->getFacture(), 
+                'decompte'=>$exercice->getAnnee().'/'.$prestation->getDecompte(), 
+                'details'=>$prestation->getJsonDetails()
+            ];
+        }
+        $json = json_encode($donnesSerialize);
+        
+        // Le valeur de pourcentage
+        $remb = $repositoryParametre->findOneByNom('percent_rembourse_prestation')->getValue(); // PAr defaut
+        $remb_plafond = $repositoryParametre->findOneByNom('percent_rembourse_prestation_plafond')->getValue(); // Si on a sauter le plafond
+        $percent = ($plafond > $totalRembourse)?$remb:$remb_plafond;
 
         return $this->render('prestation/show.html.twig', [
             'adherent' => $adherent,
@@ -258,27 +278,28 @@ class PrestationController extends AbstractController
             'remboursements' => $remboursements,
             'percent' => $percent,
             'prestationNotPayed' => $prestationNotPayed,
+            'json' => $json 
         ]);
     }
 
     /**
-     * @Route("/prestation/update", name="prestation_update_ajax")
+     * @Route("/prestation/decider", name="prestation_decider_json")
      */
-    public function ajaxUpadatePrestation(PrestationRepository $repo, Request $request, EntityManagerInterface $manager, ComptaService $comptaService)
+    public function ajaxUpadatePrestation(PrestationRepository $repoPre, Request $request, DetailRepository $repoDetail, EntityManagerInterface $manager, ComptaService $comptaService)
     {
         $data = json_decode( $request->getContent(), true);
-        $prestation = $repo->find($data['id']);
-        if ( $prestation === null ) {
-            return new JsonResponse([
-                'hasError' => true,
-                'message' => "La prestation demandé n'existe pas",
-            ]);
-        }
-        $prestation->setStatus($data['status']);
-        if($data['status'] == 1) {
-            $prestation->setRembourse($data['rembourse']);
-        } else {
-            $prestation->setRembourse(0);
+        $prestation = $repoPre->find($data['id']);
+        $prestation->setFrais($data['frais']);
+        $prestation->setRembourse($data['rembourse']);
+        if ($data['rembourse'] > 0) 
+            $prestation->setStatus(1);
+        else
+            $prestation->setStatus(-1);
+        
+        foreach ($data['details'] as $d) {
+            $detail = $repoDetail->find($d['id']);
+            if ($detail->getEtat() !== $d['etat'])
+                $detail->setEtat($d['etat']);
         }
         $manager->flush();
 

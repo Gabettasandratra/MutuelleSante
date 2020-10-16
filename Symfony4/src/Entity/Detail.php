@@ -38,8 +38,10 @@ class Detail
      */
     private $etat;
 
-    public function __construct(Type $var = null) {
+    public function __construct($montant, $nom) {
         $this->etat = true;
+        $this->montant = $montant;
+        $this->nom = $nom;
     }
 
     public function getId(): ?int

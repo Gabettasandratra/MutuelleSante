@@ -25,60 +25,8 @@
                 <div class="card-body">
                     <h4 class="card-title">Détail de remboursement</h4>
                     <hr>
-                    <div class="table-responsive">
-                        <table class="table table-bordered m-t-20">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Date</th>
-                                    <th scope="col">Béneficiaire</th>
-                                    <th scope="col">Designation</th>
-                                    <th scope="col">Frais</th>
-                                    <th scope="col">Remboursé</th>
-                                    <th scope="col">% Remb</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            {% set tFrais = 0 %}
-                            {% set  tRembourse = 0 %}
-                            {% for prestation in remboursement.prestations %}
-                                {% if prestation.status != -1 %}  
-                                <tr>
-                                    <th scope="row">{{ loop.index }}</th>
-                                    <td>{{ prestation.date |date('d/m/Y') }}</td>
-                                    <td>{{ prestation.pac.codeMutuelle ~ ' - ' ~ prestation.pac.nom ~ ' ' ~ prestation.pac.prenom }}</td>
-                                    <td>{{ prestation.designation }}</td>
-                                    <td>{{ prestation.frais|number_format(2,',',' ') }}</td> {% set tFrais = tFrais + prestation.frais %}
-                                    <td>{{ prestation.rembourse|number_format(2,',',' ') }}</td> {% set tRembourse = tRembourse + prestation.rembourse %}
-                                    <td>{{ (prestation.rembourse / prestation.frais) | round(3, 'floor') * 100 }}%</td>
-                                </tr>
-                                {% endif %}
-
-                                {% if loop.last %}
-                                    </tbody>                                    
-                                    <tfoot>
-                                        <tr>
-                                            <th scope="row" colspan=4>Total</th>
-                                            <td>{{ tFrais|number_format(2,',',' ') }}</td>
-                                            <td>{{ tRembourse|number_format(2,',',' ') }}</td>
-                                            <td>{{ (tRembourse / tFrais)| round(3, 'floor') * 100 }}%</td>
-                                        </tr>
-                                    </tfoot>
-                                {% endif %}                                   
-                            {% endfor %}
-                        </table>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 text-right">
-                            <a href="{{ path('export_detail_remboursement', {'id': remboursement.id}) }}" class="btn btn-success"><i class="mdi mdi-file-export"></i> Exporter </a>
-                            <a href="{{ path('prestation_adherent_show', {'id': adherent.id}) }}" class="btn btn-info"><i class="mdi mdi-close-circle-outline"></i> Fermer</a>
-                        </div>
-                    </div>  
-
-                    <h4 class="card-title my-4">Détaillé</h4>
-                    <hr>
-                    <table class="table">
-                        <thead>
+                    <table class="table table-striped border">
+                        <thead class="thead-light">
                             <tr>
                                 <th>N°matricule</th>
                                 {% for soin, code in donnees.soins %}
@@ -112,6 +60,13 @@
                             </tr>
                         </tfoot>                       
                     </table>
+                    <div class="row">
+                        <div class="col-md-12 text-right">
+                            <a href="{{ path('export_detail_remboursement', {'id': remboursement.id}) }}" class="btn btn-success"><i class="mdi mdi-file-export"></i> Exporter </a>
+                            <a href="{{ path('prestation_adherent_show', {'id': adherent.id}) }}" class="btn btn-info"><i class="mdi mdi-close-circle-outline"></i> Fermer</a>
+                        </div>
+                    </div>  
+
                 </div>
             </div>
         </div>

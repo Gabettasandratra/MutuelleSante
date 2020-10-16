@@ -53,8 +53,6 @@
                                         <th scope="col">Date</th>
                                         <th scope="col">Designation</th>
                                         <th scope="col">Frais</th>
-                                        <th scope="col">Décidé</th>
-                                        <th scope="col">%</th>
                                         <th scope="col">Prestataire</th>
                                         <th scope="col">Facture</th>
                                         <th scope="col">Action</th>
@@ -109,7 +107,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="prestation_designation" class=" col-form-label col-sm-3 required">Désignation *</label>
+                                        <label for="prestation_designation" class=" col-form-label col-sm-3 required">Service *</label>
                                         <div class="col-sm-9">
                                             <select name="prestation[designation]" id="prestation_designation" required="required" class="form-control">
                                                 {% for code, designation in soins %}
@@ -122,39 +120,20 @@
                                         <label for="prestation_frais" class="col-form-label col-sm-3 required">Frais *</label>
                                         <div class="input-group col-sm-9">
                                             
-                                            <input type="number" id="prestation_frais" name="prestation[frais]" required="required" class="form-control">
+                                            <input type="number" id="prestation_frais" name="prestation[frais]" required="required" class="form-control" readonly>
                                             <div class="input-group-append">
-                                                <button class="btn btn-secondary" id="soustract" type="button"><i class="mdi mdi-minus-circle-outline"></i></button>
+                                                <button class="btn btn-info" id="soustract" type="button"><i class="fa fa-plus-circle" aria-hidden="true"></i></button>
                                             </div>
-                                            <span class="help-input"></span>
                                         </div>
                                     </div>
                                     {# soustract opération #}
-                                    <div id="sous"></div>
-                                    {# Pour selectionner le status de la prestation #}
-                                    <div class="form-group row">
-                                        <label for="prestation_status" class="col-form-label col-sm-3 required">Status *</label>
-                                        <div class="col-sm-9">
-                                            <select name="prestation[status]" id="prestation_status" required="required" class="form-control">
-                                                <option value="0">En attente de décision</option>
-                                                <option value="1">Remboursé</option>
-                                                <option value="-1">Refusé</option>
-                                            </select>
-                                        </div>
+                                    <div>
+                                        <table class='table no-padding border'>
+                                            <thead><th style="width: 55%">Description</th><th style="width: 40%">Montant</th><th style="width: 5%"></th></thead>
+                                            <tbody id="sous"></tbody>
+                                        </table>
                                     </div>
 
-                                    <div class="form-group row" id="abc">
-                                        <label for="prestation_rembourse" class="col-form-label col-sm-3 required">Remboursés *</label>
-                                        <div class="input-group col-sm-3">    
-                                            <input type="number" id="prestation_percent" readonly value="{{ remb * 100 }}" required="required" class="form-control">
-                                            <div class="input-group-append">
-                                                <span class="input-group-text">%</span>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">    
-                                            <input type="number" id="prestation_rembourse" name="prestation[rembourse]" required="required" class="form-control" readonly>
-                                        </div>
-                                    </div>
                                     <div class="form-group row">
                                         <label for="prestation_prestataire" class="col-form-label col-sm-3">Prestataire </label>
                                         <div class="col-sm-9">    
@@ -186,7 +165,6 @@
     <script>
         $(document).ready(function() {            
             var prestations = new Array();
-            var frais_init = 0; // Frais initiale 
             
             $('#prestation').submit(function(e) {
                 e.preventDefault();
@@ -195,24 +173,18 @@
                     'date'            :   $('#prestation_date').val(),
                     'designation'     :   $('#prestation_designation').val(),
                     'frais'           :   $('#prestation_frais').val(),
-                    'status'          :   $('#prestation_status').val(),
                     'prestataire'     :   $('#prestation_prestataire').val(),
                     'facture'         :   $('#prestation_facture').val()
                 };
-                // Montant remboursé
-                if (prestation.status != 1) {
-                    prestation.rembourse = 0;
-                } else {
-                    prestation.rembourse = $('#prestation_rembourse').val();
-                }
-                // Enregistre les refus
-                var refus = new Array();
+                
+                // Enregistre les details
+                var details = new Array();
                 $('.sous_form').each(function(){
                     var x = parseFloat($(this).find('.sous_value').val());
                     var desc = $(this).find('.sous_desc').val();  
-                    refus.push({'montant': x, 'detail': desc});
+                    details.push({'montant': x, 'detail': desc});
                 });
-                prestation.refus = refus;
+                prestation.details = details;
 
                 if (index) {
                     prestations[index] = prestation;
@@ -222,39 +194,8 @@
                 refreshTable(prestations);
                 $('#prestation_index').val(null);
                 $('#sous').empty();
-                $('.help-input').text("");
-                $('.help-input').css("display", "none");
-                $('#abc').hide();
-                $('#prestation_percent').val({{remb*100}});
                 $('#prestation').trigger("reset");
             }); 
-
-            $('#prestation_frais').change(function(e) {
-                // On charge le frais initiale
-                if (frais_init == 0) {
-                    frais_init = parseFloat($(this).val());
-                }
-                var percent = parseFloat($('#prestation_percent').val());
-                var frais =  parseFloat($(this).val());
-                $('#prestation_rembourse').val(Math.round(percent * frais / 100));
-            });
-
-            $('#prestation_percent').change(function(e) {
-                var percent = parseFloat($(this).val());
-                var frais =  parseFloat($('#prestation_frais').val());
-                $('#prestation_rembourse').val(Math.round(percent * frais / 100));
-            });
-
-            // When status changed
-            $('#abc').hide();  // First
-            $('#prestation_status').change(function(e) {
-                var status = $(this).val();
-                if (status == 1) {
-                   $('#abc').show("slow"); 
-                } else {
-                   $('#abc').hide("slow");  
-                }  
-            });
 
             $('#del').click(function(e) {
                 e.preventDefault();
@@ -266,37 +207,22 @@
             $('#fermer').click(function(e) {
                 e.preventDefault();
                 $('#sous').empty();
-                $('.help-input').text("");
-                $('.help-input').css("display", "none");
-                $('#abc').hide();
-                $('#prestation_percent').val({{remb*100}});
                 $('#prestation').trigger("reset");
                 $('#modal').modal('hide');
             });  
  
             $('#soustract').click(function(e) {
                 e.preventDefault();
-                if ($('#prestation_frais').val()>0) {
-                    $('#sous').append(
-                        `<div class="form-group row text-danger sous_form">
-                            <label class="col-form-label col-sm-3 required">Montant enlevé</label>
-                            <div class="col-sm-3">    
-                                <input type="number" required style="color:red;" class="sous_value form-control">
-                            </div>
-                            <div class="input-group col-sm-5">    
-                                <input type="text" required style="color:red;" class="form-control sous_desc" placeholder="Description">
-                            </div>
-                            <div class="col-sm-1 py-1">
-                                <a href="#" class="rem">X</a>
-                            </div> 
-                        </div>`
-                    );
-                }
+                $('#sous').append(
+                    `<tr class="sous_form"><td><input type="text" placeholder="Soin" class="sous_desc form-control form-control-md"></td>
+                    <td><input type="number" class="sous_value form-control form-control-md"></td>
+                    <td><a href="#" class="rem text-danger text-center">X</a></td></tr>`
+                );
             });
 
             // A chaque fois qu'un sous-value chqnge
             $(document).on("change", ".sous_value" ,function(e) {
-                calculateFrais(frais_init);
+                calculateFrais();
             })
 
             // On enleve le champ
@@ -304,7 +230,7 @@
                 e.preventDefault();
                 $(this).parent().parent().remove();
                 
-                calculateFrais(frais_init);
+                calculateFrais();
             })            
 
             $("#formDecompte").submit(function(event){
@@ -314,6 +240,8 @@
                     'prestations': prestations,
                     'numero': {{ numero }}
                 }; 
+
+                console.log(form_data);
 
                 $.post( post_url, JSON.stringify(form_data), function(response) {
                     if (response.hasError == false) {
@@ -346,32 +274,19 @@
                 var markup = "<tr><th scope='row'>"+ (index + 1) +"</th>";
                 markup += "<td>" + prestation.date + "</td>";
                 markup += "<td>" + prestation.designation + "</td>";
-                markup += "<td>" + prestation.frais + "</td>";
-                // Switch prestation_status
-                if (prestation.status == 1) {
-                    markup += "<td>" + prestation.rembourse + "</td>";
-                } else if (prestation.status == 0) {
-                    markup += "<td><span class='label label-rounded label-sm label-info'>En attente</span></td>";
-                } else {
-                    markup += "<td><span class='label label-rounded label-sm label-danger'>Refusé</span></td>";
-                }
-                
-                markup += "<td>" + Math.round((prestation.rembourse / prestation.frais)*100) + " %</td>";
+                markup += "<td>" + prestation.frais.toLocaleString("fr-FR") + "</td>";               
                 markup += "<td>" + prestation.prestataire + "</td>";
                 markup += "<td>" + prestation.facture + "</td>";
                 markup += "<td>" + "<span class='action-icons'><a href='javascript:edit("+index+','+ JSON.stringify(prestation)+")'><i class='ti-pencil-alt'></i></a><a href='javascript:del("+index+")' style='padding-left:7px;color:#f62d51;'><i class='ti-trash'></i></a></span>" + "</td>";      
                 markup += "</tr>";
 
-                totRembourse += parseFloat(prestation.rembourse); 
                 totFrais += parseFloat(prestation.frais); 
 
                 $('#decompte tbody').append(markup);                   
             }
             if (prestations.length != 0) {
                 var totMarkup = "<tr><th scope='row' colspan=3>Total</th>";
-                totMarkup += "<td>" + totFrais + "</td>";
-                totMarkup += "<td>" + totRembourse + "</td>";
-                totMarkup += "<td>" + Math.round((totRembourse / totFrais)*100) + " %</td><td colspan=3></td>";
+                totMarkup += "<td>" + totFrais + "</td><td colspan=3></td></tr>";
                 $('#decompte tfoot').append(totMarkup);  
                 $('#save').removeClass('disabled');
             } else {
@@ -384,32 +299,15 @@
             $('#prestation_date').val(prestation.date);
             $('#prestation_designation').val(prestation.designation);
             $('#prestation_frais').val(prestation.frais);
-            $('#prestation_status').val(prestation.status);
-            if (prestation.status == 1) {
-                $('#prestation_percent').val(Math.round((prestation.rembourse/prestation.frais)*100));
-                $('#prestation_rembourse').val(prestation.rembourse);
-                $('#abc').show(); 
-            } else {
-                $('#prestation_frais').trigger("change");
-            }
-            
             $('#prestation_prestataire').val(prestation.prestataire);
             $('#prestation_facture').val(prestation.facture);
 
-            prestation.refus.forEach(refus => {
+            console.log(prestation.details);
+            prestation.details.forEach(detail => {
                 $('#sous').append(
-                    `<div class="form-group row text-danger sous_form">
-                        <label class="col-form-label col-sm-3 required">Montant enlevé</label>
-                        <div class="col-sm-3">    
-                            <input type="number" value="`+ refus.montant +`" required style="color:red;" class="sous_value form-control">
-                        </div>
-                        <div class="input-group col-sm-5">    
-                            <input type="text" value="`+ refus.detail +`" required style="color:red;" class="form-control sous_desc" placeholder="Description">
-                        </div>
-                        <div class="col-sm-1 py-1">
-                            <a href="#" class="rem">X</a>
-                        </div> 
-                    </div>`
+                    `<tr><td><input type="text" placeholder="Soin" value="`+ detail.detail +`" class="sous_desc form-control form-control-md"></td>
+                    <td><input type="number" value="`+ detail.montant +`" class="sous_value form-control form-control-md"></td>
+                    <td><a href="#" class="rem text-danger text-center">X</a></td></tr>`
                 );
             });
             $('#modal').modal('show');
@@ -420,20 +318,16 @@
             $('#del').click();
         } 
 
-        function calculateFrais(frais_init) {
+        function calculateFrais() {
             var sous = 0;
-            var help = "";
             $('.sous_value').each(function(){
                 var x = parseFloat(this.value);
                 if (!isNaN(x)) {
                     sous += x;
-                    help += " - "+this.value;
                 }
             });
-            $('#prestation_frais').val(frais_init-sous);
+            $('#prestation_frais').val(sous);
             $('#prestation_frais').trigger("change");
-            $('.help-input').text("= "+frais_init+help);
-            $('.help-input').css("display", "block");
         }
     </script>
 {% endblock %}

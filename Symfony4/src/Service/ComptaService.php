@@ -174,8 +174,8 @@ class ComptaService
 
             $article->setMontant($prestation->getRembourse());
             $article->setDate(new \DateTime());
-            $piece = $prestation->getAdherent()->getNumero() ."/". $this->session->get('exercice')->getAnnee();
-            $article->setPiece($piece . "/" . $prestation->getDecompte()); // Le decompte de prestation
+            $piece = $prestation->getPac()->getMatricule() ."/". $this->session->get('exercice')->getAnnee();
+            $article->setPiece('D'.$piece . "/" . $prestation->getDecompte()); // Le decompte de prestation
             $article->setIsFerme(true);
 
             $prestation->setDateDecision(new \DateTime());

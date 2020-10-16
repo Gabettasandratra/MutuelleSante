@@ -90,6 +90,7 @@
                                             <span class="font-weight-medium text-dark"> Total des montants remboursés</span>
                                         </li>
                                     </ul>
+                                    <a href="{{ path('prestation_adherent_show', {'id': pac.adherent.id}) }}"class="btn btn-sm btn-info my-2"><i class="mdi mdi-home-map-marker"></i> Voir fiche d'adhésion congrégation</a>
                                 </div>
                                 <div class="col-md-6">
                                     <ul class="list-style-none">
@@ -99,6 +100,7 @@
                             
                                     </ul>
                                 </div>
+        
                             </div>
                             {% if info.possedeDroit %}
                                 <div class="alert alert-success">
