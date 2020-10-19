@@ -36,15 +36,11 @@ class BudgetRepository extends ServiceEntityRepository
     }
     */
 
-    /*
-    public function findOneBySomeField($value): ?Budget
+    public function findExercice($exercice)
     {
-        return $this->createQueryBuilder('b')
-            ->andWhere('b.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        return $this->_em->createQuery('select b from App\Entity\Budget b where b.debut >= :deb and b.fin <= :fin order by b.libelle')
+                            ->setParameter('deb', $exercice->getDateDebut())
+                            ->setParameter('fin', $exercice->getDateFin())
+                            ->getArrayResult(); 
     }
-    */
 }

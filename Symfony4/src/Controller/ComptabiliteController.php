@@ -10,6 +10,7 @@ use App\Form\ArticleType;
 use App\Service\ImportExcel;
 use App\Service\ConfigEtatFi;
 use Doctrine\ORM\EntityRepository;
+use App\Repository\BudgetRepository;
 use App\Repository\CompteRepository;
 use App\Repository\ArticleRepository;
 use Symfony\Component\Form\FormError;
@@ -245,7 +246,7 @@ class ComptabiliteController extends AbstractController
     }
 
     /**
-     * @Route("/comptabilite/plan", name="comptabilite_plan")
+     * @Route("/comptabilite/plan/generale", name="comptabilite_plan")
      */
     public function plan(CompteRepository $repositoryCompte, Request $request, EntityManagerInterface $manager)
     {
@@ -299,6 +300,19 @@ class ComptabiliteController extends AbstractController
             'form' => $form->createView()
         ]);
     }
+
+    /**
+     * @Route("/comptabilite/plan/budgetaire", name="comptabilite_plan_budgetaire")
+     */
+    public function planBudgetaire(Request $request, BudgetRepository $repo, SessionInterface $session)
+    {
+        $exercice = $session->get('exercice'); 
+        $budget = $repo->findExercice($exercice);
+        return $this->render('comptabilite/budget.html.twig', [
+            'budgets' => json_encode($budget)
+        ]);
+    }
+
 
     /**
      * @Route("/comptabilite/bilan", name="comptabilite_bilan")

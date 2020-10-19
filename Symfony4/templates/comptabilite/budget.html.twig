@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Plan budgetaire{% endblock %}
+
+{% block header %}
+    <div class="page-breadcrumb">
+        <div class="d-flex align-items-center">
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Plan budgetaire</h4>
+            <div class="ml-auto">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0 p-0">
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Comptabilité</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Plan budgetaire</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Plan budgetaire</h4>
+                    <hr>
+                    <div class="row">                       
+                        <table class="table table-hover table-striped" id="budgets">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">N°</th>
+                                    <th scope="col">Code</th>
+                                    <th scope="col">Budget</th>
+                                    <th scope="col">Date validité</th>
+                                    <th scope="col">Montant</th>
+                                    <th scope="col">Depensé</th>
+                                    <th scope="col">Restant</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                            <tfoot></tfoot>
+                        </table>                            
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    var budgets = {{budgets|raw}};
+    console.log(budgets);
+
+    const resfreshTable = function() {
+        $('#budgets tbody').empty();
+
+        var totB=0,totD=0,totR=0;
+        
+        for (let index = 0; index < budgets.length; index++) {
+            var budget = budgets[index];
+            var markup = "<tr><th scope='row'>"+ budget.id +"</th>";
+            markup += "<td>" + budget.code + "</td>";
+            markup += "<td>" + budget.libelle + "</td>";
+            markup += "<td>" + budget.debut.date + "</td>";
+            markup += "<td>" + budget.montant.toLocaleString("fr-FR")+ "</td>";
+            markup += "</tr>";
+            totB += budget.montant;            
+            $('#budgets tbody').append(markup);                   
+        }
+
+        if (budgets.length != 0) {
+            var totMarkup = "<tr><th scope='row' colspan=4>Total</th>";
+            totMarkup += "<td class='text-center'>" + totB.toLocaleString("fr-FR") + "</td>";
+            totMarkup += "</tr>";
+            $('#budgets tfoot').append(totMarkup);  
+        } 
+    }
+
+    refreshTable();
+</script>
+{% endblock %}

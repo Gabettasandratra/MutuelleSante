@@ -33,7 +33,7 @@ class PrestationRepository extends ServiceEntityRepository
             ->andWhere('p.adherent = :ad')
             ->andWhere('p.isPaye = false')
             ->setParameter('ad', $adherent)
-            ->orderBy('p.date', 'ASC')
+            ->orderBy('p.id', 'desc')
             ->getQuery()
             ->getResult()
         ;

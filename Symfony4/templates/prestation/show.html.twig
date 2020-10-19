@@ -326,8 +326,9 @@ $(document).ready(function() {
         }
         var percent = parseFloat($('#prestation_percent').val());
         prestation.rembourse = Math.round(percent * prestation.frais / 100);
+        prestation.status = 1;
         prestation.details[indexDetail] = detail;
-        prestation[id] = prestation; // Modify value
+        prestations[id] = prestation; // Modify value
         updateDetail(prestation,id);
     });
 
@@ -374,6 +375,7 @@ $(document).ready(function() {
 });
 
 function refreshTable(prestations) {
+    console.log(prestations);
     $('#app tbody').empty();
     $('#app tfoot').empty();
 
