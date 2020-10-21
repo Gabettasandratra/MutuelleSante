@@ -70,12 +70,18 @@ class Compte
      */
     private $acceptIn;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Tier::class, mappedBy="compte")
+     */
+    private $tiers;
+
     public function __construct()
     {
         $this->acceptOut = true;
         $this->acceptIn = true;
         $this->isTresor = false;
         $this->type = true;
+        $this->tiers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -239,6 +245,37 @@ class Compte
     public function isTresorerieCheque()
     {
         return str_split($this->poste, 4)[0] == "5112";
+    }
+
+    /**
+     * @return Collection|Tier[]
+     */
+    public function getTiers(): Collection
+    {
+        return $this->tiers;
+    }
+
+    public function addTier(Tier $tier): self
+    {
+        if (!$this->tiers->contains($tier)) {
+            $this->tiers[] = $tier;
+            $tier->setCompte($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTier(Tier $tier): self
+    {
+        if ($this->tiers->contains($tier)) {
+            $this->tiers->removeElement($tier);
+            // set the owning side to null (unless already changed)
+            if ($tier->getCompte() === $this) {
+                $tier->setCompte(null);
+            }
+        }
+
+        return $this;
     }
 
 }

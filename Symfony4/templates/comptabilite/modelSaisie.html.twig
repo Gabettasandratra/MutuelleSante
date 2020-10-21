@@ -1,0 +1,99 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Model de saisie{% endblock %}
+
+{% block header %}
+    <div class="page-breadcrumb">
+        <div class="d-flex align-items-center">
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Model de saisie</h4>
+            <div class="ml-auto">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0 p-0">
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Comptabilité</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Model saisie</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% form_theme form 'bootstrap_4_layout.html.twig' %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6"><h4 class="card-title">Model de saisie</h4></div>
+                        <div class="col-md-6 text-right"><button class="btn btn-info btn-sm" data-toggle="modal" href="#modal"><i class="mdi mdi-bookmark-plus-outline"></i> Créer un nouveau model</button></div>
+                    </div>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped border m-t-20">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">Type</th>
+                                    <th scope="col">Nom</th>
+                                    <th scope="col">C.j</th>
+                                    <th scope="col">N° compte débité</th>
+                                    <th scope="col">N° compte crédité</th>
+                                    <th scope="col">N° code analytique</th>
+                                    <th scope="col">N° compte tier</th>
+                                    <th scope="col">N° compte budgetaire</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for model in models %}
+                                <tr>
+                                    <td><span class="label label-success">{{model.type}}</span></td>
+                                    <td>{{model.nom}}</td>
+                                    <td>{{model.journal}}</td>
+                                    <td>{% if model.debit %}{{model.debit.poste}}{% else %}<i class="mdi mdi-keyboard"></i>{% endif %}</td>
+                                    <td>{% if model.credit %}{{model.credit.poste}}{% else %}<i class="mdi mdi-keyboard"></i>{% endif %}</td>
+                                    <td>{% if model.analytic %}{{model.analytic.code}}{% else %}<i class="mdi mdi-keyboard "></i>{% endif %}</td>
+                                    <td>{% if model.tier %}{{model.tier.code}}{% else %}<i class="mdi mdi-keyboard"></i>{% endif %}</td>
+                                    <td>{% if model.budget %}{{model.budget.code}}{% else %}<i class="mdi mdi-keyboard"></i>{% endif %}</td>
+                                    <td><a href="{{path('comptabilite_model_saisie_del',{id:model.id})}}" class="label btn btn-danger label-danger"><i class="fa fa-trash" aria-hidden="true"></i></a></td>
+                                </tr>                            
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div> 
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div class="modal fade" id="modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Model de saisie</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">                                                  
+                    <div class="col-md-12">
+                        {{ form_start(form) }}
+                            {{form_row(form.nom, { 'label': 'Nom :' })}}  
+                            {{form_row(form.type, { 'label': 'Type de l\'opération :' })}}  
+                            {{form_row(form.journal, { 'label': 'Journal :' })}}  
+                            {{form_row(form.debit, { 'label': 'Compte générale débité :' })}}  
+                            {{form_row(form.credit, { 'label': 'Compte générale crédité :' })}}  
+                            {{form_row(form.analytic, { 'label': 'Compte analytique :' })}} 
+                            {{form_row(form.tier, { 'label': 'Compte tier :' })}}  
+                            {{form_row(form.budget, { 'label': 'Poste budgetaire :' })}}   
+                            <div class="form-row">
+                                <div class="col-12 text-right">
+                                    <button type="submit" class="btn btn-success">Créer</i></button>
+                                </div>
+                            </div>  
+                        {{ form_end(form) }} 
+                    </div>                       
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

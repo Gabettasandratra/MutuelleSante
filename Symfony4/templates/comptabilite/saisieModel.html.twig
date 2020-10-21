@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Saisie standard{% endblock %}
+{% block title %}Saisie avec model{% endblock %}
 
 {% block header %}
     <div class="page-breadcrumb">
         <div class="d-flex align-items-center">
-            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Saisie standard</h4>
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Saisie model</h4>
             <div class="ml-auto">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb m-0 p-0">
@@ -26,16 +26,14 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">
-                    {% if edit %}
-                        Modification du mouvement N° {{edit}}
-                    {% else %}
-                        Saisir nouveau écriture
-                    {% endif %} 
+                        {{model.nom}}
                     </h4>
                     <hr>
                     {{ form_start(form) }}
+                    
+
                     <div class="row"> 
-                        <div class="col-md-3">{{ form_row(form.categorie, { label: 'Journal'}) }}</div>
+                        <div class="col-md-3">{{ form_row(form.categorie, { label: 'Journal',attr:{dis:'true'}}) }}</div>
                         <div class="col-md-3">{{ form_row(form.date) }}</div>
                         <div class="offset-md-2 col-md-4">{{ form_row(form.piece, { label: 'N° de pièce',attr:{placeholder:"Réference"}}) }}</div>
                     </div>
@@ -44,19 +42,29 @@
                         <div class="col-md-9">{{ form_row(form.libelle, { label: 'Libellé',attr:{placeholder:"Description de l'opération"}}) }}</div>
                     </div>
                     <div class="row mt-3">
-                        <div class="col-md-6">{{ form_row(form.compteDebit,{ label: 'N° compte générale débité'}) }}</div>
+                        {% set attrD = "true" %}
+                        {% if not model.debit %}{% set attrD = 'false' %}{% endif %}
+                        <div class="col-md-6">{{ form_row(form.compteDebit,{label: 'N° compte générale débité', attr:{dis:attrD}}) }}</div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-6">{{ form_row(form.compteCredit,{ label: 'N° compte générale crédité'}) }}</div>
+                        {% set attrC = "true" %}
+                        {% if not model.credit %}{% set attrC = "false" %}{% endif %}
+                        <div class="col-md-6">{{ form_row(form.compteCredit,{label: 'N° compte générale crédité', attr:{dis:attrC}}) }}</div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">{{ form_row(form.analytic,{ label: 'N° compte analytique'}) }}</div>
+                    {% set attrA = "true"  %}
+                        {% if not model.analytic %}{% set attrA = "false" %}{% endif %}
+                        <div class="col-md-6">{{ form_row(form.analytic,{ label: 'N° compte analytique', attr:{dis:attrA}}) }}</div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">{{ form_row(form.tier,{ label: 'N° compte tier'}) }}</div>
+                    {% set attrT = "true" %}
+                        {% if not model.tier %}{% set attrT = "false" %}{% endif %}
+                        <div class="col-md-6">{{ form_row(form.tier,{ label: 'N° compte tier', attr:{dis:attrT}}) }}</div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">{{ form_row(form.budget,{ label: 'Poste budgetaire'}) }}</div>
+                    {% set attrB = "true" %}
+                        {% if not model.budget %}{% set attrB = "false" %}{% endif %}
+                        <div class="col-md-6">{{ form_row(form.budget,{ label: 'Poste budgetaire', attr:{dis:attrB}}) }}</div>
                     </div>
                     <div class="form-row">
                         <div class="col-5">
@@ -96,5 +104,8 @@
 {% block javascripts %}
 <script>
     $('#success-alert').modal();
+    $("select[dis=true] option:not(:selected)").prop("disabled", true);
+    $('select[dis=true]').css('pointer-events','none');
+    $('select[dis=true]').css('background-color','#DDD');
 </script>
 {% endblock %}

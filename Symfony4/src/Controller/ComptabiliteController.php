@@ -2,23 +2,32 @@
 
 namespace App\Controller;
 
+use App\Entity\Tier;
+use App\Entity\Budget;
 use App\Entity\Compte;
 use App\Entity\Article;
 use App\Entity\Exercice;
 use App\Form\CompteType;
 use App\Form\ArticleType;
+use App\Entity\Analytique;
+use App\Entity\ModelSaisie;
 use App\Service\ImportExcel;
 use App\Service\ConfigEtatFi;
+use App\Repository\TierRepository;
 use Doctrine\ORM\EntityRepository;
 use App\Repository\BudgetRepository;
 use App\Repository\CompteRepository;
 use App\Repository\ArticleRepository;
 use Symfony\Component\Form\FormError;
+use App\Repository\ExerciceRepository;
 use App\Repository\ParametreRepository;
+use App\Repository\AnalytiqueRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\ModelSaisieRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -73,20 +82,13 @@ class ComptabiliteController extends AbstractController
      * @Route("/comptabilite/saisie", name="comptabilite_saisie_standard")
      * @Route("/comptabilite/saisie/edit/{id}", name="comptabilite_saisie_edit")
      */
-    public function saisieStandard(Article $article = null, Request $request, ParametreRepository $repositoryParametre, CompteRepository $repositoryCompte, EntityManagerInterface $manager, SessionInterface $session)
+    public function saisieStandard(Article $article = null, Request $request, CompteRepository $repositoryCompte, EntityManagerInterface $manager, SessionInterface $session)
     {
-        // Affichage du plan analytique
-        $plan_analytiques = $repositoryParametre->findOneBy(['nom' => 'plan_analytique'])->getList();
-        $choices['...'] = null;
-        foreach ($plan_analytiques as $key => $value) {
-            $choices[$value.' ('.$key.')'] = $key;
-        } // reverse key value
         // Les codes journaux
         $codes = $repositoryCompte->findCodeJournaux();
-        foreach ($codes as $code) {
+        foreach ($codes as $code)
             $cCodes[$code['titre'].' ('.$code['codeJournal'].')'] = $code['codeJournal'];
-        }
-
+        
         $edit = true;
         // Article 
         if ($article === null) {
@@ -111,10 +113,7 @@ class ComptabiliteController extends AbstractController
                         'grouping' => true
                     ])
                     ->add('libelle')
-                    ->add('piece')
-                    ->add('analytique', ChoiceType::class, [
-                        'choices' => $choices
-                    ])            
+                    ->add('piece')           
                     ->add('compteDebit', EntityType::class, [
                         'class' => Compte::class,
                         'query_builder' => function (EntityRepository $er) {
@@ -137,6 +136,27 @@ class ComptabiliteController extends AbstractController
                             return $c->getPoste().' | '.$c->getTitre();
                         },
                     ])
+                    ->add('analytic', EntityType::class, [
+                        'class' => Analytique::class,
+                        'required' => false,
+                        'choice_label' => function ($a) {
+                            return $a->getLibelle().' ('.$a->getCode().')';
+                        }
+                    ])
+                    ->add('tier', EntityType::class, [
+                        'class' => Tier::class,
+                        'required' => false,
+                        'choice_label' => function ($a) {
+                            return $a->getLibelle().' ('.$a->getCode().')';
+                        }
+                    ])
+                    ->add('budget', EntityType::class, [
+                        'class' => Budget::class,
+                        'required' => false,
+                        'choice_label' => function ($a) {
+                            return $a->getLibelle().' ('.$a->getCode().')';
+                        }
+                    ])
                     ->getForm();
         
         $form->handleRequest($request);
@@ -151,6 +171,7 @@ class ComptabiliteController extends AbstractController
                     $solde = $repositoryCompte->findSoldes([$cCredit->getPoste()], $exercice);
                     if ($montant <= $solde) {
                         $manager->persist($article);
+
                         $manager->flush(); 
                         $message = ($edit)?'La modification du mouvement de numéro '.$article->getId().' effectué':'Le numéro de mouvement de la pièce créé est '.$article->getId();
                         $this->addFlash('success', $message);
@@ -169,10 +190,218 @@ class ComptabiliteController extends AbstractController
                 $form->get('date')->addError(new FormError("La date ".$date->format('d/m/Y')." n'appartient pas à l'exercice courant"));
             }
         }
+
         return $this->render('comptabilite/saisieStandard.html.twig', [
             'form' => $form->createView(),
             'edit' => $article->getId()
         ]);
+    }
+
+// SAISIE D'UNE ECRITURE COMPTABLE
+    /**
+     * @Route("/comptabilite/saisie/model/{id}", name="comptabilite_saisie_model")
+     */
+    public function saisieModel(ModelSaisie $model,Request $request, CompteRepository $repositoryCompte, EntityManagerInterface $manager, SessionInterface $session)
+    {
+        // Les codes journaux
+        $codes = $repositoryCompte->findCodeJournaux();
+        foreach ($codes as $code)
+            $cCodes[$code['titre'].' ('.$code['codeJournal'].')'] = $code['codeJournal'];
+        
+        // Article 
+        $article = new Article();
+        $article->setCategorie($model->getJournal());
+        $article->setCompteDebit($model->getDebit());
+        $article->setCompteCredit($model->getCredit());
+        $article->setAnalytic($model->getAnalytic());
+        $article->setTier($model->getTier());
+        $article->setBudget($model->getBudget());
+
+        $form = $this->createFormBuilder($article)
+                    ->add('categorie', ChoiceType::class, [
+                        'choices' => $cCodes
+                    ]) 
+                    ->add('date', DateType::class, [
+                        'data' => new \DateTime(),
+                        'widget' => 'single_text',
+                        'format' => 'dd/MM/yyyy',
+                        'attr' => ['class' => 'datepicker','autocomplete' => 'off'],
+                        'html5' => false,
+                    ])
+                    ->add('montant', MoneyType::class, [
+                        'currency' => 'MGA',
+                        'grouping' => true
+                    ])
+                    ->add('libelle')
+                    ->add('piece')           
+                    ->add('compteDebit', EntityType::class, [
+                        'class' => Compte::class,
+                        'query_builder' => function (EntityRepository $er) {
+                            return $er->createQueryBuilder('c')
+                                    ->andWhere('length(c.poste) = 6')
+                                    ->orderBy('c.poste', 'ASC');
+                        },
+                        'choice_label' => function ($c) {
+                            return $c->getPoste().' | '.$c->getTitre();
+                        },
+                    ])
+                    ->add('compteCredit', EntityType::class, [
+                        'class' => Compte::class,
+                        'query_builder' => function (EntityRepository $er) {
+                            return $er->createQueryBuilder('c')
+                                    ->andWhere('length(c.poste) = 6')
+                                    ->orderBy('c.poste', 'ASC');
+                        },
+                        'choice_label' => function ($c) {
+                            return $c->getPoste().' | '.$c->getTitre();
+                        },
+                    ])
+                    ->add('analytic', EntityType::class, [
+                        'class' => Analytique::class,
+                        'required' => false,
+                        'choice_label' => function ($a) {
+                            return $a->getLibelle().' ('.$a->getCode().')';
+                        }
+                    ])
+                    ->add('tier', EntityType::class, [
+                        'class' => Tier::class,
+                        'required' => false,
+                        'choice_label' => function ($a) {
+                            return $a->getLibelle().' ('.$a->getCode().')';
+                        }
+                    ])
+                    ->add('budget', EntityType::class, [
+                        'class' => Budget::class,
+                        'required' => false,
+                        'choice_label' => function ($a) {
+                            return $a->getLibelle().' ('.$a->getCode().')';
+                        }
+                    ])
+                    ->getForm();
+        
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $date = $form->get('date')->getData();
+            $exercice = $session->get('exercice');
+            if ($exercice->check($date)) {
+                // protect against negative solde
+                $montant = $form->get('montant')->getData();
+                $cCredit = $form->get('compteCredit')->getData();
+                if ($cCredit->getIsTresor()) { // Trésorerie
+                    $solde = $repositoryCompte->findSoldes([$cCredit->getPoste()], $exercice);
+                    if ($montant <= $solde) {
+                        $manager->persist($article);
+                        $manager->flush(); 
+                        $message ='Le numéro de mouvement de la pièce créé est '.$article->getId();
+                        $this->addFlash('success', $message);
+                        return $this->redirectToRoute('comptabilite_saisie_model');
+                    } else {
+                        $form->get('montant')->addError(new FormError("Le solde negatif est interdit pour les trésoreries. Solde actuelle $solde"));
+                    }
+                } else { // Operation divers
+                    $manager->persist($article);
+                    $manager->flush();
+                    $message = 'Le numéro de mouvement de la pièce créé est '.$article->getId();
+                    $this->addFlash('success', $message);
+                    return $this->redirectToRoute('comptabilite_saisie_model');
+                }
+            } else {
+                $form->get('date')->addError(new FormError("La date ".$date->format('d/m/Y')." n'appartient pas à l'exercice courant"));
+            }
+        }
+
+        return $this->render('comptabilite/saisieModel.html.twig', [
+            'form' => $form->createView(),
+            'model' => $model
+        ]);
+    }    
+
+    /**
+     * @Route("/comptabilite/model/saisie", name="comptabilite_model_saisie")
+     */
+    public function modelSaisie(Request $request, CompteRepository $repositoryCompte,EntityManagerInterface $manager, ModelSaisieRepository $repo)
+    {
+        $journaux = $repositoryCompte->findCodeJournaux();
+        foreach ($journaux as $code) {
+            $codes[$code['titre'].' ('.$code['codeJournal'].')'] = $code['codeJournal'];
+        }
+        $model = new ModelSaisie();
+        $form = $this->createFormBuilder($model)
+                ->add('nom')
+                ->add('type', ChoiceType::class, [
+                    'choices' => ['Entré'=>'E', 'Sortie'=>'S','Entré / Sortie'=>'ES', 'Trésorerie'=>'T']
+                ])  
+                ->add('journal', ChoiceType::class, [
+                    'choices' => $codes
+                ])                    
+                ->add('debit', EntityType::class, [
+                    'class' => Compte::class,
+                    'required' => false,
+                    'query_builder' => function (EntityRepository $er) {
+                        return $er->createQueryBuilder('c')
+                                ->andWhere('length(c.poste) = 6')
+                                ->orderBy('c.poste', 'ASC');
+                    },
+                    'choice_label' => function ($c) {
+                        return $c->getPoste().' | '.$c->getTitre();
+                    },
+                ])
+                ->add('credit', EntityType::class, [
+                    'class' => Compte::class,
+                    'required' => false,
+                    'query_builder' => function (EntityRepository $er) {
+                        return $er->createQueryBuilder('c')
+                                ->andWhere('length(c.poste) = 6')
+                                ->orderBy('c.poste', 'ASC');
+                    },
+                    'choice_label' => function ($c) {
+                        return $c->getPoste().' | '.$c->getTitre();
+                    },
+                ])
+                ->add('analytic', EntityType::class, [
+                    'class' => Analytique::class,
+                    'required' => false,
+                    'choice_label' => function ($a) {
+                        return $a->getLibelle().' ('.$a->getCode().')';
+                    }
+                ])
+                ->add('tier', EntityType::class, [
+                    'class' => Tier::class,
+                    'required' => false,
+                    'choice_label' => function ($a) {
+                        return $a->getLibelle().' ('.$a->getCode().')';
+                    }
+                ])
+                ->add('budget', EntityType::class, [
+                    'class' => Budget::class,
+                    'required' => false,
+                    'choice_label' => function ($a) {
+                        return $a->getLibelle().' ('.$a->getCode().')';
+                    }
+                ])
+                ->getForm();   
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            dump($model);
+            $manager->persist($model);
+            $manager->flush();
+            return $this->redirectToRoute('comptabilite_model_saisie');
+        }
+
+        return $this->render('comptabilite/modelSaisie.html.twig', [
+            'models' => $repo->findAll(),
+            'form' => $form->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/comptabilite/model/saisie/del/{id}", name="comptabilite_model_saisie_del")
+     */
+    public function deleteModeleSaisie(ModelSaisie $model,EntityManagerInterface $manager)
+    {
+        $manager->remove($model);
+        $manager->flush();
+        return $this->redirectToRoute('comptabilite_model_saisie');
     }
 
     /**
@@ -280,38 +509,90 @@ class ComptabiliteController extends AbstractController
     }   
 
     /**
-     * @Route("/comptabilite/plan/analytique", name="comptabilite_plan_analytique")
+     * @Route("/comptabilite/plan/budgetaire", name="comptabilite_plan_budgetaire")
      */
-    public function planAnalytique(Request $request, ParametreRepository $repositoryParametre, EntityManagerInterface $manager)
+    public function planBudgetaire(BudgetRepository $repo, SessionInterface $session)
     {
-        $parametre = $repositoryParametre->findOneBy(['nom' => 'plan_analytique']);
-        $data['plan_analytique'] = json_encode($parametre->getList());
-        $form = $this->createFormBuilder($data)
-                    ->add('plan_analytique', TextareaType::class)
-                    ->getForm()
-        ;   
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {   
-            $parametre->setList(json_decode($form->get('plan_analytique')->getData(), true));
-            $manager->flush();
-        }
-
-        return $this->render('comptabilite/analytique.html.twig',[
-            'form' => $form->createView()
+        $exercice = $session->get('exercice');   
+        return $this->render('comptabilite/budget.html.twig', [
+            'budgets' => json_encode($repo->findExercice($exercice))
         ]);
     }
 
     /**
-     * @Route("/comptabilite/plan/budgetaire", name="comptabilite_plan_budgetaire")
+     * @Route("/comptabilite/plan/budgetaire/add", name="add_budget")
      */
-    public function planBudgetaire(Request $request, BudgetRepository $repo, SessionInterface $session)
+    public function addBudget(Request $request, ExerciceRepository $repoExercice, EntityManagerInterface $manager, SessionInterface $session)
     {
-        $exercice = $session->get('exercice'); 
-        $budget = $repo->findExercice($exercice);
-        return $this->render('comptabilite/budget.html.twig', [
-            'budgets' => json_encode($budget)
+        $idE = $session->get('exercice')->getId(); 
+        $exercice = $repoExercice->find($idE);
+        $budget = new Budget($request->request->get('code'),$request->request->get('libelle'),$request->request->get('prevision'));
+        $budget->setExercice($exercice);
+        $manager->persist($budget);
+        $manager->flush();
+        return new JsonResponse([
+            'hasError' => false,
+            'message' => "Budget ajouter avec success",
+            'budget' => $budget->getAsArray()
         ]);
     }
+
+    /**
+     * @Route("/comptabilite/plan/tiers", name="comptabilite_plan_tiers")
+     */
+    public function planTiers(Request $request, TierRepository $repo, CompteRepository $compteRepo,EntityManagerInterface $manager)
+    {
+        if ($request->isMethod('post')) {
+            $code = $request->request->get('code');
+            $intitule = $request->request->get('libelle');
+            $adresse = $request->request->get('adresse');
+            $contact = $request->request->get('contact');
+            $type = $request->request->get('type');
+            $poste = $compteRepo->findOneByPoste($request->request->get('poste'));
+
+            $tier = new Tier();
+            $tier->setCode($code);
+            $tier->setLibelle($intitule);
+            $tier->setAdresse($adresse);
+            $tier->setContact($contact);
+            $tier->setType($type);
+            $tier->setCompte($poste);
+            $manager->persist($tier);
+            $manager->flush();
+            return new JsonResponse([
+                'hasError' => false,
+                'message' => "Budget ajouter avec success",
+                'tier' => $tier->getAsArray()
+            ]);
+        }
+
+        return $this->render('comptabilite/tiers.html.twig', [
+            'tiers' => json_encode($repo->findResult()),
+            'comptesTiers' => $compteRepo->findPosteTitre("4%")
+        ]);
+    }
+
+    /**
+     * @Route("/comptabilite/plan/analytics", name="comptabilite_plan_analytics")
+     */
+    public function planAnalytics(Request $request, AnalytiqueRepository $repo,EntityManagerInterface $manager)
+    {
+        if ($request->isMethod('post')) {
+            $ana = new Analytique($request->request->get('code'),$request->request->get('libelle'));
+            $manager->persist($ana);
+            $manager->flush();
+            return new JsonResponse([
+                'hasError' => false,
+                'message' => "Analytique ajouter avec success",
+                'analytique' => ['id'=>$ana->getId(),'code'=>$ana->getCode(),'libelle'=>$ana->getLibelle()]
+            ]);
+        }
+
+        return $this->render('comptabilite/ana.html.twig', [
+            'analytics' => json_encode($repo->findAnalytics()),
+        ]);
+    }
+
 
 
     /**
@@ -436,7 +717,7 @@ class ComptabiliteController extends AbstractController
         ]);
     }
 
-    public function renderModalJournal(CompteRepository $repositoryCompte, SessionInterface $session)
+    public function renderModalJournal(ModelSaisieRepository $modelRepo, CompteRepository $repositoryCompte, SessionInterface $session)
     {
         $exercice = $session->get('exercice');
 
@@ -448,6 +729,7 @@ class ComptabiliteController extends AbstractController
 
         return $this->render('comptabilite/modalJournal.html.twig', [
             'codes' => $repositoryCompte->findCodeJournaux(),
+            'models' => $modelRepo->findAll(),
             'periodes' => $periods,
             'labelComptes' => $repositoryCompte->findPosteTitre()
         ]);

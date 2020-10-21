@@ -38,11 +38,6 @@ class Article
     private $piece;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $analytique;
-
-    /**
      * @ORM\Column(type="datetime")
      * @Assert\LessThan("+1 day")
      */
@@ -71,6 +66,21 @@ class Article
      * @ORM\Column(type="boolean")
      */
     private $isFerme;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Analytique::class, inversedBy="articles")
+     */
+    private $analytic;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Tier::class, inversedBy="articles")
+     */
+    private $tier;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Budget::class, inversedBy="articles")
+     */
+    private $budget;
 
     public function __construct()
     {   
@@ -114,18 +124,6 @@ class Article
     public function setPiece(string $piece): self
     {
         $this->piece = $piece;
-
-        return $this;
-    }
-
-    public function getAnalytique(): ?string
-    {
-        return $this->analytique;
-    }
-
-    public function setAnalytique(string $analytique): self
-    {
-        $this->analytique = $analytique;
 
         return $this;
     }
@@ -186,6 +184,42 @@ class Article
     public function setIsFerme(bool $isFerme): self
     {
         $this->isFerme = $isFerme;
+
+        return $this;
+    }
+
+    public function getAnalytic(): ?Analytique
+    {
+        return $this->analytic;
+    }
+
+    public function setAnalytic(?Analytique $analytic): self
+    {
+        $this->analytic = $analytic;
+
+        return $this;
+    }
+
+    public function getTier(): ?Tier
+    {
+        return $this->tier;
+    }
+
+    public function setTier(?Tier $tier): self
+    {
+        $this->tier = $tier;
+
+        return $this;
+    }
+
+    public function getBudget(): ?Budget
+    {
+        return $this->budget;
+    }
+
+    public function setBudget(?Budget $budget): self
+    {
+        $this->budget = $budget;
 
         return $this;
     }

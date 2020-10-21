@@ -19,32 +19,9 @@ class TierRepository extends ServiceEntityRepository
         parent::__construct($registry, Tier::class);
     }
 
-    // /**
-    //  * @return Tier[] Returns an array of Tier objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findResult()
     {
-        return $this->createQueryBuilder('t')
-            ->andWhere('t.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('t.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        return $this->_em->createQuery('select t.id, t.code, t.libelle,t.type, t.contact, t.adresse, tc.poste from App\Entity\Tier t join t.compte tc')
+                    ->getArrayResult(); 
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Tier
-    {
-        return $this->createQueryBuilder('t')
-            ->andWhere('t.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

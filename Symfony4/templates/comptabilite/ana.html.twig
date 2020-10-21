@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Plan Budgetaire{% endblock %}
+{% block title %}Plan Analytique{% endblock %}
 
 {% block header %}
     <div class="page-breadcrumb">
         <div class="d-flex align-items-center">
-            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Plan Budgetaire</h4>
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Plan Analytique</h4>
             <div class="ml-auto">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb m-0 p-0">
                         <li class="breadcrumb-item text-muted active" aria-current="page">Comptabilité</li>
-                        <li class="breadcrumb-item text-muted" aria-current="page">Plan Budgetaire</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Plan Analytique</li>
                     </ol>
                 </nav>
             </div>
@@ -22,27 +22,27 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Plan Budgetaire</h4>
+                    <h4 class="card-title">Plan Analytique</h4>
                     <hr>
-                    <div class="row">                       
-                        <table class="table table-hover table-striped border" id="budgets">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th scope="col">Code</th>
-                                    <th scope="col">Budget</th>
-                                    <th scope="col">Prévision</th>
-                                    <th scope="col">Réalisé</th>
-                                    <th scope="col">Ecart</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                            <tfoot></tfoot>
-                        </table>                            
+                    <div class="row">  
+                        <div class="col-8">                   
+                            <table class="table table-hover table-striped border" id="budgets">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col">Code</th>
+                                        <th scope="col">Intitulé</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                                <tfoot></tfoot>
+                            </table>
+                        </div>  
+                        <div class="col-4">
+                            <button class="btn btn-success" data-toggle="modal" data-target="#form-dialog"><i class="fa fa-plus-circle" aria-hidden="true"></i> Creer un nouveau compte analytique</button>
+                        </div>                            
                     </div>
                    
-                    <div class="row">
-                        <button class="btn btn-success" data-toggle="modal" data-target="#form-dialog"><i class="fa fa-plus-circle" aria-hidden="true"></i> Creer un nouveau budget</button>
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -52,29 +52,23 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-info text-light">
-                    <h5 class="modal-title" id="exampleModalLabel">Creer un nouveau poste budgetaire</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Creer un nouveau compte analytique</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form method="post" action="{{path('add_budget')}}" id="form">
+                    <form method="post" id="form">
                         <div class="form-group row">
-                            <label for="code" class="col-form-label col-sm-5 required">Code budgetaire</label>
+                            <label for="code" class="col-form-label col-sm-5 required">Code analytique</label>
                             <div class="col-sm-7">
                                 <input type="text" id="code" name="code" required="required" class="form-control" palceholder="Code unique">
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="libelle" class="col-form-label col-sm-5 required">Libellé</label>
+                            <label for="libelle" class="col-form-label col-sm-5 required">Intitulé</label>
                             <div class="col-sm-7">
                                 <input type="text" id="libelle" name="libelle" required="required" class="form-control" palceholder="Nom du budget">
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label for="prevision" class="col-form-label col-sm-5 required">Montant prévision</label>
-                            <div class="col-sm-7">
-                                <input type="number" id="prevision" name="prevision" required="required" class="form-control">
                             </div>
                         </div>
                     
@@ -92,52 +86,30 @@
 
 {% block javascripts %}
 <script>
-    var budgets = {{budgets|raw}};
-    console.log(budgets);
-
+    var budgets = {{analytics|raw}};
     const refreshTable = function() {
         $('#budgets tbody').empty();
-        $('#budgets tfoot').empty();
-
-        var totB=0,totR=0;
-        
+        $('#budgets tfoot').empty();        
         for (let index = 0; index < budgets.length; index++) {
             var budget = budgets[index];
             var markup = "<tr>";
             markup += "<td>" + budget.code + "</td>";
             markup += "<td>" + budget.libelle + "</td>";
-            markup += "<td>" + budget.montant.toLocaleString("fr-FR") + "</td>";
-            markup += "<td>" + budget.realise.toLocaleString("fr-FR")+ "</td>";
-            markup += "<td>" + (budget.montant - budget.realise).toLocaleString("fr-FR")+ "</td>";
             markup += "</tr>";
-            totB += budget.montant;  
-            totR += budget.realise;
             $('#budgets tbody').append(markup);                   
         }
-
-        if (budgets.length != 0) {
-            var totMarkup = "<tr><th scope='row' colspan=2>Total</th>";
-            totMarkup += "<td>" + totB.toLocaleString("fr-FR") + "</td>";
-            totMarkup += "<td>" + totR.toLocaleString("fr-FR") + "</td>";
-            console.log(totR);
-            totMarkup += "<td>" + (totB-totR).toLocaleString("fr-FR") + "</td>";
-            totMarkup += "</tr>";
-            $('#budgets tfoot').append(totMarkup);  
-        } 
     }
     refreshTable();
 
     $("#form").submit(function(event){
         event.preventDefault(); 
-        var post_url = $(this).attr("action");
+        var post_url = window.location.href;
         var form_data = $(this).serialize();
-
         console.log(form_data);
-        
         $.post( post_url, form_data, function(response) {
             if (response.hasError == false) {
                 console.log('success');
-                budgets.push(response.budget);
+                budgets.push(response.analytique);
                 refreshTable();
                 $('#form-dialog').modal('hide');
             } else {

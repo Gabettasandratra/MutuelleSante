@@ -37,16 +37,14 @@
                             <table id="no-order" class="table table-hover mini-table no-padding border">
                                 <thead class="thead-light">
                                     <tr>
+                                        <th>Type</th>
                                         <th>Poste</th>
                                         <th>Intitulé</th>
-                                        <th>Type</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for compte in comptes %}                                                          
                                         <tr {% if compte.poste|length == 1 %}class="table-light font-weight-bold"{% endif %} {% if compte.note %}title="{{ compte.note }}" data-toggle="tooltip"{% endif %}>
-                                            <td>{{ compte.poste }}</td>
-                                            <td>{{ compte.titre }}</td>
                                             <td>
                                                 {% if compte.poste|length == 6 %}
                                                     <i class="mdi mdi-checkbox-blank" title="Compte" data-toggle="tooltip"></i>    
@@ -54,6 +52,8 @@
                                                     <i class="mdi mdi-checkbox-multiple-blank" title="Rubrique" data-toggle="tooltip"></i>    
                                                 {% endif %}
                                             </td>
+                                            <td>{{ compte.poste }}</td>
+                                            <td>{{ compte.titre }}</td>
                                         </tr>
                                     {% endfor %} 
                             </tbody>
@@ -61,11 +61,6 @@
                         </div>
                     </div>
                     <hr>
-                    <div class="row">
-                        <div class="col-md-12 text-right">
-                            <a href="{{ path('comptabilite_plan_analytique') }}" class="btn btn-sm btn-info">Voir le plan analytique</a>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

@@ -63,7 +63,7 @@
                                         <td>{{ article.libelle }}</td>
                                         <td>{{ article.montant|number_format(2,',',' ') }}</td>
                                         <td>{{ article.piece }}</td>
-                                        <td>{{ article.analytique }}</td>
+                                        <td>{% if article.analytic %}{{ article.analytic.code }}{% endif %}</td>
                                         {% if not app.session.get('exercice').isCloture %}
                                         <td>{% if not article.isFerme %}<a href="{{ path('comptabilite_saisie_edit',{'id': article.id}) }}" class="label btn-primary label-primary"><i class="mdi mdi-grease-pencil"></i></a>
                                             {% else %}<span class="label label-warning"><i class="mdi mdi-lock"></i></span>{% endif %}

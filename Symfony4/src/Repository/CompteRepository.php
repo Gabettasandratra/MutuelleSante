@@ -26,8 +26,13 @@ class CompteRepository extends ServiceEntityRepository
                                     ->getResult();
     }
 
-    public function findPosteTitre()
+    public function findPosteTitre($begin = null)
     {
+        if ($begin) {
+            return $this->_em->createQuery('select c.poste,c.titre from App\Entity\Compte c where length(c.poste) = 6 and c.poste like :b order by c.poste')
+                        ->setParameter('b', $begin)                                  
+                        ->getResult();
+        }
         return $this->_em->createQuery('select c.poste,c.titre from App\Entity\Compte c where length(c.poste) = 6 order by c.poste')
                         ->getResult();
     }

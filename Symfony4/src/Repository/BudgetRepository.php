@@ -38,9 +38,8 @@ class BudgetRepository extends ServiceEntityRepository
 
     public function findExercice($exercice)
     {
-        return $this->_em->createQuery('select b from App\Entity\Budget b where b.debut >= :deb and b.fin <= :fin order by b.libelle')
-                            ->setParameter('deb', $exercice->getDateDebut())
-                            ->setParameter('fin', $exercice->getDateFin())
+        return $this->_em->createQuery('select b.id, b.code, b.libelle, b.montant, b.realise from App\Entity\Budget b where b.exercice = :e')
+                            ->setParameter('e', $exercice)
                             ->getArrayResult(); 
     }
 }

@@ -288,6 +288,14 @@
 													</span>
 												</a>
 											</li>
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="#modal-saisie" data-toggle="modal" data-backdrop="static" class="sidebar-link">
+													<i class="mdi mdi-pen"></i>
+													<span class="hide-menu">
+														Saisie avec model
+													</span>
+												</a>
+											</li>
 											{% endif %}
 											<li class="sidebar-item waves-effect waves-dark">
 												<a href="{{ path('comptabilite_plan') }}" class="sidebar-link">
@@ -298,10 +306,26 @@
 												</a>
 											</li>
 											<li class="sidebar-item waves-effect waves-dark">
+												<a href="{{ path('comptabilite_plan_analytics') }}" class="sidebar-link">
+													<i class="mdi mdi-buffer"></i>
+													<span class="hide-menu">
+														Plan analytique
+													</span>
+												</a>
+											</li>
+											<li class="sidebar-item waves-effect waves-dark">
 												<a href="{{ path('comptabilite_plan_budgetaire') }}" class="sidebar-link">
-													<i class="mdi mdi-view-list"></i>
+													<i class="mdi mdi-cube"></i>
 													<span class="hide-menu">
 														Plan budgetaire
+													</span>
+												</a>
+											</li>
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="{{ path('comptabilite_plan_tiers') }}" class="sidebar-link">
+													<i class="mdi mdi-sale"></i>
+													<span class="hide-menu">
+														Plan tiers
 													</span>
 												</a>
 											</li>
@@ -310,6 +334,14 @@
 													<i class="mdi mdi-bank"></i>
 													<span class="hide-menu">
 														Trésorerie</span>
+												</a>
+											</li>
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="{{ path('comptabilite_model_saisie') }}" class="sidebar-link">
+													<i class="mdi mdi-briefcase-download"></i>
+													<span class="hide-menu">
+														Model de sasie
+													</span>
 												</a>
 											</li>
 										</ul>
@@ -543,13 +575,16 @@
                 startDate: new Date('{{ app.session.get('exercice').dateDebut|date('m/d/Y') }}'),
                 endDate: new Date('{{ app.session.get('exercice').dateFin|date('m/d/Y') }}')
             });
+			// For handling model saisie
+
+			$("#form-model").submit(function(event){
+                event.preventDefault();     
+                window.location.href = "/comptabilite/saisie/model/"+$("#id-model").val();
+            });
+			$('[data-toggle="tooltip"]').tooltip();
+			$(".preloader").fadeOut();
 		</script>
 
 		{% block javascripts %}{% endblock %}
-
-		<script>
-			$('[data-toggle="tooltip"]').tooltip();
-$(".preloader").fadeOut();
-		</script>
 	</body>
 </html>

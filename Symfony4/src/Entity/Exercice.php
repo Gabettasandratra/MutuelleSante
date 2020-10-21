@@ -54,10 +54,16 @@ class Exercice
      */
     private $dateFin;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Budget::class, mappedBy="exercice", orphanRemoval=true)
+     */
+    private $budgets;
+
     public function __construct()
     {
         $this->isCloture = false;   
         $this->historiqueCotisations = new ArrayCollection();
+        $this->budgets = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -152,5 +158,36 @@ class Exercice
             return true;
         }
         return false;
+    }
+
+    /**
+     * @return Collection|Budget[]
+     */
+    public function getBudgets(): Collection
+    {
+        return $this->budgets;
+    }
+
+    public function addBudgets(Budget $budgets): self
+    {
+        if (!$this->budgets->contains($budgets)) {
+            $this->budgets[] = $budgets;
+            $budgets->setExercice($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBudgets(Budget $budgets): self
+    {
+        if ($this->budgets->contains($budgets)) {
+            $this->budgets->removeElement($budgets);
+            // set the owning side to null (unless already changed)
+            if ($budgets->getExercice() === $this) {
+                $budgets->setExercice(null);
+            }
+        }
+
+        return $this;
     }
 }

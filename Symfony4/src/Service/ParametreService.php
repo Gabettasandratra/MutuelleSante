@@ -44,16 +44,6 @@ class ParametreService
         ]); 
         $parametres[] = $soins;
 
-        $analytiques = new Parametre('plan_analytique');
-        $analytiques->setList([
-            'COM' => 'Commun',
-            'BUR' => 'Bureau',
-        ]); 
-        
-        $parametres[] = $analytiques;
-        $parametres[] = new Parametre('code_analytique_cong', 'CONG-{n}');
-
-
         foreach ($parametres as $parametre) {
             $this->manager->persist($parametre);  
         }

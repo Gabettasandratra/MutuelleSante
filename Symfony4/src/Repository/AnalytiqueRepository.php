@@ -19,32 +19,9 @@ class AnalytiqueRepository extends ServiceEntityRepository
         parent::__construct($registry, Analytique::class);
     }
 
-    // /**
-    //  * @return Analytique[] Returns an array of Analytique objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findAnalytics()
     {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('a.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        return $this->_em->createQuery('select t.id, t.code, t.libelle from App\Entity\Analytique t')
+                    ->getArrayResult(); 
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Analytique
-    {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

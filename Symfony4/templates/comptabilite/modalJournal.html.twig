@@ -79,3 +79,33 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" tabindex="-1" id="modal-saisie" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-light">
+                <h5 class="modal-title" id="exampleModalLabel">Saisie écriture comptable</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form-model">
+                    <div class="form-group">
+                        <label for="recipient-name" class="col-form-label">Selectionner le model de saisie</label>
+                        <select class="form-control" name="model" id="id-model">
+                            {% for model in models %}
+                                <option value="{{model.id}}" class="pre-space">{{model.nom}}</span></option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group text-right">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Fermer</button>
+                        <button type="submit" class="btn btn-primary">OK</button>
+                    </div>
+                </form>
+            </div>
+            
+        </div>
+    </div>
+</div>

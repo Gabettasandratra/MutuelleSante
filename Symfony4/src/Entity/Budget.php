@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\BudgetRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -18,7 +20,7 @@ class Budget
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=10)
+     * @ORM\Column(type="string", length=10, unique=true)
      */
     private $code;
 
@@ -33,14 +35,29 @@ class Budget
     private $montant;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="float")
      */
-    private $debut;
+    private $realise;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\ManyToOne(targetEntity=Exercice::class, inversedBy="budgets")
+     * @ORM\JoinColumn(nullable=false)
      */
-    private $fin;
+    private $exercice;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Article::class, mappedBy="budget")
+     */
+    private $articles;
+
+    public function __construct($code, $lib, $montant)
+    {
+        $this->code = $code;
+        $this->libelle = $lib;
+        $this->montant = $montant;
+        $this->realise = 0;
+        $this->articles = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -83,26 +100,62 @@ class Budget
         return $this;
     }
 
-    public function getDebut(): ?\DateTimeInterface
+    public function getRealise(): ?float
     {
-        return $this->debut;
+        return $this->realise;
     }
 
-    public function setDebut(\DateTimeInterface $debut): self
+    public function setRealise(float $realise): self
     {
-        $this->debut = $debut;
+        $this->realise = $realise;
 
         return $this;
     }
 
-    public function getFin(): ?\DateTimeInterface
+    public function getExercice(): ?Exercice
     {
-        return $this->fin;
+        return $this->exercice;
     }
 
-    public function setFin(\DateTimeInterface $fin): self
+    public function setExercice(?Exercice $exercice): self
     {
-        $this->fin = $fin;
+        $this->exercice = $exercice;
+
+        return $this;
+    }
+    
+    public function getAsArray()
+    {
+        return ['id'=>$this->id,'code'=>$this->code,'libelle'=>$this->libelle,'montant'=>(float)$this->montant,'realise'=>(float)$this->realise];
+    }
+
+    /**
+     * @return Collection|Article[]
+     */
+    public function getArticles(): Collection
+    {
+        return $this->articles;
+    }
+
+    public function addArticle(Article $article): self
+    {
+        if (!$this->articles->contains($article)) {
+            $this->articles[] = $article;
+            $article->setBudget($this);
+        }
+
+        return $this;
+    }
+
+    public function removeArticle(Article $article): self
+    {
+        if ($this->articles->contains($article)) {
+            $this->articles->removeElement($article);
+            // set the owning side to null (unless already changed)
+            if ($article->getBudget() === $this) {
+                $article->setBudget(null);
+            }
+        }
 
         return $this;
     }
