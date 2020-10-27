@@ -32,4 +32,13 @@ class ParametreRepository extends ServiceEntityRepository
         }
         return $retour;
     }
+
+    public function findDonneesMutuelle()
+    {
+        $nom = $this->_em->createQuery("select p.value from App\Entity\Parametre p where p.nom = 'nom_mutuelle'")->getSingleResult();
+        $adresse = $this->_em->createQuery("select p.value from App\Entity\Parametre p where p.nom = 'adresse_mutuelle'")->getSingleResult();
+        $contact = $this->_em->createQuery("select p.value from App\Entity\Parametre p where p.nom = 'contact_mutuelle'")->getSingleResult();
+        $email = $this->_em->createQuery("select p.value from App\Entity\Parametre p where p.nom = 'email_mutuelle'")->getSingleResult();
+        return ['nom_mutuelle'=>$nom['value'],'adresse_mutuelle'=>$adresse['value'],'contact_mutuelle'=>$contact['value'],'email_mutuelle'=>$email['value']];
+    }
 }

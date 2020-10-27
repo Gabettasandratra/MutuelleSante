@@ -47,7 +47,7 @@ class ComptabiliteController extends AbstractController
     /**
      * @Route("/comptabilite/journal", name="comptabilite_view_journal")
      */
-    public function viewJournal(Request $request, CompteRepository $repositoryCompte, ArticleRepository $repositoryArticle, SessionInterface $session)
+    public function viewJournal(Request $request, ParametreRepository $parametreRepo, CompteRepository $repositoryCompte, ArticleRepository $repositoryArticle, SessionInterface $session)
     {
         $exercice = $session->get('exercice');
 
@@ -73,7 +73,8 @@ class ComptabiliteController extends AbstractController
         return $this->render('comptabilite/journal.html.twig', [
             'articles' => $articles,
             'code' => $repositoryCompte->findCodeJournaux($code)[0],
-            'periode' => ['debut' => $dateDebut, 'fin' => $dateFin]
+            'periode' => ['debut' => $dateDebut, 'fin' => $dateFin],
+            'mutuelle' => $parametreRepo->findDonneesMutuelle()
         ]);
     }
 
@@ -197,7 +198,6 @@ class ComptabiliteController extends AbstractController
         ]);
     }
 
-// SAISIE D'UNE ECRITURE COMPTABLE
     /**
      * @Route("/comptabilite/saisie/model/{id}", name="comptabilite_saisie_model")
      */
@@ -407,7 +407,7 @@ class ComptabiliteController extends AbstractController
     /**
      * @Route("/comptabilite/grandlivre", name="comptabilite_livre")
      */
-    public function livre(Request $request, ArticleRepository $repositoryArticle, CompteRepository $repositoryCompte, SessionInterface $session)
+    public function livre(Request $request,ParametreRepository $parametreRepo, ArticleRepository $repositoryArticle, CompteRepository $repositoryCompte, SessionInterface $session)
     {
         $exercice = $session->get('exercice');
         $poste = $request->query->get('poste');
@@ -447,14 +447,15 @@ class ComptabiliteController extends AbstractController
             'donnees' => $donnees,
             'poste' => $poste,
             'subtitle' => $subtitle,
-            'periode' => ['debut' => $dateDebut, 'fin' => $dateFin]
+            'periode' => ['debut' => $dateDebut, 'fin' => $dateFin],
+            'mutuelle' => $parametreRepo->findDonneesMutuelle()
         ]);
     }
 
     /**
      * @Route("/comptabilite/balance", name="comptabilite_balance")
      */
-    public function balance(Request $request, ArticleRepository $repositoryArticle, SessionInterface $session)
+    public function balance(Request $request,ParametreRepository $parametreRepo, ArticleRepository $repositoryArticle, SessionInterface $session)
     {
         $exercice = $session->get('exercice');
         $fin = $request->query->get('fin');
@@ -470,7 +471,8 @@ class ComptabiliteController extends AbstractController
 
         return $this->render('comptabilite/balance.html.twig', [
             'donnees' => $repositoryArticle->findBalance($dateDebut, $dateFin),
-            'periode' => ['debut' => $dateDebut, 'fin' => $dateFin]
+            'periode' => ['debut' => $dateDebut, 'fin' => $dateFin],
+            'mutuelle' => $parametreRepo->findDonneesMutuelle()
         ]);
     }
 
@@ -593,12 +595,10 @@ class ComptabiliteController extends AbstractController
         ]);
     }
 
-
-
     /**
      * @Route("/comptabilite/bilan", name="comptabilite_bilan")
      */
-    public function bilan(ConfigEtatFi $etatFi, CompteRepository $repo, SessionInterface $session)
+    public function bilan(ConfigEtatFi $etatFi,ParametreRepository $parametreRepo, CompteRepository $repo, SessionInterface $session)
     {
         $exercice = $session->get('exercice'); 
         $actifNonCourant = $etatFi->actifNonCourant();  
@@ -612,7 +612,8 @@ class ComptabiliteController extends AbstractController
             'actifsCourants' => $this->getBilan($exercice, $repo, $actifCourant),
             'capitaux' => $this->getBilan($exercice, $repo, $capitaux),
             'passifsNonCourants' => $this->getBilan($exercice, $repo, $passifsNonCourants),
-            'passifsCourants' => $this->getBilan($exercice, $repo, $passifsCourants)
+            'passifsCourants' => $this->getBilan($exercice, $repo, $passifsCourants),
+            'mutuelle' => $parametreRepo->findDonneesMutuelle()
         ]);
     }
 
@@ -635,7 +636,7 @@ class ComptabiliteController extends AbstractController
     /**
      * @Route("/comptabilite/resultat", name="comptabilite_resultat")
      */
-    public function resultat(ConfigEtatFi $etatFi, CompteRepository $repo, SessionInterface $session)
+    public function resultat(ConfigEtatFi $etatFi,ParametreRepository $parametreRepo, CompteRepository $repo, SessionInterface $session)
     {
         $exercice = $session->get('exercice');
         $chiffreAffaireNet = $etatFi->chiffreAffaireNet();  
@@ -657,7 +658,8 @@ class ComptabiliteController extends AbstractController
             'chargesFinanciers' => $this->getResultat($exercice, $repo, $cFinanciers),
             'produitsExceptionnels' => $this->getResultat($exercice, $repo, $pException),
             'chargesExceptionnels' => $this->getResultat($exercice, $repo, $cException),
-            'impots' => $this->getResultat($exercice, $repo, $impots)
+            'impots' => $this->getResultat($exercice, $repo, $impots),
+            'mutuelle' => $parametreRepo->findDonneesMutuelle()
         ]);
     }
 

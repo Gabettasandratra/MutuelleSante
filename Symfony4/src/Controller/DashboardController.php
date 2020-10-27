@@ -6,6 +6,7 @@ use Fpdf\Fpdf;
 use App\Pdf\Pdf;
 use App\Entity\Adherent;
 use App\Pdf\PDFMutuelle;
+use App\Repository\CompteRepository;
 use App\Repository\ArticleRepository;
 use App\Repository\AdherentRepository;
 use App\Repository\PrestationRepository;
@@ -21,17 +22,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class DashboardController extends AbstractController
 {
     /**
-     * @Route("/")
+     * @Route("/", name="dashboard")
      */
-    public function home()
-    {
-        return $this->redirectToRoute('dashboard');
-    }
-
-    /**
-     * @Route("/dashboard", name="dashboard")
-     */
-    public function index(AdherentRepository $repo, PrestationRepository $repoPre, SessionInterface $session)
+    public function index(CompteRepository $compteRepo,AdherentRepository $repo, PrestationRepository $repoPre, SessionInterface $session)
     {
         $exercice = $session->get('exercice');
 
@@ -50,16 +43,10 @@ class DashboardController extends AbstractController
         
         $montantPrestations = $repoPre->findMontantPayedEachMonth($exercice->getAnnee());
         
-        $m_remb = array();
         foreach ($montantPrestations as $prestation) {
-            $m_remb[] = (float) $prestation['m_remb'];
+            $m_remb[] = ($prestation['nb']==0)?0:round($prestation['t_remb'] / $prestation['nb']);
+            $m_frais[] =($prestation['nb']==0)?0: round($prestation['t_frais'] / $prestation['nb']);
         }
-
-        $m_frais = array();
-        foreach ($montantPrestations as $prestation) {
-            $m_frais[] = (float) $prestation['m_frais'];
-        }
-
 
         $json_prestations = json_encode([
             'label' => ['Jan','Fev','Mar','Avr','Mai','Jui','Juil','Août','Sep','Oct','Nov','Dec'],
@@ -70,11 +57,27 @@ class DashboardController extends AbstractController
             'congregations' => $json_congregation,
             'beneficiaires' => $json_beneficiaire,
             'prestations' => $json_prestations,
+            'tresoreries' => $compteRepo->findTresorerie(),
             'soins' => $repoPre->findPercentActe($exercice),
             'statPres' => $repoPre->findStatRemb($exercice),
             'nbAdhPac' => $repo->findNbAdhAndPac($exercice),
             'tauxAttente' => $repoPre->findTauxRemb($exercice),
         ]);
+    }
+
+    /**
+     * @Route("/dashboard/json/{type}", name="dashboard_resultat")
+     */
+    public function getJsonDashboard($type,CompteRepository $compteRepo,SessionInterface $session)
+    {
+        $exercice = $session->get('exercice');
+        switch($type) {
+            case 'resultat': 
+                $r = $compteRepo->findChargeProduitParMois($exercice); break;
+            case 'tresorerie' :
+                $r = $compteRepo->findSoldeTresorerieParMois($exercice); break;
+        }   
+        return new JsonResponse($r);
     }
 
     /**

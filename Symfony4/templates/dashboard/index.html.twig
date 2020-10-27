@@ -10,9 +10,9 @@
     <div class="row">
             <!-- Earnings (Monthly) Card Example -->
             <div class="col-xl-3 col-md-3 mb-4">
-              <div class="card border-left-primary shadow h-100 py-2">
+              <div class="card border-left-primary shadow h-100">
                 <div class="card-body">
-                  <div class="row no-gutters align-items-center">
+                  <div class="row no-gutters align-items-center mb-2">
                     <div class="col mr-2">
                       <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">congrégations</div>
                       <div class="h5 mb-0 font-weight-bold text-gray-800">{{nbAdhPac.ad}}</div>
@@ -21,14 +21,6 @@
                       <i class="fas fa-home fa-2x text-gray-300"></i>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Earnings (Monthly) Card Example -->
-            <div class="col-xl-3 col-md-3 mb-4">
-              <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                       <div class="text-xs font-weight-bold text-success text-uppercase mb-1">bénéficiaires</div>
@@ -44,9 +36,9 @@
 
             <!-- Earnings (Monthly) Card Example -->
             <div class="col-xl-3 col-md-3 mb-4">
-              <div class="card border-left-info shadow h-100 py-2">
+              <div class="card border-left-info shadow h-100">
                 <div class="card-body">
-                  <div class="row no-gutters align-items-center">
+                  <div class="row no-gutters align-items-center mb-2">
                     <div class="col mr-2">
                       <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Taux de remb </div>
                       <div class="row no-gutters align-items-center">
@@ -64,14 +56,6 @@
                       <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Pending Requests Card Example -->
-            <div class="col-xl-3 col-md-3 mb-4">
-              <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                       <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Remb attente</div>
@@ -79,6 +63,29 @@
                     </div>
                     <div class="col-auto">
                       <i class="fas fa-hourglass-half fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-xl-6 col-md-6 mb-4">
+              <div class="card border-left-info shadow h-100">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div class="h4 text-info text-center text-uppercase mb-2">Solde de trésorerie</div>
+                      {% for tresorerie in tresoreries %}  
+                      <div class="row no-gutters align-items-center border-bottom mb-1">
+                        <div class="col-8">
+                          <div class="font-weight-normal">{{tresorerie.titre}}</div>
+                        </div>
+                        <div class="col-4">
+                          <div class=" text-gray-800">{{tresorerie.solde|number_format(2,',',' ')}} Ar</div>
+                        </div>
+                        
+                      </div>
+                      {% endfor %}
                     </div>
                   </div>
                 </div>
@@ -135,15 +142,73 @@
         </div>
     </div>
 
-    {# Section des remboursements moyenne par bénéficiaires dans une exercice #}
+   {#Variation de trésorerie #}
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-12">
             <div class="card shadow">
                 <div class="card-body">
                     <div class="d-md-flex align-items-center">
                         <div>
-                            <h5 class="card-title text-uppercase">Coûts moyenne de remboursement</h5>
+                            <h5 class="card-title text-uppercase">Variation des trésoreries</h5>
                             <h6 class="card-subtitle">Année {{ app.session.get('exercice').annee }}</h6>
+                        </div>
+                        <div class="ml-auto d-flex no-block align-items-center">
+                            <ul class="list-inline font-12 dl m-r-15 m-b-0">
+                                <li class="list-inline-item text-blue-chart"><i class="fa fa-circle"></i> Voalohany </li>
+                                <li class="list-inline-item text-red-chart"><i class="fa fa-circle"></i> Faharoa</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <!-- column -->
+                        <div class="col-lg-12">
+                            <div id="tresoreries" class="ct-charts chart-line" style="height:300px;"></div>
+                        </div>
+                        <!-- column -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="d-md-flex align-items-center">
+                        <div>
+                            <h5 class="card-title text-uppercase">Résultat de l'exercice</h5>
+                            <h6 class="card-subtitle">Année {{ app.session.get('exercice').annee }}</h6>
+                        </div>
+                        <div class="ml-auto d-flex no-block align-items-center">
+                            <ul class="list-inline font-12 dl m-r-15 m-b-0">
+                                <li class="list-inline-item text-1-chart"><i class="fa fa-circle"></i> Produit</li>
+                                <li class="list-inline-item text-2-chart"><i class="fa fa-circle"></i> Charge</li>
+                                <li class="list-inline-item text-3-chart"><i class="fa fa-circle"></i> Résultat</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <!-- column -->
+                        <div class="col-lg-12">
+                            <div id="resultat" class="ct-charts chart-line" style="height:300px;"></div>
+                        </div>
+                        <!-- column -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Section des remboursements moyenne par bénéficiaires dans une exercice #}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="d-md-flex align-items-center">
+                        <div>
+                            <h5 class="card-title h3">Coûts moyenne de remboursement</h5>
+                            <h6 class="card-subtitle"> {{app.session.get('exercice').dateDebut|date('d F Y')}} - {{app.session.get('exercice').dateFin|date('d F Y')}}</h6>
                         </div>
                         <div class="ml-auto d-flex no-block align-items-center">
                             <ul class="list-inline font-12 dl m-r-15 m-b-0">
@@ -155,9 +220,37 @@
                     <div class="row">
                         <!-- column -->
                         <div class="col-lg-12">
-                            <div id="prestation" class="chart-bar ct-charts"></div>
+                            <div id="prestation" class="chart-bar ct-charts" style="height:300px;"></div>
                         </div>
                         <!-- column -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Section pourcentage des remboursements dans un exercice #}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="d-md-flex align-items-center">
+                        <div>
+                            <h5 class="card-title text-uppercase">Pourcentage des soins</h5>
+                            <h6 class="card-subtitle">Année {{ app.session.get('exercice').annee }}</h6>
+                        </div>
+                    </div>
+                    <div class="row">
+                        {% for soin in soins %}
+                        <div class="col-4 my-1">
+                          {{soin.description}}
+                        </div>
+                        <div class="col-8 my-1">
+                          <div class="progress mb-2" style="height: 16px;">
+                            <div class="progress-bar bg-primary" role="progressbar" title="{{100*soin.value}}%" data-toggle="tooltip"{% if soin.value != 0 %}style="width:{{100*soin.value}}%"{% endif %} aria-valuenow="{{soin.value*100}}" aria-valuemin="0" aria-valuemax="100"><span class="font-12">{% if soin.value != 0 %}{{100*soin.value}}%{% endif %}</span></div>
+                          </div>     
+                        </div>                   
+                        {% endfor %}       
                     </div>
                 </div>
             </div>
@@ -197,34 +290,6 @@
           </div>
         </div>
     </div>
-
-    {# Section pourcentage des remboursements dans un exercice #}
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-body">
-                    <div class="d-md-flex align-items-center">
-                        <div>
-                            <h5 class="card-title text-uppercase">Pourcentage des soins</h5>
-                            <h6 class="card-subtitle">Année {{ app.session.get('exercice').annee }}</h6>
-                        </div>
-                    </div>
-                    <div class="row">
-                        {% for soin in soins %}
-                        <div class="col-4 my-1">
-                          {{soin.description}}
-                        </div>
-                        <div class="col-8 my-1">
-                          <div class="progress mb-2" style="height: 16px;">
-                            <div class="progress-bar bg-primary" role="progressbar" title="{{100*soin.value}}%" data-toggle="tooltip"{% if soin.value != 0 %}style="width:{{100*soin.value}}%"{% endif %} aria-valuenow="{{soin.value*100}}" aria-valuemin="0" aria-valuemax="100"><span class="font-12">{% if soin.value != 0 %}{{100*soin.value}}%{% endif %}</span></div>
-                          </div>     
-                        </div>                   
-                        {% endfor %}       
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 {% endblock %}
 
 {% block javascripts %}
@@ -241,7 +306,62 @@
         createChartLine('#beneficiaire', beneficiaires.label, [beneficiaires.series], 0, 500);
 
         var prestations = {{ prestations|raw }};
-        createChartBar('#prestation', prestations.label, prestations.series, 0, 100000);   
+        createChartBar('#prestation', prestations.label, prestations.series, 0, 500000); 
+
+        // Trésoreries
+        $.get('{{path('dashboard_resultat',{type:'tresorerie'})}}', function(data) {
+            console.log(data);
+          var chart = new Chartist.Line('#tresoreries', {
+              labels: prestations.label,
+              series: [data],
+          }, {
+              low: 0,
+              high: 50000000,
+              showArea: true,
+              fullWidth: true,
+              plugins: [
+                  Chartist.plugins.tooltip()
+              ],
+              axisY: {
+                  offset: 60,
+                  labelInterpolationFnc: function(value) {
+                      return (value / 1000000)+ 'M Ar';
+                  }
+              },
+              labelOffset: {
+                x: 0,
+                y: -50
+              },
+              axisX: {offset:40, showGrid:false}
+          });
+          chart.on('draw', function(ctx) {
+            if (ctx.type === 'area') {
+                ctx.element.attr({
+                    x1: ctx.x1 + 0.001
+                });
+            }
+          });
+          chart.on('created', function(ctx) {
+              var defs = ctx.svg.elem('defs');
+              defs.elem('linearGradient', {
+                  id: 'gradient',
+                  x1: 0,
+                  y1: 1,
+                  x2: 0,
+                  y2: 0
+              }).elem('stop', {
+                  offset: 0,
+                  'stop-color': 'rgba(255, 255, 255, 1)'
+              }).parent().elem('stop', {
+                  offset: 1,
+                  'stop-color': 'rgba(64, 196, 255, 1)'
+              });
+          });
+        });
+        // Repartitions des charges
+        $.get('{{path('dashboard_resultat',{type:'resultat'})}}', function(data) {
+          createChartLine('#resultat', prestations.label, [data.charge,data.produit,data.resultat], 0, 100000000, 70);
+        });
     });
     </script>
 {% endblock %}

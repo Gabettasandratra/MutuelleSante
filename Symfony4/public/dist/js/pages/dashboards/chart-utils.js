@@ -9,7 +9,7 @@ File: js
 // ============================================================== 
 // Newsletter
 // ============================================================== 
-function createChartLine(elem, lab, ser, low = 0, high = 50) {
+function createChartLine(elem, lab, ser, low = 0, high = 50, offs = 50) {
 
     var chart = new Chartist.Line(elem, {
         labels: lab,
@@ -18,14 +18,14 @@ function createChartLine(elem, lab, ser, low = 0, high = 50) {
         low: low,
         high: high,
         showArea: true,
-        fullWidth: false,
+        fullWidth: true,
         plugins: [
             Chartist.plugins.tooltip()
         ],
         axisY: {
             onlyInteger: true,
             scaleMinSpace: 40,
-            offset: 20,
+            offset: offs,
             labelInterpolationFnc: function(value) {
                 return (value / 1);
             }
@@ -74,7 +74,7 @@ function createChartBar(elem, lab, ser, low = 0, high = 50) {
         low: low,
         high: high,
         showArea: true,
-        fullWidth: false,
+        fullWidth: true,
         plugins: [
             Chartist.plugins.tooltip()
         ],
@@ -82,7 +82,7 @@ function createChartBar(elem, lab, ser, low = 0, high = 50) {
             scaleMinSpace: 40,
             offset: 50,
             labelInterpolationFnc: function(value) {
-                return value;
+                return value.toLocaleString('fr-FR');
             }
         },
     });
@@ -125,7 +125,11 @@ function createChartPie(elem, ser) {
     var chart = new Chartist.Pie(elem, {
         series: ser,
     }, {
-        showLabel: false,
+        donut: true,
+        donutWidth: 60,
+        donutSolid: true,
+        startAngle: 270,
+        showLabel: true,
         plugins: [
             Chartist.plugins.tooltip()
         ],

@@ -12,6 +12,7 @@ use App\Repository\PacRepository;
 use App\Repository\CompteRepository;
 use App\Repository\ArticleRepository;
 use App\Repository\AdherentRepository;
+use App\Repository\ParametreRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -187,7 +188,7 @@ class ExportController extends AbstractController
     /**
      * @Route("/pdf/balance/{debut}/{fin}", name="pdf_balance")
      */
-    public function pdfBalance($debut, $fin, ArticleRepository $repo)
+    public function pdfBalance($debut, $fin,ParametreRepository $parametreRepo, ArticleRepository $repo)
     {
         $dateDebut = \DateTime::createFromFormat('dmY', $debut);
         $dateFin = \DateTime::createFromFormat('dmY', $fin);
@@ -196,7 +197,7 @@ class ExportController extends AbstractController
         $periode['fin'] = $dateFin;
 
         $donnees = $repo->findBalance($dateDebut, $dateFin);
-        $pdf = new Pdf($periode, 'Balance des comptes');
+        $pdf = new Pdf($periode,$parametreRepo->findDonneesMutuelle(), 'Balance des comptes');
         $pdf->AliasNbPages();
         $pdf->AddPage('P', 'A4');
 
@@ -211,7 +212,7 @@ class ExportController extends AbstractController
     /**
      * @Route("/pdf/journal/{code}/{debut}/{fin}", name="pdf_journal")
      */
-    public function pdfJournal($code, $debut, $fin, ArticleRepository $repo, CompteRepository $repoCompte)
+    public function pdfJournal($code, $debut, $fin, ParametreRepository $parametreRepo,ArticleRepository $repo, CompteRepository $repoCompte)
     {
         $dateDebut = \DateTime::createFromFormat('dmY', $debut);
         $dateFin = \DateTime::createFromFormat('dmY', $fin);
@@ -224,7 +225,7 @@ class ExportController extends AbstractController
         // Le subtitle
         $codeJour = $repoCompte->findCodeJournaux($code);
 
-        $pdf = new Pdf($periode, 'Journal', $codeJour[0]['codeJournal'].'  '.$codeJour[0]['titre']);
+        $pdf = new Pdf($periode, $parametreRepo->findDonneesMutuelle(),'Journal', $codeJour[0]['codeJournal'].'  '.$codeJour[0]['titre']);
         $pdf->AliasNbPages();
         $pdf->AddPage('P', 'A4');
 
@@ -240,7 +241,7 @@ class ExportController extends AbstractController
     /**
      * @Route("/pdf/grand-livre/{poste}/{debut}/{fin}", name="pdf_livre")
      */
-    public function pdfLivre($poste, $debut, $fin, ArticleRepository $repo, CompteRepository $repoCompte)
+    public function pdfLivre($poste, $debut, $fin,ParametreRepository $parametreRepo, ArticleRepository $repo, CompteRepository $repoCompte)
     {
         $dateDebut = \DateTime::createFromFormat('dmY', $debut);
         $dateFin = \DateTime::createFromFormat('dmY', $fin);
@@ -260,7 +261,7 @@ class ExportController extends AbstractController
             $subtitle = 'Auxilliaires';
         }
 
-        $pdf = new Pdf($periode, 'Grand-livre des comptes', $subtitle);
+        $pdf = new Pdf($periode,$parametreRepo->findDonneesMutuelle(), 'Grand-livre des comptes', $subtitle);
         $pdf->AliasNbPages();
         $pdf->AddPage('P', 'A4');
 
@@ -276,7 +277,7 @@ class ExportController extends AbstractController
     /**
      * @Route("/pdf/bilan", name="pdf_bilan")
      */
-    public function pdfBilan(ConfigEtatFi $etatFi, CompteRepository $repo, SessionInterface $session)
+    public function pdfBilan(ConfigEtatFi $etatFi,ParametreRepository $parametreRepo, CompteRepository $repo, SessionInterface $session)
     {
         $exercice = $session->get('exercice'); 
         $periode = ['debut' => $exercice->getDateDebut(), 'fin' => $exercice->getDateFin()];
@@ -297,7 +298,7 @@ class ExportController extends AbstractController
         $passifsCourants = $etatFi->passifCourant();
         $donneesP['pc'] = $this->getBilan($exercice, $repo, $passifsCourants);
 
-        $pdf = new Pdf($periode, 'Bilan actif', 'Document fin d\'exercice');
+        $pdf = new Pdf($periode, $parametreRepo->findDonneesMutuelle(),'Bilan actif', 'Document fin d\'exercice');
         $pdf->AliasNbPages();
         $pdf->AddPage('P', 'A4');
         $pdf->bilanActifTable($donneesA);
@@ -331,7 +332,7 @@ class ExportController extends AbstractController
     /**
      * @Route("/pdf/resultat", name="pdf_resultat")
      */
-    public function pdfResultat(ConfigEtatFi $etatFi, CompteRepository $repo, SessionInterface $session)
+    public function pdfResultat(ConfigEtatFi $etatFi,ParametreRepository $parametreRepo, CompteRepository $repo, SessionInterface $session)
     {
         $exercice = $session->get('exercice'); 
         $periode = ['debut' => $exercice->getDateDebut(), 'fin' => $exercice->getDateFin()];
@@ -364,7 +365,7 @@ class ExportController extends AbstractController
         $impots = $etatFi->impots();
         $donnees['im']  = $this->getResultat($exercice, $repo, $impots);
 
-        $pdf = new Pdf($periode, 'Compte de résultat', 'Document fin d\'exercice');
+        $pdf = new Pdf($periode,$parametreRepo->findDonneesMutuelle(), 'Compte de résultat', 'Document fin d\'exercice');
         $pdf->AliasNbPages();
         $pdf->AddPage('P', 'A4');
         $pdf->compteResultatTable($donnees);

@@ -27,22 +27,19 @@ class ParametreService
         $parametres = [];
         
         $parametres[] = new Parametre('compte_cotisation');
-        $parametres[] = new Parametre('label_cotisation', 'Cotisation {a} | {c}');
+        $parametres[] = new Parametre('label_cotisation', 'Cot {a} | {c}');
         $parametres[] = new Parametre('compte_prestation');
-        $parametres[] = new Parametre('label_prestation', 'Remboursement {a} | {c}');
+        $parametres[] = new Parametre('label_prestation', 'Remb {a} | {c}');
         $parametres[] = new Parametre('percent_prestation', 1);
         $parametres[] = new Parametre('plafond_prestation', 2);
         $parametres[] = new Parametre('percent_rembourse_prestation', 0.6);
         $parametres[] = new Parametre('percent_rembourse_prestation_plafond', 0.25);
-        $parametres[] = new Parametre('compte_dette_prestation');
-        
-        
-        $soins = new Parametre('soins_prestation');
-        $soins->setList([
-            'DENTAIRE' => 'Soins dentaires',
-            'AUTRES' => 'Autres soins'
-        ]); 
-        $parametres[] = $soins;
+        $parametres[] = new Parametre('compte_dette_prestation');    
+        $parametres[] = new Parametre('soins_prestation');
+        $parametres[] = new Parametre('nom_mutuelle', 'Mutuelle Santé');
+        $parametres[] = new Parametre('adresse_mutuelle', 'adresse');
+        $parametres[] = new Parametre('contact_mutuelle', 'telephone');
+        $parametres[] = new Parametre('email_mutuelle', 'email');
 
         foreach ($parametres as $parametre) {
             $this->manager->persist($parametre);  

@@ -40,17 +40,16 @@
                                         <th scope="col" style="width: 8%">Date</th>
                                         <th scope="col" style="width: 5%">C.j</th>
                                         <th scope="col" style="width: 1%">N°id</th>
-                                        <th scope="col" style="width: 40%">Libellé</th>
-                                        <th scope="col" style="width: 15%">Réference</th>
+                                        <th scope="col" style="width: 40%">Libellé écriture</th>
                                         <th scope="col" style="width: 15%">Débit</th>
                                         <th scope="col" style="width: 15%">Crédit</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for classe, comptes in donnees %}
-                                        <tr><th colspan=7>{{ classe }}</th></tr>
+                                        <tr><th colspan=6>{{ classe }}</th></tr>
                                         {% for compte, articles in comptes %}
-                                            <tr><th colspan=7  class="table-active">{{ compte }}</th></tr> 
+                                            <tr><th colspan=6  class="table-active">{{ compte }}</th></tr> 
                                             {% set debit = 0 %} {% set credit = 0 %}
                                             {% for article in articles %}
                                                 <tr>
@@ -58,14 +57,13 @@
                                                     <td>{{ article.categorie }}</td>
                                                     <td>{{ article.id }}</td>
                                                     <td>{{ article.libelle }}</td>
-                                                    <td>{{ article.piece }}</td>
                                                     
                                                     <td class="text-center">{% if article.debit %}{{ article.debit|number_format(2,',',' ') }}{% endif %}</td> {% set debit = debit + article.debit %}
                                                     <td class="text-center">{% if article.credit %}{{ article.credit|number_format(2,',',' ') }}{% endif %}</td> {% set credit = credit + article.credit %}
                                                 </tr>
                                             {% endfor %}  
                                             <tr>
-                                                <th class="text-right" colspan=5>Total : {{ compte }}</span></th>
+                                                <th class="text-right" colspan=4>Total : {{ compte }}</span></th>
                                                 <td class="text-center">{{ debit|number_format(2,',',' ') }}</td>
                                                 <td class="text-center">{{ credit|number_format(2,',',' ') }}</td>
                                             </tr>    

@@ -274,7 +274,7 @@
 										<a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
 											<i class="mdi mdi-keyboard"></i>
 											<span class="hide-menu">
-												Gestion comptable
+												Saisie
 											</span>
 										</a>
 										
@@ -297,6 +297,24 @@
 												</a>
 											</li>
 											{% endif %}
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="{{ path('comptabilite_model_saisie') }}" class="sidebar-link">
+													<i class="mdi mdi-briefcase-download"></i>
+													<span class="hide-menu">
+														Model de sasie
+													</span>
+												</a>
+											</li>
+										</ul>
+									</li>
+									<li class="sidebar-item">
+										<a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+											<i class="mdi mdi-table"></i>
+											<span class="hide-menu">
+												Structure
+											</span>
+										</a>
+										<ul aria-expanded="false" class="pl-2 collapse first-level">
 											<li class="sidebar-item waves-effect waves-dark">
 												<a href="{{ path('comptabilite_plan') }}" class="sidebar-link">
 													<i class="mdi mdi-view-list"></i>
@@ -334,14 +352,6 @@
 													<i class="mdi mdi-bank"></i>
 													<span class="hide-menu">
 														Trésorerie</span>
-												</a>
-											</li>
-											<li class="sidebar-item waves-effect waves-dark">
-												<a href="{{ path('comptabilite_model_saisie') }}" class="sidebar-link">
-													<i class="mdi mdi-briefcase-download"></i>
-													<span class="hide-menu">
-														Model de sasie
-													</span>
 												</a>
 											</li>
 										</ul>
@@ -436,7 +446,14 @@
 										</a>
 										<ul aria-expanded="false" class="pl-2 collapse first-level">
 											<li class="sidebar-item waves-effect waves-dark">
-												<a href="{{ path('parametre_mutuelle') }}" class="sidebar-link">
+												<a href="{{ path('parametre_mutuelle_donnees') }}" class="sidebar-link">
+													<i class="mdi mdi-tag-outline"></i>
+													<span class="hide-menu">
+														Données techniques</span>
+												</a>
+											</li>
+											<li class="sidebar-item waves-effect waves-dark">
+												<a href="{{ path('parametre_mutuelle_fonctions') }}" class="sidebar-link">
 													<i class="mdi mdi-settings"></i>
 													<span class="hide-menu">
 														Mutuelle</span>

@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Journal
+    Journal {{code.titre|capitalize}}
 {% endblock %}
 
 {% block stylesheets %}
@@ -34,20 +34,19 @@
                         subtitle: code.codeJournal|upper ~" "~ code.titre|capitalize,
                         periode: periode,
                     } %}
-
                     <hr>                           
                     <div class="row">
-                        <table class="table table-hover border no-padding" id="zero_config">
+                        <table class="table table-hover border no-padding" id="no-order">
                             <thead class="thead-light">
                                 <tr>
                                     <th scope="col" style="width: 5%">Date</th>
                                     <th scope="col" style="width: 2%">N°</th>
                                     <th scope="col" style="width: 5%">Débité</th>
                                     <th scope="col" style="width: 5%">Crédité</th>
-                                    <th scope="col" style="width: 35%">Libellé</th>
+                                    <th scope="col" style="width: 35%">Libellé écriture</th>
                                     <th scope="col" style="width: 15%">Montant</th>
                                     <th scope="col" style="width: 15%">Réference</th>
-                                    <th scope="col" style="width: 15%">Dest</th>
+                                    <th scope="col" style="width: 15%">Tier</th>
                                     {% if  not app.session.get('exercice').isCloture %}
                                     <th scope="col" style="width: 1%">Act</th>
                                     {% endif %}
@@ -63,7 +62,7 @@
                                         <td>{{ article.libelle }}</td>
                                         <td>{{ article.montant|number_format(2,',',' ') }}</td>
                                         <td>{{ article.piece }}</td>
-                                        <td>{% if article.analytic %}{{ article.analytic.code }}{% endif %}</td>
+                                        <td>{% if article.tier %}{{ article.tier.code }}{% endif %}</td>
                                         {% if not app.session.get('exercice').isCloture %}
                                         <td>{% if not article.isFerme %}<a href="{{ path('comptabilite_saisie_edit',{'id': article.id}) }}" class="label btn-primary label-primary"><i class="mdi mdi-grease-pencil"></i></a>
                                             {% else %}<span class="label label-warning"><i class="mdi mdi-lock"></i></span>{% endif %}

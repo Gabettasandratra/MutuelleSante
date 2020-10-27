@@ -83,7 +83,7 @@ class PrestationRepository extends ServiceEntityRepository
         // Les douze mois de l'anneé
         $retour = [];
         for ($i=1; $i <= 12; $i++) { 
-            $retour[$i] = $this->_em->createQuery('select sum(p.frais) as t_frais, avg(p.frais) as m_frais, sum(p.rembourse) as t_remb, avg(p.rembourse) as m_remb from App\Entity\Prestation p where year(p.date) = :year and month(p.date) = :month')
+            $retour[$i] = $this->_em->createQuery('select count(p) as nb, sum(p.frais) as t_frais, avg(p.frais) as m_frais, sum(p.rembourse) as t_remb, avg(p.rembourse) as m_remb from App\Entity\Prestation p where year(p.date) = :year and month(p.dateDecision) = :month and p.status = 1')
                                                 ->setParameter('year', $annee)
                                                 ->setParameter('month', $i)
                                                 ->getOneOrNullResult();

@@ -40,12 +40,18 @@ ul.border-bottom-white li {
 
 /* TEXT COLOR */
 
-.text-blue-chart {
+.text-blue-chart,
+.text-1-chart {
     color: #4fc3f7;
 }
 
-.text-red-chart {
+.text-red-chart,
+.text-3-chart {
     color: #f05b4f;
+}
+
+.text-2-chart {
+    color: #7460ee;
 }
 
 
@@ -54,7 +60,6 @@ ul.border-bottom-white li {
 .chart-line,
 .chart-bar {
     position: relative;
-    height: 250px;
 }
 
 .chart-line .ct-series-a .ct-area {
@@ -79,13 +84,32 @@ ul.border-bottom-white li {
     stroke-width: 2px;
 }
 
-.chart-line .ct-series-a .ct-point,
-.chart-line .ct-series-b .ct-point {
-    stroke-width: 6px;
+.chart-line .ct-series-c .ct-area {
+    fill: #191530;
+    fill-opacity: 0.1;
+}
+
+.chart-line .ct-series-c .ct-line,
+.chart-line .ct-series-c .ct-point {
+    stroke: #f05b4f;
+    stroke-width: 2px;
+}
+
+.ct-line {
+    stroke-width: 2px!important;
+}
+
+.ct-point {
+    stroke-width: 3px!important;
+    stroke-linecap: round;
 }
 
 .chart-bar .ct-series-a .ct-bar {
     stroke: #4fc3f7;
+}
+
+.ct-bar {
+    stroke-width: 20px!important;
 }
 
 
@@ -123,4 +147,20 @@ ul.border-bottom-white li {
     width: 100%;
     margin-top: .25rem;
     font-size: 80%;
+}
+
+.chartist-tooltip {
+    background: #2d3242;
+}
+
+.chartist-tooltip:before {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    margin-left: -5px;
+    border: 5px solid transparent;
+    border-top-color: #2d3242!important;
 }

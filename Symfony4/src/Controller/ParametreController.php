@@ -22,6 +22,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -32,9 +33,44 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 class ParametreController extends AbstractController
 {
     /**
-     * @Route("/parametre/mutuelle", name="parametre_mutuelle")
+     * @Route("/parametre/mutuelle/donees", name="parametre_mutuelle_donnees")
      */
-    public function mutuelle(ParametreRepository $repository,CompteRepository $repositoryCompte, ParametreService $paramService, Request $request, EntityManagerInterface $manager)
+    public function donneesMutuelles(Request $request,ParametreRepository $repository,ParametreService $paramService,EntityManagerInterface $manager)
+    {
+        $parameters = $repository->getParameters();
+        if (!$parameters) {
+            $paramService->initialize();
+            $arameters = $repository->getParameters();
+        }
+
+        $nom_mutuelle = $parameters['nom_mutuelle'];
+        $adresse_mutuelle = $parameters['adresse_mutuelle'];
+        $contact_mutuelle = $parameters['contact_mutuelle'];
+        $email_mutuelle = $parameters['email_mutuelle'];
+
+        $form = $this->createFormBuilder()
+                ->add('nom_mutuelle', TextType::class, ['data'=>$nom_mutuelle->getValue()])
+                ->add('adresse_mutuelle', TextType::class, ['data'=>$adresse_mutuelle->getValue()])
+                ->add('contact_mutuelle', TextType::class, ['data'=>$contact_mutuelle->getValue()])
+                ->add('email_mutuelle', TextType::class, ['data'=>$email_mutuelle->getValue()])
+                ->getForm(); 
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $nom_mutuelle->setValue($form->get('nom_mutuelle')->getData());
+            $adresse_mutuelle->setValue($form->get('adresse_mutuelle')->getData());
+            $contact_mutuelle->setValue($form->get('contact_mutuelle')->getData());
+            $email_mutuelle->setValue($form->get('email_mutuelle')->getData());
+            $manager->flush();
+        }
+        return $this->render('parametre/donnees.html.twig', [
+            'form' => $form->createView()
+        ]); 
+    }
+
+    /**
+     * @Route("/parametre/mutuelle/fonctions", name="parametre_mutuelle_fonctions")
+     */
+    public function parametreCotisationPrestation(ParametreRepository $repository,CompteRepository $repositoryCompte, ParametreService $paramService, Request $request, EntityManagerInterface $manager)
     {
         $allParameters = $repository->getParameters();
         if (!$allParameters) {

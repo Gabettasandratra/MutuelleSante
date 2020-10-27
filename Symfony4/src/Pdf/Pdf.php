@@ -5,9 +5,10 @@ namespace App\Pdf;
 use Fpdf\Fpdf;
 
 class Pdf extends Fpdf {
-    public function __construct($periode,$title,$subtitle=null) {
+    public function __construct($periode, $mutuelle,$title,$subtitle=null) {
         parent::__construct();
         $this->periode = $periode;
+        $this->mutuelle = $mutuelle;
         $this->title = $title;
         $this->subtitle = $subtitle;
     }
@@ -17,19 +18,19 @@ class Pdf extends Fpdf {
         $this->RoundedRect(5, 5, 200, 30, 1);
         $this->SetFont('Arial','',10);
         
-        $this->Cell(95,5,'MSRM',0,0,'L'); 
+        $this->Cell(95,5, $this->mutuelle['nom_mutuelle'],0,0,'L'); 
         $this->Cell(95,5,'Periode du '.$this->periode['debut']->format('d/m/Y'),0,1,'R'); // End of line
 
-        $this->Cell(60,5,'CNPC Porte 14 Antanimena',0,0,'L');
+        $this->Cell(60,5,$this->mutuelle['adresse_mutuelle'],0,0,'L');
         $this->SetFont('Arial','B',15);
         $this->Cell(70,8,$this->title,0,0,'C');
         $this->SetFont('Arial','',10);
         $this->Cell(60,5,'Au '.$this->periode['fin']->format('d/m/Y'),0,1,'R'); // End
 
-        $this->Cell(95,5,'034 10 776 69',0,0,'L');
+        $this->Cell(95,5,$this->mutuelle['contact_mutuelle'],0,0,'L');
         $this->Cell(95,5,'Tenue du compte : Ar ',0,1,'R'); // End
 
-        $this->Cell(60,5,'smutuellesante@yahoo.fr',0,0,'L');
+        $this->Cell(60,5,$this->mutuelle['email_mutuelle'],0,0,'L');
         $this->Cell(70,5, $this->subtitle,0,0,'C');
         $this->Cell(60,5,'Date de tirage : '.date('d/m/Y'),0,1,'R'); // End
 
@@ -199,41 +200,39 @@ class Pdf extends Fpdf {
         $this->SetX(5);
         $this->SetFont('Arial','B',10);
 
-        $this->Cell(17,8,'Date', 1,0, 'C');
-        $this->Cell(10,8,'C.j', 'TBR',0, 'C');
-        $this->Cell(8,8,'N°', 'TBR',0, 'C');
-        $this->Cell(70,8,'Libellé', 'TBR',0, 'C');
-        $this->Cell(33,8,'Réference', 'TBR',0, 'C');
-        $this->Cell(31,8,'Débit', 'TBR',0, 'C');
-        $this->Cell(31,8,'Crédit', 'TBR',1, 'C');
+        $this->Cell(17,8,'Date', 'TLR',0, 'C');
+        $this->Cell(10,8,'C.j', 'TR',0, 'C');
+        $this->Cell(8,8,'N°', 'TR',0, 'C');
+        $this->Cell(103,8,'Libellé écriture', 'TR',0, 'C');
+        $this->Cell(31,8,'Débit', 'TR',0, 'C');
+        $this->Cell(31,8,'Crédit', 'TR',1, 'C');
 
         foreach ($livres as $classe => $comptes) {
             $this->SetX(5);
             $this->SetFont('Arial','BI',9);
-            $this->Cell(200,6, strtoupper($classe), 'LBR',1, 'L');    
+            $this->Cell(200,6, ' '.strtoupper($classe), 'TLR',1, 'L');    
             
             $credit = 0; $debit = 0;
             foreach ($comptes as $compte => $articles) {
                 $this->SetFont('Arial','I',9);
                 $this->SetX(5);
-                $this->Cell(200,6, $compte, 'LBR',1, 'L');
+                $this->Cell(200,6,  ' '.$compte, 'TLR',1, 'L');
 
                 $this->SetFont('Arial','',9);
                 foreach ($articles as $article) {
                     $this->SetX(5);
-                    $this->Cell(17,6, $article['date']->format('d/m/y'), 1,0, 'C');
-                    $this->Cell(10,6, $article['categorie'], 'TBR',0, 'C');
-                    $this->Cell(8,6, $article['id'], 'TBR',0, 'C');
-                    $this->Cell(70,6, $article['libelle'], 'TBR',0, 'L');
-                    $this->Cell(33,6, $article['piece'], 'TBR',0, 'L');
-                    $this->Cell(31,6, $this->number_format($article['debit']), 'TBR',0, 'C'); $debit += $article['debit'];
-                    $this->Cell(31,6, $this->number_format($article['credit']), 'TBR',1, 'C'); $credit += $article['credit'];
+                    $this->Cell(17,6, $article['date']->format('d/m/y'), 'TLR',0, 'C');
+                    $this->Cell(10,6, $article['categorie'], 'TR',0, 'C');
+                    $this->Cell(8,6, $article['id'], 'TR',0, 'C');
+                    $this->Cell(103,6, $article['libelle'], 'TR',0, 'L');
+                    $this->Cell(31,6, $this->number_format($article['debit']), 'TR',0, 'C'); $debit += $article['debit'];
+                    $this->Cell(31,6, $this->number_format($article['credit']), 'TR',1, 'C'); $credit += $article['credit'];
                 }
                 $this->SetX(5);
                 $this->SetFont('Arial','BI',9);
-                $this->Cell(138,6, 'Total '.$compte, 'LBR',0, 'R');              
-                $this->Cell(31,6, $this->number_format($debit), 'BR',0, 'C'); 
-                $this->Cell(31,6, $this->number_format($credit), 'BR',1, 'C');
+                $this->Cell(138,6, 'Total '.$compte, 1,0, 'R');              
+                $this->Cell(31,6, $this->number_format($debit), 'TBR',0, 'C'); 
+                $this->Cell(31,6, $this->number_format($credit), 'TBR',1, 'C');
             }
             
         }

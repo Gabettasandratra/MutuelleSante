@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Données techniques{% endblock %}
+
+{% block header %}
+    <div class="page-breadcrumb">
+        <div class="d-flex align-items-center">
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Données techniques</h4>
+            <div class="ml-auto">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0 p-0">
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Paramètres</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Donées techniques</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% form_theme form 'bootstrap_4_layout.html.twig' %}
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Information sur la mutuelle de santé</h4>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_start(form) }}
+                                {{ form_row(form.nom_mutuelle, { 'label' : 'Nom '}) }}
+                                {{ form_row(form.adresse_mutuelle, { 'label' : 'Adresse siège'}) }}
+                                {{ form_row(form.contact_mutuelle, { 'label' : 'Contact'}) }}
+                                {{ form_row(form.email_mutuelle, { 'label' : 'Adresse email'}) }}
+                                <div class="form-row">
+                                    <div class="col-12 text-right">
+                                        <button type="submit" class="btn btn-success"><i class="mdi mdi-content-save"></i> Enregistrer</button>
+                                    </div>
+                                </div>                                                     
+                            {{ form_end(form) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
