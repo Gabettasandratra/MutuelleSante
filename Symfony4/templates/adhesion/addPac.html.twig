@@ -57,6 +57,16 @@
                         <div class="col-6">
                             {{ form_start(form) }}
                                 {{ form_widget(form) }}
+                                {{ form_row(form.codeMutuelle, { 'label': 'Numero Matricule:' }) }}                        
+                                {{ form_row(form.nom, { 'label': 'Nom:' }) }}                        
+                                {{ form_row(form.prenom, { 'label': 'Prenom:' }) }}                        
+                                {{ form_row(form.sexe, { 'label': 'Genre:' }) }}                        
+                                {{ form_row(form.dateNaissance, { 'label': 'Date de naissance:' }) }}                        
+                                {{ form_row(form.cin, { 'label': 'Numero CIN:' }) }}                        
+                                {{ form_row(form.tel, { 'label': 'Numero tel:' }) }}     
+                                {{ form_row(form.parente, { 'label': 'Rôle dans la congrégation:' }) }}                                           
+                                {{ form_row(form.dateEntrer, { 'label': 'Date d\'entrer dans la mutuelle:' }) }}                                           
+                                {{ form_row(form.photo, { 'label': 'Photo d\'identité:' }) }}                                           
                                 {% if editMode is defined and editMode == true %}
                                     <button type="submit" class="btn btn-success">Enregistrer les modifications</button>
                                 {% else %}

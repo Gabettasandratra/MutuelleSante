@@ -17,9 +17,7 @@ class PacType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('codeMutuelle', TextType::class, [
-                'label' => 'N° Matricule'
-            ])
+            ->add('codeMutuelle', TextType::class)
             ->add('nom')
             ->add('prenom')
             ->add('sexe', ChoiceType::class, [
@@ -28,7 +26,12 @@ class PacType extends AbstractType
                     'Feminin' => 'Feminin',
                 ]
             ])
-            ->add('dateNaissance', BirthdayType::class)
+            ->add('dateNaissance', DateType::class, [
+                'widget' => 'single_text',
+                'format' => 'dd/MM/yyyy',
+                'attr' => ['class' => 'datepicker-simple','autocomplete' => 'off','placeholder' => 'jj/mm/aaaa'],
+                'html5' => false,
+            ])
             ->add('cin')
             ->add('tel')
             ->add('parente', ChoiceType::class, [
@@ -36,10 +39,15 @@ class PacType extends AbstractType
                     'Responsable' => 'Responsable',
                     'Membre' => 'Membre',
                     'Autre' => 'Autre',
-                ],
-                'label' => 'Fonction au seon de la congrégation'
+                ]
             ])
-            ->add('dateEntrer', DateType::class)
+            ->add('dateEntrer', DateType::class, [
+                'data' => new \DateTime(),
+                'widget' => 'single_text',
+                'format' => 'dd/MM/yyyy',
+                'attr' => ['class' => 'datepicker-simple','autocomplete' => 'off'],
+                'html5' => false,
+            ])
             ->add('photo', FileType::class, [
                 'mapped' => false,
                 'required' => false

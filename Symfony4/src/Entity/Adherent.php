@@ -274,7 +274,7 @@ class Adherent
     public function getCompteCotisation(Exercice $exercice)
     {        
         foreach ($this->compteCotisations as  $compteCotisation) {
-            if ( $compteCotisation->getExercice() === $exercice) {
+            if ( $compteCotisation->getExercice()->getAnnee() === $exercice->getAnnee()) {
                 return $compteCotisation;
             }
         }

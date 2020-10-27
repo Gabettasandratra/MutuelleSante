@@ -185,8 +185,8 @@
                                             <td>{{ pac.parente }}</td>
                                             {% if exercice.isCurrent  %}
                                             <td>
-                                                <a href="{{ path('adhesion_edit_pac', { 'id': adherent.id, 'idPac': pac.id }) }}" class="label btn-warning label-warning">Modifier</a>
-                                                <a href="{{ path('adhesion_remove_pac', { 'id': adherent.id, 'idPac': pac.id }) }}" class="label btn-danger label-danger">Retirer</button>
+                                                <a href="{{ path('adhesion_edit_pac', { 'id': adherent.id, 'idPac': pac.id }) }}" class="label btn-warning label-primary"><i class="fas fa-edit"></i></a>
+                                                {% if not adherent.compteCotisation(exercice).isPaye %}<a href="{{ path('adhesion_remove_pac', { 'id': adherent.id, 'idPac': pac.id }) }}" class="label btn-danger label-danger"><i class="fa fa-times" aria-hidden="true"></i></button>{% endif %}
                                             </td>
                                             {% endif %}
                                         </tr>

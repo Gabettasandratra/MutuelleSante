@@ -29,12 +29,14 @@
                     <h4 class="card-title">Liste des congrégations adhérées</h4>
                     <hr>
                     <div class="table-responsive">
-                        <table id="zero_config" class="table">
-                            <thead>
+                        <table id="zero_config" class="table border">
+                            <thead class="thead-light">
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Code</th>
                                     <th scope="col">Nom de la congrégation</th>
+                                    <th scope="col">Adresse</th>
+                                    <th scope="col">Bénéficiaires</th>
                                     <th scope="col">Actions</th>
                                 </tr>
                             </thead>
@@ -44,6 +46,8 @@
                                         <th scope="row">{{ adherent.id }}</th>
                                         <td>{{ adherent.numero }}</td>
                                         <td>{{ adherent.nom }}</td>
+                                        <td>{{ adherent.adresse }}</td>
+                                        <td>{{ adherent.nbBeneficiaires }}</td>
                                         <td>
                                             <a href="{{ path('adhesion_show', {'id': adherent.id}) }}"class="label btn-primary label-primary">Voir</a>
                                         </td>

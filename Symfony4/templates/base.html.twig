@@ -186,10 +186,10 @@
 												</a>
 											</li>
 											<li class="sidebar-item waves-effect waves-dark">
-												<a href="{{ path('adhesion_beneficiaires') }}" class="sidebar-link">
+												<a href="{{ path('adhesion_beneficiaires_retires') }}" class="sidebar-link">
 													<i class="mdi mdi-format-list-bulleted"></i>
 													<span class="hide-menu">
-														Liste béneficiaires
+														Liste béneficiaires retirés
 													</span>
 												</a>
 											</li>
@@ -590,6 +590,14 @@
                 format: "dd/mm/yyyy",
                 autoclose: true,
                 startDate: new Date('{{ app.session.get('exercice').dateDebut|date('m/d/Y') }}'),
+                endDate: new Date('{{ app.session.get('exercice').dateFin|date('m/d/Y') }}')
+            });
+
+            $('.datepicker-simple').datepicker({
+                language: 'fr',
+                orientation: "bottom",
+                format: "dd/mm/yyyy",
+                autoclose: true,
                 endDate: new Date('{{ app.session.get('exercice').dateFin|date('m/d/Y') }}')
             });
 			// For handling model saisie

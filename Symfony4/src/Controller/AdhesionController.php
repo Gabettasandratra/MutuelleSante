@@ -43,16 +43,6 @@ class AdhesionController extends AbstractController
     }
 
     /**
-     * @Route("/adhesion/beneficiaires", name="adhesion_beneficiaires")
-     */
-    public function beneficiaires(AdherentRepository $repository)
-    {
-        return $this->render('adhesion/beneficiaires.html.twig', [
-            'adherents' => $repository->findAll()
-        ]);
-    }
-
-    /**
      * @Route("/adhesion/beneficiaires/retires", name="adhesion_beneficiaires_retires")
      */
     public function beneficiairesRetires(PacRepository $repository)
