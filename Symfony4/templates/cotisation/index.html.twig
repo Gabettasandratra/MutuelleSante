@@ -29,13 +29,14 @@
                     <h4 class="card-title">Choisissez la congrégation parmi la liste</h4>
                     <hr>
                     <div class="table-responsive">
-                        <table id="zero_config" class="table">
-                            <thead>
+                        <table id="zero_config" class="table border">
+                            <thead class="thead-light">
                                 <tr>
-                                    <th scope="col">Code</th>
-                                    <th scope="col">Nom de la congrégation</th>
+                                    <th scope="col">Num</th>
+                                    <th scope="col">Nom congrégation</th>
+                                    <th scope="col">Adresse</th>
                                     <th scope="col">Cotisation</th>
-                                    <th scope="col">Actions</th>
+                                    <th scope="col">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -43,6 +44,7 @@
                                     <tr>
                                         <th>{{ adherent.numero }}</th>
                                         <td>{{ adherent.nom }}</td>
+                                        <td>{{ adherent.adresse }}</td>
                                         {% if adherent.isPaye %}
                                             <td><span class="label label-rounded label-success">Payé</span></td>
                                         {% else %}

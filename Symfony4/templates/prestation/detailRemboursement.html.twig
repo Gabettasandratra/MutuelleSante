@@ -23,9 +23,30 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Détail de remboursement</h4>
+                    <h4 class="card-title">Remboursement #{{remboursement.id}}</h4>
                     <hr>
-                    <table class="table table-striped border">
+                    <div class="row">
+                        <div class="col-md-4 p-2">
+                            <h6 class="font-medium">Congrégation</h6> 
+                            <span>{{remboursement.adherent.numero}} - {{remboursement.adherent.nom}}</span>
+                        </div>
+                        <div class="col-md-4 p-2">
+                            <h6 class="font-medium">Date de paiement</h6> 
+                            <span>{{remboursement.date|date('d/m/Y')}}</span>
+                        </div>
+                        <div class="col-md-4 p-2">
+                            <h6 class="font-medium">Référence chèque</h6> 
+                            <span>{{remboursement.reference}}</span>
+                        </div>
+                        {% if remboursement.remarque %}
+                        <div class="col-md-12 p-2">
+                            <span class="font-medium">Note</span> 
+                            <span>{{remboursement.remarque}}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <table class="table table-bordered table-hover no-padding border">
                         <thead class="thead-light">
                             <tr>
                                 <th>N°matricule</th>
@@ -52,7 +73,7 @@
                         {% endfor %}
                         </tbody>  
                         <tfoot>
-                            <tr>
+                            <tr class="font-weight-bold">
                                 <th colspan={{1+donnees.soins|length}}>Total</th>
                                 <td>{{frais|number_format(2,',',' ')}}</td>
                                 <td>{{rembourse|number_format(2,',',' ')}}</td>
@@ -62,7 +83,8 @@
                     </table>
                     <div class="row">
                         <div class="col-md-12 text-right">
-                            <a href="{{ path('export_detail_remboursement', {'id': remboursement.id}) }}" class="btn btn-success"><i class="mdi mdi-file-export"></i> Exporter </a>
+                            <a href="{{ path('export_detail_remboursement', {'id': remboursement.id}) }}" class="btn btn-success"><i class="mdi mdi-file-export"></i> Exporter EXCEL</a>
+                            <a href="#" class="btn btn-danger"><i class="mdi mdi-file-export"></i> Exporter PDF</a>
                             <a href="{{ path('prestation_adherent_show', {'id': adherent.id}) }}" class="btn btn-info"><i class="mdi mdi-close-circle-outline"></i> Fermer</a>
                         </div>
                     </div>  

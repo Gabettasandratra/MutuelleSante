@@ -51,7 +51,16 @@
                                         </li>
                                         <li class="my-3">
                                             <span class="font-weight-medium text-dark"> Date d'entrée:</span>
-                                        </li>                                       
+                                        </li>   
+                                        <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark"> Numéro téléphone:</span>
+                                        </li>
+                                        <li class="my-3 ">
+                                            <span class="font-weight-medium text-dark"> Email:</span>
+                                        </li>
+                                        <li class="my-3">
+                                            <span class="font-weight-medium text-dark"> Date d'entrée:</span>
+                                        </li>                                        
                                     </ul>
                                 </div>
                                 <div class="col-md-8">
@@ -61,6 +70,15 @@
                                         </li>
                                         <li class="my-3 border-bottom">
                                             <span> {{ adherent.numero }} </span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ adherent.dateInscription | date('d / m / Y') }}</span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {{ adherent.telephone1 }} {% if adherent.telephone2 %}/ {{ adherent.telephone2 }}{% endif %}</span>
+                                        </li>
+                                        <li class="my-3 border-bottom">
+                                            <span> {% if adherent.email %}{{ adherent.email }}{% else %} ... {% endif %} </span>
                                         </li>
                                         <li class="my-3 border-bottom">
                                             <span> {{ adherent.dateInscription | date('d / m / Y') }}</span>
@@ -143,7 +161,7 @@
                                 <tbody>
                                     {% for remboursement in remboursements %}
                                         <tr {% if remboursement.remarque %} data-toggle="tooltip" title="{{ remboursement.remarque }}"{% endif %}>
-                                            <th scope="row">{{ loop.index }}</th>
+                                            <th scope="row">{{ remboursement.id }}</th>
                                             <td>{{ remboursement.date |date('d/m/Y') }}</td>
                                             <td>{{ remboursement.exercice.annee }}</td>
                                             <td>{{ remboursement.montant|number_format(2,',',' ') }}</td>

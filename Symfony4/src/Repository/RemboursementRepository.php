@@ -26,7 +26,7 @@ class RemboursementRepository extends ServiceEntityRepository
     */
     public function findRemboursement(Exercice $exercice, Adherent $adherent)
     {
-        return $this->_em->createQuery('select r from App\Entity\Remboursement r where r.adherent = :ad and r.date between :dateDebut and :dateFin order by r.date DESC')
+        return $this->_em->createQuery('select r from App\Entity\Remboursement r where r.adherent = :ad and r.date between :dateDebut and :dateFin order by r.date asc')
                         ->setParameter('ad', $adherent)    
                         ->setParameter('dateDebut', $exercice->getDateDebut())
                         ->setParameter('dateFin', $exercice->getDateFin())                  

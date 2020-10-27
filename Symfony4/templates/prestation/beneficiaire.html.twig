@@ -90,7 +90,7 @@
                                             <span class="font-weight-medium text-dark"> Total des montants remboursés</span>
                                         </li>
                                     </ul>
-                                    <a href="{{ path('prestation_adherent_show', {'id': pac.adherent.id}) }}"class="btn btn-sm btn-info my-2"><i class="mdi mdi-home-map-marker"></i> Voir fiche d'adhésion congrégation</a>
+                                    <a href="{{ path('prestation_adherent_show', {'id': pac.adherent.id}) }}"class="btn btn-sm btn-primary my-2"><i class="mdi mdi-home-map-marker"></i> Voir fiche de prestation congrégation</a>
                                 </div>
                                 <div class="col-md-6">
                                     <ul class="list-style-none">
@@ -119,12 +119,7 @@
                             <h4 class="card-title">Liste des prestations consommées</h4>
                         </div>
                         {% if info.possedeDroit and exercice.isCurrent and not exercice.isCloture %}
-                        <div class="col-3">
-                            <div class="text-right">
-                                <a href="#" class="btn btn-sm btn-success"><i class="mdi mdi-import"></i> Importer decompte de prestations</a>
-                            </div> 
-                        </div>
-                        <div class="col-3">
+                        <div class="col-6">
                             <div class="text-right">
                                 <a href="{{ path('prestation_beneficiaire_decompte', {'id' : pac.id}) }}" class="btn btn-sm btn-info"><i class="mdi mdi-hospital"></i> Saisir decompte de prestations</a>
                             </div> 

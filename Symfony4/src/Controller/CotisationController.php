@@ -37,6 +37,18 @@ class CotisationController extends AbstractController
     }
 
     /**
+     * @Route("/cotisation/rapport", name="cotisation_rapport")
+     */
+    public function rapport(CompteCotisationRepository $repository, SessionInterface $session)
+    {
+        $exercice = $session->get('exercice');
+        return $this->render('cotisation/rapport.html.twig', [
+            'exercice' => $exercice,
+            'comptes' => $repository->findBy(['exercice' => $exercice])
+        ]);
+    }
+
+    /**
      * @Route("/cotisation/{id}", name="cotisation_show")
      */
     public function show(Adherent $adherent, CompteCotisationRepository $repository, SessionInterface $session)

@@ -274,7 +274,7 @@
                 var markup = "<tr><th scope='row'>"+ (index + 1) +"</th>";
                 markup += "<td>" + prestation.date + "</td>";
                 markup += "<td>" + prestation.designation + "</td>";
-                markup += "<td>" + prestation.frais.toLocaleString("fr-FR") + "</td>";               
+                markup += "<td>" + parseFloat(prestation.frais).toLocaleString("fr") + "</td>";               
                 markup += "<td>" + prestation.prestataire + "</td>";
                 markup += "<td>" + prestation.facture + "</td>";
                 markup += "<td>" + "<span class='action-icons'><a href='javascript:edit("+index+','+ JSON.stringify(prestation)+")'><i class='ti-pencil-alt'></i></a><a href='javascript:del("+index+")' style='padding-left:7px;color:#f62d51;'><i class='ti-trash'></i></a></span>" + "</td>";      
@@ -286,7 +286,7 @@
             }
             if (prestations.length != 0) {
                 var totMarkup = "<tr><th scope='row' colspan=3>Total</th>";
-                totMarkup += "<td>" + totFrais + "</td><td colspan=3></td></tr>";
+                totMarkup += "<td>" + parseFloat(totFrais).toLocaleString("fr") + "</td><td colspan=3></td></tr>";
                 $('#decompte tfoot').append(totMarkup);  
                 $('#save').removeClass('disabled');
             } else {

@@ -22,7 +22,7 @@ class AdherentRepository extends ServiceEntityRepository
 
     public function findJoinCompteCotisation(Exercice $exercice)
     {
-        return $this->_em->createQuery('select a.id, a.numero, a.nom, c.due, c.paye, c.isPaye from App\Entity\Adherent a inner join App\Entity\CompteCotisation c with c.adherent = a and c.exercice = :e')
+        return $this->_em->createQuery('select a.id, a.adresse,a.numero, a.nom, c.due, c.paye, c.isPaye from App\Entity\Adherent a inner join App\Entity\CompteCotisation c with c.adherent = a and c.exercice = :e')
                          ->setParameter('e', $exercice)
                          ->getResult()
         ;

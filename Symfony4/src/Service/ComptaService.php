@@ -93,7 +93,6 @@ class ComptaService
         $article->setCompteCredit($remboursement->getTresorerie());        
         $article->setLibelle($label);
         $article->setCategorie($remboursement->getTresorerie()->getCodeJournal());
-        $article->setAnalytique($remboursement->getAdherent()->getCodeAnalytique()); // Le congrégation rembourser
         $article->setMontant($remboursement->getMontant());
         $article->setDate($remboursement->getDate());
         $article->setPiece($remboursement->getReference());

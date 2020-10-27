@@ -1,0 +1,138 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Rapport de cotisation de l'année {{exercice.annee}}{% endblock %}
+
+{% block header %}
+    <div class="page-breadcrumb">
+        <div class="d-flex align-items-center">
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Rapport sur la cotisation</h4>
+            <div class="ml-auto">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0 p-0">
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Cotisation</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Rapport</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">    
+                    <h4 class="card-title">Cotisation de l'année {{exercice.annee}}</h4>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-4 p-2">
+                            <h6 class="font-medium">Année d'exercice</h6> 
+                            <span>{{exercice.annee}}</span>
+                        </div>
+                        <div class="col-md-4 p-2">
+                            <h6 class="font-medium">Montant pour ancien</h6> 
+                            <span>{{exercice.cotAncien|number_format(0,',',' ')}} Ar / Bénéficiaire</span>
+                        </div>
+                        <div class="col-md-4 p-2">
+                            <h6 class="font-medium">Montant pour nouveau</h6> 
+                            <span>{{exercice.cotNouveau|number_format(0,',',' ')}} Ar / Bénéficiaire</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="table border no-padding m-t-20">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col">Num</th>
+                                        <th scope="col">Nom congrégation</th>
+                                        <th scope="col">Ancien</th>
+                                        <th scope="col">Nouveau</th>
+                                        <th scope="col">Montant due</th>
+                                        <th scope="col">Montant percue</th>
+                                        <th scope="col">Situation</th>
+                                        <th scope="col">Reste à payé</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% set totD = 0 %} {% set totP = 0 %} {% set totR = 0 %}
+                                    {% for compte in comptes %}
+                                        <tr>
+                                            <th scope="row">{{ compte.adherent.numero }}</th>
+                                            <td>{{ compte.adherent.nom }}</td>
+                                            <td>{{ compte.ancien }}</td>
+                                            <td>{{ compte.nouveau }}</td>
+                                            <td>{{ compte.due|number_format(2,',',' ') }}</td>{% set totD = totD + compte.due %}
+                                            <td>{{ compte.paye|number_format(2,',',' ') }}</td>{% set totP = totP + compte.paye %}
+                                            <td>
+                                                {% if compte.isPaye %}
+                                                    <span class="label label-rounded label-success">Payé</span>
+                                                {% else %}
+                                                    <span class="label label-rounded label-warning">Non payé</span>
+                                                {% endif %}         
+                                            </td>
+                                            <td>{{ compte.reste|number_format(2,',',' ')  }}</td>{% set totR = totR + compte.reste %}
+                                        </tr>
+                                    {% endfor %}
+                                    <tr class="font-weight-bold">
+                                        <th scope="row" colspan=4>Total</th>
+                                        <td>{{ totD|number_format(2,',',' ') }}</td>
+                                        <td>{{ totP|number_format(2,',',' ') }}</td>
+                                        <td></td>
+                                        <td>{{ totR|number_format(2,',',' ') }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>                 
+                        </div>
+                    </div>
+
+                    <h4 class="card-title">Historique des paiements</h4>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="table table-striped border no-padding m-t-10">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col">Num</th>
+                                        <th scope="col">Nom congrégation</th>
+                                        <th scope="col">Montant</th>
+                                        <th scope="col">Date versement</th>
+                                        <th scope="col">Référence</th>
+                                        <th scope="col">Note</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% set tot = 0 %} 
+                                    {% for compte in comptes %}
+                                        {% for paiement in compte.historiqueCotisations %}                                                                                  
+                                        <tr>
+                                            <th scope="row">{{ compte.adherent.numero }}</th>
+                                            <td>{{ compte.adherent.nom }}</td>
+                                            <td>{{ paiement.montant|number_format(2,',',' ') }}</td>{% set tot = tot + paiement.montant %}
+                                            <td>{{ paiement.datePaiement|date('d/m/Y') }}</td>
+                                            <td>{{ paiement.reference }}</td>{% set totD = totD + compte.due %}
+                                            <td>{{ paiement.remarque }}</td>
+                                            
+                                        </tr>
+                                        {% endfor %}
+                                    {% endfor %}
+                                    <tr class="font-weight-bold">
+                                        <th scope="row" colspan=2>Total</th>
+                                        <td>{{ tot|number_format(2,',',' ') }}</td>
+                                        <td colspan=3></td>
+                                    </tr>
+                                </tbody>
+                            </table>                 
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-12">
+                            <a href="{{ path('export_rapport_cotisations') }}" class="btn btn-success"><i class="mdi mdi-file-export"></i> Exporter EXCEL</a>
+                            <a href="{{ path('dashboard_pdf_cotisation') }}" class="btn btn-danger"><i class="mdi mdi-file-export"></i> Exporter PDF</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

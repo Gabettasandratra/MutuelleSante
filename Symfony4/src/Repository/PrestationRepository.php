@@ -159,7 +159,6 @@ class PrestationRepository extends ServiceEntityRepository
                             ->setParameter('nom', 'soins_prestation')
                             ->getOneOrNullResult();
         $soins = $pSoins->getList();
-        dump($bens);
 
         $beneficiaires = [];
         
