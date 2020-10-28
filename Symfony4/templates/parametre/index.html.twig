@@ -29,10 +29,11 @@
                         <div class="col-md-6">
                             {{ form_start(form) }}
                                 {{ form_row(form.compte_cotisation, { 'label' : 'Compte associé au cotisation'}) }}
-                                {{ form_row(form.label_cotisation, { 'label' : 'Libellé des cotisations dans le journal comptable'}) }}
+                                {{ form_row(form.label_cotisation, { 'label' : 'Libellé d\'article de cotisation'}) }}
+                                {{ form_row(form.periode_cotisation_mois, { 'label' : 'Période de paiement de cotisation (mois)'}) }}
                                 <div class="m-4"><hr></div>
                                 {{ form_row(form.compte_prestation, { 'label' : 'Compte associé au remboursement'}) }}
-                                {{ form_row(form.label_prestation, { 'label' : 'Libellé des cotisations dans le journal comptable'}) }}
+                                {{ form_row(form.label_prestation, { 'label' : 'Libellé d\'article de remboursement'}) }}
                                 {{ form_row(form.percent_prestation, { 'label' : 'Pourcentage de cotisation versé pour avoir accès au prestation'}) }}
                                 {{ form_row(form.plafond_prestation, { 'label' : 'Plafond de prestation (ex: 2 x cotisation)'}) }}
                                 {{ form_row(form.percent_rembourse_prestation, { 'label' : 'Pourcentage de remboursement par defaut'}) }}

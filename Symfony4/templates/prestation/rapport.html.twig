@@ -1,0 +1,92 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Rapport de remboursement de l'année {{exercice.annee}}{% endblock %}
+
+{% block header %}
+    <div class="page-breadcrumb">
+        <div class="d-flex align-items-center">
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Rapport de remboursement</h4>
+            <div class="ml-auto">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0 p-0">
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Prestation</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Rapport</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">    
+                    <h4 class="card-title">Remboursement de l'année {{exercice.annee}}</h4>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-4 p-2">
+                            <h6 class="font-medium">Année d'exercice</h6> 
+                            <span>{{exercice.annee}}</span>
+                        </div>
+                        <div class="col-md-4 p-2">
+                            <h6 class="font-medium">Plafond de remboursement</h6> 
+                            <span>{{coefficient}} x Cotisation </span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="table border no-padding m-t-20">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col">Num</th>
+                                        <th scope="col">Nom congrégation</th>
+                                        <th scope="col">Date</th>
+                                        <th scope="col">Montant</th>
+                                        <th scope="col">Référence chèque</th>
+                                        <th scope="col">Cotisation</th>
+                                        <th scope="col">Plafond remb</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for cong_remb in rembs %}
+                                        {% set t = 0 %}
+                                        {% for remb in cong_remb.rembs %}                                                                                  
+                                        <tr>
+                                            <th scope="row">{{ remb.adherent.numero }}</th>
+                                            <td>{{ remb.adherent.nom }}</td>
+                                            <td>{{ remb.date|date('d/m/Y') }}</td>
+                                            <td>{{ remb.montant|number_format(0,',',' ') }}</td>{% set t = t+remb.montant %}
+                                            <td>{{ remb.reference }}</td>
+                                            <td></td>                                            
+                                            <td></td>                                                                                        
+                                        </tr>
+                                        {% endfor %}
+                                        <tr class="font-weight-bold">
+                                            <td scope="row" colspan=3>Total</td>
+                                            <td>{{ t|number_format(0,',',' ') }}</td>
+                                            <td></td>    
+                                            {% set cot = cong_remb.adherent.compteCotisation(exercice).paye %}                                        
+                                            <td>{{ cot|number_format(0,',',' ') }}</td>                                            
+                                            <td>{{(cot*coefficient)|number_format(0,',',' ')}}</td>                                            
+                                              
+                                        </tr>
+                                    {% endfor %}
+                                    
+                                </tbody>
+                            </table>                 
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col-md-12">
+                            <a href="{{ path('export_rapport_prestations') }}" class="btn btn-success"><i class="mdi mdi-file-export"></i> Exporter EXCEL</a>
+                            <a href="{{ path('dashboard_pdf_remb') }}" class="btn btn-danger"><i class="mdi mdi-file-export"></i> Exporter PDF</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

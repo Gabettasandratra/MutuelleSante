@@ -28,6 +28,7 @@ class ParametreService
         
         $parametres[] = new Parametre('compte_cotisation');
         $parametres[] = new Parametre('label_cotisation', 'Cot {a} | {c}');
+        $parametres[] = new Parametre('periode_cotisation_mois', 6);
         $parametres[] = new Parametre('compte_prestation');
         $parametres[] = new Parametre('label_prestation', 'Remb {a} | {c}');
         $parametres[] = new Parametre('percent_prestation', 1);

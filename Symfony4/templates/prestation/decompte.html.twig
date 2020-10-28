@@ -302,10 +302,9 @@
             $('#prestation_prestataire').val(prestation.prestataire);
             $('#prestation_facture').val(prestation.facture);
 
-            console.log(prestation.details);
             prestation.details.forEach(detail => {
                 $('#sous').append(
-                    `<tr><td><input type="text" placeholder="Soin" value="`+ detail.detail +`" class="sous_desc form-control form-control-md"></td>
+                    `<tr class="sous_form"><td><input type="text" placeholder="Soin" value="`+ detail.detail +`" class="sous_desc form-control form-control-md"></td>
                     <td><input type="number" value="`+ detail.montant +`" class="sous_value form-control form-control-md"></td>
                     <td><a href="#" class="rem text-danger text-center">X</a></td></tr>`
                 );

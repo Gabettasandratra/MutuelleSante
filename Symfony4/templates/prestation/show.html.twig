@@ -274,7 +274,7 @@
                                     <div class="form-group row" id="remb_form">
                                         <label for="prestation_rembourse" class="col-form-label col-sm-3 required">Remboursé</label>
                                         <div class="input-group col-sm-4">    
-                                            <input type="number" id="prestation_percent" value="{{ percent * 100 }}" required="required" class="form-control" readonly>
+                                            <input type="number" id="prestation_percent" required="required" class="form-control" readonly>
                                             <div class="input-group-append">
                                                 <span class="input-group-text">%</span>
                                             </div>
@@ -310,90 +310,93 @@
 {% block javascripts %}
 <script src="{{ asset('assets/libs/datatable/dist/jquery.dataTables.min.js') }}"></script>
 <script>
-$(document).ready(function() { 
-    var prestations = {{json|raw}}; // Les donnees à affiché
-    refreshTable(prestations);
+var reste_remb = {{info.reste}};
+var pourcent_normal = {{percent.normal}};
+var pourcent_plafond = {{percent.plafond}}; 
 
-    $(document).on("click", ".act", function(e) {
-        var index = $(this).attr('data-index');
-        var prestation = prestations[index];
-        $('#prestation_index').val(index);
-        $('#prestation_date').val(prestation.date);
-        $('#prestation_beneficiaire').val(prestation.pac);
-        $('#prestation_decompte').val(prestation.decompte);
-        $('#prestation_designation').val(prestation.designation);
+var prestations = {{json|raw}}; // Les donnees à affiché
+refreshTable(prestations);
 
-        updateDetail(prestation,index);
-        $('#modal').modal({backdrop: "static"});
-    });
-
-    // Accepter un detail
-    $(document).on("click", ".decid", function(e) {
-        e.preventDefault();
-        var id = $(this).parent().attr('p-id');
-        var indexDetail = $(this).parent().attr('data-index');
-
-        var prestation = prestations[id];
-        var detail = prestation.details[indexDetail];
-        if (detail.etat) {
-            detail.etat = false;
-            prestation.frais = prestation.frais - detail.montant;        
-        } else {
-            detail.etat = true;
-            prestation.frais = prestation.frais + detail.montant;        
-        }
-        var percent = parseFloat($('#prestation_percent').val());
-        prestation.rembourse = Math.round(percent * prestation.frais / 100);
-        prestation.status = 1;
-        prestation.details[indexDetail] = detail;
-        prestations[id] = prestation; // Modify value
-        updateDetail(prestation,id);
-    });
-
-    $('#pay_link').click(function(e) {
-        e.preventDefault();
-        var bool = true;
-        $('.remb').each(function() {
-            if ($(this).text() == "En attente")
-                bool = false;
-        });
-        if (bool) {
-            window.location.href = $(this).attr('href');
-        } else {
-            $("#alert").show("slow");  
-        }
-    });
-
-    $(document).on('click', '.alert-close', function() {
-       $(this).parent().hide();
-    })
-
-    $('#prestation').submit(function(e) {
-        e.preventDefault();
-        var index = $('#prestation_index').val();
-        var prestation = prestations[index];
-        var data = {
-            id : prestation.id,
-            frais : prestation.frais,
-            rembourse : prestation.rembourse,
-            details: prestation.details
-        };
-
-        var posting = $.post('{{ path('prestation_decider_json') }}', JSON.stringify(data));
-        posting.done(function(data) {
-            if (data.hasError == false) {
-                $('#modal').modal('hide');
-                refreshTable(prestations);
-            }
-        });
-        posting.fail(function(data) {
-            console.log("FAIL");
-        });
-    }); 
+$(document).on("click", ".act", function(e) {
+    var index = $(this).attr('data-index');
+    var prestation = prestations[index];
+    $('#prestation_index').val(index);
+    $('#prestation_date').val(prestation.date);
+    $('#prestation_beneficiaire').val(prestation.pac);
+    $('#prestation_decompte').val(prestation.decompte);
+    $('#prestation_designation').val(prestation.designation);
+   
+    updateDetail(prestation,index);
+    $('#modal').modal({backdrop: "static"});
 });
 
+// Accepter un detail
+$(document).on("click", ".decid", function(e) {
+    e.preventDefault();
+    var id = $(this).parent().attr('p-id');
+    var indexDetail = $(this).parent().attr('data-index');
+
+    var prestation = prestations[id];
+    var detail = prestation.details[indexDetail];
+    if (detail.etat) {
+        detail.etat = false;
+        prestation.frais = prestation.frais - detail.montant;        
+    } else {
+        detail.etat = true;
+        prestation.frais = prestation.frais + detail.montant;        
+    }
+    var percent = parseFloat($('#prestation_percent').val());
+    prestation.rembourse = Math.round(percent * prestation.frais / 100);
+    prestation.status = 1;
+    prestation.details[indexDetail] = detail;
+    prestations[id] = prestation; // Modify value
+    updateDetail(prestation,id);
+});
+
+$('#pay_link').click(function(e) {
+    e.preventDefault();
+    var bool = true;
+    $('.remb').each(function() {
+        if ($(this).text() == "En attente")
+            bool = false;
+    });
+    if (bool) {
+        window.location.href = $(this).attr('href');
+    } else {
+        $("#alert").show("slow");  
+    }
+});
+
+$(document).on('click', '.alert-close', function() {
+    $(this).parent().hide();
+})
+
+$('#prestation').submit(function(e) {
+    e.preventDefault();
+    var index = $('#prestation_index').val();
+    var prestation = prestations[index];
+    var data = {
+        id : prestation.id,
+        frais : prestation.frais,
+        rembourse : prestation.rembourse,
+        details: prestation.details
+    };
+
+    var posting = $.post('{{ path('prestation_decider_json') }}', JSON.stringify(data));
+    posting.done(function(data) {
+        if (data.hasError == false) {
+            $('#modal').modal('hide');
+            refreshTable(prestations);
+            reste_remb -= prestation.rembourse;
+        }
+    });
+    posting.fail(function(data) {
+        console.log("FAIL");
+    });
+}); 
+
+
 function refreshTable(prestations) {
-    console.log(prestations);
     $('#app tbody').empty();
     $('#app tfoot').empty();
 
@@ -433,8 +436,13 @@ function refreshTable(prestations) {
 
 function updateDetail(prestation, index) {
     $('#prestation_frais').val(prestation.frais.toLocaleString("fr-FR", {maximumSignifiantDigits:2}));   
-    var percent = parseFloat($('#prestation_percent').val());
-    $('#prestation_rembourse').val((Math.round(percent * prestation.frais / 100)).toLocaleString("fr-FR"));
+    // Gestion pourcentage
+    var percent = pourcent_normal;  
+    if (percent * prestation.frais > reste_remb) {
+        percent = pourcent_plafond;
+    }
+    $('#prestation_percent').val(percent*100);
+    $('#prestation_rembourse').val((Math.round(percent * prestation.frais)).toLocaleString("fr-FR"));
     $('#details').empty();
     // Details
     prestation.details.forEach((detail,i) => {

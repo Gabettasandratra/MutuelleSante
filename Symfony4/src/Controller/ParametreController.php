@@ -80,6 +80,7 @@ class ParametreController extends AbstractController
 
         $pCotisation = $allParameters['compte_cotisation'];
         $pLabelCotisation = $allParameters['label_cotisation'];
+        $pPeriodeCotisation = $allParameters['periode_cotisation_mois'];
         $pPrestation = $allParameters['compte_prestation'];
         $pLabelPrestation = $allParameters['label_prestation'];
         $pSoins = $allParameters['soins_prestation'];
@@ -94,6 +95,7 @@ class ParametreController extends AbstractController
         $compteRembPre = $repositoryCompte->findOneByPoste($pCompteRembPrestation->getValue());        
         $data['compte_cotisation'] = $compteCot;
         $data['label_cotisation'] = $pLabelCotisation->getValue();
+        $data['periode_cotisation_mois'] = $pPeriodeCotisation->getValue();
         $data['compte_prestation'] = $comptePre;
         $data['label_prestation'] = $pLabelPrestation->getValue();
         $data['percent_prestation'] = $pPercent->getValue();
@@ -103,12 +105,13 @@ class ParametreController extends AbstractController
         $data['soins_prestation'] = json_encode($pSoins->getList());
         /* Le data est uniquement pour afficher le données dans le formulaire */
 
-        $form = $this->createForm(ParametersType::class, $data) ;        
+        $form = $this->createForm(ParametersType::class, $data);        
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             /* Enregistrer tous les parametres données */
             $pCotisation->setValue($form->get('compte_cotisation')->getData()->getPoste());
             $pLabelCotisation->setValue($form->get('label_cotisation')->getData());
+            $pPeriodeCotisation->setValue($form->get('periode_cotisation_mois')->getData());
 
             $pPrestation->setValue($form->get('compte_prestation')->getData()->getPoste());
             $pLabelPrestation->setValue($form->get('label_prestation')->getData());

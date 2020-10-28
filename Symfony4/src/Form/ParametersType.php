@@ -30,6 +30,7 @@ class ParametersType extends AbstractType
                 },
             ])
             ->add('label_cotisation')
+            ->add('periode_cotisation_mois',NumberType::class)
             ->add('compte_prestation', EntityType::class, [
                 'class' => Compte::class,
                 'query_builder' => function (EntityRepository $er) {

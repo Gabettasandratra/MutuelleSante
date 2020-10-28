@@ -267,10 +267,11 @@ class PrestationController extends AbstractController
         }
         $json = json_encode($donnesSerialize);
         
+       
         // Le valeur de pourcentage
         $remb = $repositoryParametre->findOneByNom('percent_rembourse_prestation')->getValue(); // PAr defaut
         $remb_plafond = $repositoryParametre->findOneByNom('percent_rembourse_prestation_plafond')->getValue(); // Si on a sauter le plafond
-        $percent = ($plafond > $totalRembourse)?$remb:$remb_plafond;
+        $percent = ['normal' => $remb, 'plafond' => $remb_plafond];
 
         return $this->render('prestation/show.html.twig', [
             'adherent' => $adherent,
@@ -388,6 +389,20 @@ class PrestationController extends AbstractController
             'adherent' => $remboursement->getAdherent(),
             'edit' => true,
             'form' => $form->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/prestation/rapport", name="prestation_rapport")
+     */
+    public function rapport(RemboursementRepository $repository, ParametreRepository $repositoryParametre,SessionInterface $session)
+    {
+        $exercice = $session->get('exercice');
+        $coefficient_remb = $repositoryParametre->findOneByNom('plafond_prestation')->getValue();
+        return $this->render('prestation/rapport.html.twig', [
+            'exercice' => $exercice,
+            'coefficient' => $coefficient_remb,
+            'rembs' => $repository->findRapportRemboursement($exercice)
         ]);
     }
 }

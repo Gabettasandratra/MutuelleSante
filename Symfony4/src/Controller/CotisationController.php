@@ -12,6 +12,7 @@ use App\Entity\HistoriqueCotisation;
 use Symfony\Component\Form\FormError;
 use App\Form\HistoriqueCotisationType;
 use App\Repository\AdherentRepository;
+use App\Repository\ParametreRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\CompteCotisationRepository;
@@ -51,13 +52,18 @@ class CotisationController extends AbstractController
     /**
      * @Route("/cotisation/{id}", name="cotisation_show")
      */
-    public function show(Adherent $adherent, CompteCotisationRepository $repository, SessionInterface $session)
+    public function show(Adherent $adherent, CompteCotisationRepository $repository,ParametreRepository $repoParam, SessionInterface $session)
     {
         $exercice = $session->get('exercice');
+        $periode_mois = $repoParam->findOneBy(['nom'=>'periode_cotisation_mois'])->getValue();
+        $dateDeb = new \DateTime($exercice->getDateDebut()->format('Y-m-d'));
+        $dateFinCot = $dateDeb->modify("+$periode_mois month");
+        $ouvert = (new \DateTime() >= $dateFinCot)? false:true;
         $compteCotisation = $repository->findCompteCotisation($adherent, $exercice);
         return $this->render('cotisation/show.html.twig', [
             'adherent' => $adherent,
             'exercice' => $exercice,
+            'ouvert' => $ouvert,
             'compteCotisation' => $compteCotisation
         ]);
     }

@@ -44,4 +44,20 @@ class RemboursementRepository extends ServiceEntityRepository
                         ->getSingleScalarResult()
         ; 
     }
+
+    public function findRapportRemboursement(Exercice $exercice)
+    {
+        $congs = $this->_em->createQuery('select r from App\Entity\Remboursement r where r.exercice = :e group by r.adherent')
+                        ->setParameter('e', $exercice)    
+                        ->getResult();
+        foreach ($congs as $cong) {
+            $adh = $cong->getAdherent();
+            $rembs = $this->_em->createQuery('select r from App\Entity\Remboursement r where r.exercice = :e and r.adherent = :a')
+                        ->setParameter('e', $exercice)    
+                        ->setParameter('a', $exercice)    
+                        ->getResult();
+            $output[] = ['adherent'=>$adh,'rembs'=>$rembs];
+        }
+        return $output;
+    }
 }

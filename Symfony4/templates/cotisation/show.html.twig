@@ -182,7 +182,7 @@
                         <div class="col-5">
                             <h4 class="card-title">Versement de cotisation</h4>
                         </div>
-                        {% if not compteCotisation.isPaye and exercice.isCurrent and not exercice.isCloture %}
+                        {% if not compteCotisation.isPaye and ouvert and exercice.isCurrent and not exercice.isCloture %}
                             <div class="col-7">
                                 <div class="text-right">
                                     <a href="{{ path('cotisation_pay', {'id': adherent.id}) }}" class="btn btn-sm btn-info"><i class="mdi mdi-plus-circle-outline"></i> Enregistrer nouveau paiement</a>
