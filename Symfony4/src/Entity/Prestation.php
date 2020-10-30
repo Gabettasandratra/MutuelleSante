@@ -263,7 +263,6 @@ class Prestation
 
     public function setStatus(int $status): self
     {
-        $this->dateDecision = new \DateTime();
         $this->status = $status;
 
         return $this;

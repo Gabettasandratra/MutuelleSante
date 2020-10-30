@@ -7,7 +7,9 @@ use App\Entity\Article;
 use App\Entity\Remboursement;
 use App\Service\ParametreService;
 use App\Entity\HistoriqueCotisation;
+use App\Repository\BudgetRepository;
 use App\Repository\CompteRepository;
+use App\Repository\AnalytiqueRepository;
 use App\Repository\PrestationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -19,18 +21,24 @@ class ComptaService
     private $manager;
     private $validator;
     private $comptaRepo;
+    private $analyticRepo;
 
-    public function __construct(SessionInterface $session, ParametreService $paramService, EntityManagerInterface $entityManager, CompteRepository $comptaRepo, PrestationRepository $prestationRepo)
+    public function __construct(SessionInterface $session, ParametreService $paramService, EntityManagerInterface $entityManager, CompteRepository $comptaRepo, BudgetRepository $repoBudget, AnalytiqueRepository $analyticRepo,PrestationRepository $prestationRepo)
     {
         $this->manager = $entityManager;
         $this->session = $session;
+        $this->budgetRepo = $repoBudget;
         $this->comptaRepo = $comptaRepo;
+        $this->analyticRepo = $analyticRepo;
         $this->prestationRepo = $prestationRepo;
         $this->paramService = $paramService;
     }
 
     /*
-    * A chaque versement de cotisation
+    * IMPUTATION DE COTISATION
+    * - ne passe pas par le compte tiers 4 donc pas de compte Tiers associé
+    * - pas de charge mais poduits donc pas necessaire le compte Analytique
+    * - compte budgetaire des cotisations seul associé
     */
     public function payCotisation(HistoriqueCotisation $cotisation)
     {
@@ -51,7 +59,9 @@ class ComptaService
         $article->setDate($cotisation->getDatePaiement());
         $article->setPiece($cotisation->getReference());
         $article->setIsFerme(true); // No modifiable depuis journal
-
+        $idBudget = $this->paramService->getParametre('budget_cotisation'); // Budget
+        $article->setBudget($this->budgetRepo->find($idBudget));
+        
         $cotisation->setArticle($article);
 
         $this->manager->persist($cotisation); // seul persist suffit
@@ -149,14 +159,16 @@ class ComptaService
         return $remboursement;
     }
 
-    /**
-     * Le but c'est d'enregistrer en tant que dette les prestations décidé de remboursé 
-     */
+    /*
+    * IMPUTATION DE DECISION DE PRESTATION
+    * - passe par le compte tiers 403 (fournisseurs - congregations) ainsi on a un compte Tiers
+    * - charge de compte 606 (charge remboursement) - compte Analytique de la SOIN
+    * - compte budgetaire des prestations associé 
+    */
     public function updateDetteRemb($journal ='PRE')
     {
         $posteRemboursement = $this->paramService->getParametre('compte_prestation'); // Charge
         $compteRemboursement = $this->comptaRepo->findOneByPoste($posteRemboursement); 
-
         $posteRembDette = $this->paramService->getParametre('compte_dette_prestation'); // Dette des prestations
         $compteRembDette = $this->comptaRepo->findOneByPoste($posteRembDette);
 
@@ -164,25 +176,38 @@ class ComptaService
         $prestationNoEcris = $this->prestationRepo->findNoEcriture();
 
         foreach ($prestationNoEcris as $prestation) {
-            $article = new Article();
-            $article->setCompteDebit($compteRemboursement);        
-            $article->setCompteCredit($compteRembDette); 
-            $label = "Préstation bénéficiaire: ".$prestation->getPac()->getMatricule();
-            $article->setLibelle($label);
-            $article->setCategorie($journal);
+            if ($prestation->getRembourse() != 0) {          
+                $article = new Article();
+                $article->setCompteDebit($compteRemboursement);        
+                $article->setCompteCredit($compteRembDette); 
+                $label = "Préstation bénéficiaire: ".$prestation->getPac()->getMatricule();
+                $article->setLibelle($label);
+                $article->setCategorie($journal);
+                $article->setMontant($prestation->getRembourse());
+                $article->setDate(new \DateTime());
+                $piece = $prestation->getPac()->getMatricule() ."/". $this->session->get('exercice')->getAnnee();
+                $article->setPiece('D'.$piece . "/" . $prestation->getDecompte()); // Le decompte de prestation
+                $article->setIsFerme(true);
+                // Compta ana - tier - budget
+                $article->setTier($prestation->getAdherent()->getTier());
+                $idBudget = $this->paramService->getParametre('budget_prestation');
+                $article->setBudget($this->budgetRepo->find($idBudget));
+                $compteAna = $this->analyticRepo->findOneBy(['code'=>$prestation->getDesignation()]);
+                $article->setAnalytic($compteAna);
 
-            $article->setMontant($prestation->getRembourse());
-            $article->setDate(new \DateTime());
-            $piece = $prestation->getPac()->getMatricule() ."/". $this->session->get('exercice')->getAnnee();
-            $article->setPiece('D'.$piece . "/" . $prestation->getDecompte()); // Le decompte de prestation
-            $article->setIsFerme(true);
-
+                $this->manager->persist($article);
+            }
             $prestation->setDateDecision(new \DateTime());
-            $this->manager->persist($article);
         }       
         $this->manager->flush();       
     }
 
+    /*
+    * IMPUTATION DE VERSEMENT (REMISE) DE CHEQUE
+    * - aucun compte Tiers
+    * - aucun compte Analytique
+    * - aucun poste Budgetaire 
+    */
     public function verserCheque(Article $articleCheque, Compte $compteBanque, \DateTime $date, $borderaux)
     {
         $article = new Article();

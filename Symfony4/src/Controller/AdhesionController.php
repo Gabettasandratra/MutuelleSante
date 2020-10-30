@@ -3,14 +3,16 @@
 namespace App\Controller;
 
 use App\Entity\Pac;
+use App\Entity\Tier;
 use App\Form\PacType;
 use App\Entity\Adherent;
 use App\Entity\Exercice;
 use App\Form\AdherentType;
-use App\Service\ExcelReader;
 
+use App\Service\ExcelReader;
 use App\Entity\CompteCotisation;
 use App\Repository\PacRepository;
+use App\Repository\CompteRepository;
 use Symfony\Component\Form\FormError;
 use App\Repository\AdherentRepository;
 use App\Repository\ExerciceRepository;
@@ -70,7 +72,7 @@ class AdhesionController extends AbstractController
     /**
      * @Route("/adhesion/inscrire", name="adhesion_new")
      */
-    public function create(Request $request, AdherentRepository $repository, ParametreRepository $paramRepo, EntityManagerInterface $manager)
+    public function create(Request $request, CompteRepository $repoCompte, AdherentRepository $repository, ParametreRepository $paramRepo, EntityManagerInterface $manager)
     { 
         $adherent = new Adherent();
         $generatedNumero = $repository->generateNumero();
@@ -100,15 +102,23 @@ class AdhesionController extends AbstractController
             $currentExercice = $this->getDoctrine()
                                     ->getRepository(Exercice::class)
                                     ->findCurrent();
-            $newCompteCotisation = new CompteCotisation($currentExercice, $adherent);
-            
-            // Create analytic account 
+            $newCompteCotisation = new CompteCotisation($currentExercice, $adherent);          
+            // Create analytic account           
             $codeAnalytique = $paramRepo->findOneByNom('code_analytique_cong')->getValue(); // Le modele code analytique
             $code = str_ireplace('{n}', $adherent->getNumero(), $codeAnalytique);
 
-            $planAnalytique = $paramRepo->findOneByNom('plan_analytique');
-            $planAnalytique->addInList($code, 'Congrégation '.$adherent->getNom());
-            $adherent->setCodeAnalytique($code);
+            $compteAssocie = $paramRepo->findOneByNom('compte_dette_prestation')->getValue(); 
+            $compteCollectif = $repoCompte->findOneBy(['poste'=>$compteAssocie]);
+
+            $tier = new Tier();
+            $tier->setCode($code);
+            $tier->setType('F');
+            $tier->setLibelle($adherent->getNom());
+            $tier->setAdresse($adherent->getAdresse());
+            $tier->setContact($adherent->getTelephone1());
+            $tier->setCompte($compteCollectif);
+
+            $adherent->setTier($tier);
 
             $manager->persist($adherent);
             $manager->persist($newCompteCotisation);

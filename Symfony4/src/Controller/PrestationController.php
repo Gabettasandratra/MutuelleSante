@@ -20,6 +20,7 @@ use App\Repository\DetailRepository;
 use Symfony\Component\Form\FormError;
 use App\Repository\AdherentRepository;
 use App\Repository\ParametreRepository;
+use App\Repository\AnalytiqueRepository;
 use App\Repository\PrestationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\RemboursementRepository;
@@ -84,11 +85,10 @@ class PrestationController extends AbstractController
     /**
      * @Route("/prestation/beneficiaire/{id}/decompte", name="prestation_beneficiaire_decompte", requirements={"id"="\d+"})
      */
-    public function addDecompte(Pac $pac, PrestationRepository $repositoryPrestation, CompteCotisationRepository $repoCompte, ParametreRepository $repositoryParametre,RemboursementRepository $repoRemb, SessionInterface $session)
+    public function addDecompte(Pac $pac, AnalytiqueRepository $repoServiceSante, PrestationRepository $repositoryPrestation, CompteCotisationRepository $repoCompte, ParametreRepository $repositoryParametre,RemboursementRepository $repoRemb, SessionInterface $session)
     {
         $exercice = $session->get('exercice');
         $generatedNumero = $repositoryPrestation->generateNumero($pac->getAdherent(), $exercice);
-        $soins = $repositoryParametre->findOneByNom('soins_prestation');
         $remb = $repositoryParametre->findOneByNom('percent_rembourse_prestation')->getValue();
         $remb_plafond = $repositoryParametre->findOneByNom('percent_rembourse_prestation_plafond')->getValue();
 
@@ -103,7 +103,7 @@ class PrestationController extends AbstractController
             'pac' => $pac,
             'numero' => $generatedNumero,
             'remb' => $percent,
-            'soins' => $soins->getList()
+            'soins' => $repoServiceSante->findServiceSante()
         ]);
     }
 
@@ -228,13 +228,11 @@ class PrestationController extends AbstractController
     {
         $exercice = $session->get('exercice');
         $plafondPrestation = $repositoryParametre->findOneByNom('plafond_prestation');
-
         $remboursements = $repositoryRemboursement->findRemboursement($exercice, $adherent);
         $totalRembourse = 0;
         foreach ($remboursements as $remboursement) {
             $totalRembourse += $remboursement->getMontant();
         }
-
         $compteCotisation = $repository->findCompteCotisation($adherent, $exercice);
         
         /* A DEMANDER  */
@@ -246,7 +244,6 @@ class PrestationController extends AbstractController
             'plafond' => $plafond,
             'reste' => $plafond - $totalRembourse,
         ];
-
         // Serialization du prestation
         $prestationNotPayed = $repositoryPrestation->findNotPayed($adherent);
         $donnesSerialize = [];
@@ -265,9 +262,7 @@ class PrestationController extends AbstractController
                 'details'=>$prestation->getJsonDetails()
             ];
         }
-        $json = json_encode($donnesSerialize);
-        
-       
+        $json = json_encode($donnesSerialize);          
         // Le valeur de pourcentage
         $remb = $repositoryParametre->findOneByNom('percent_rembourse_prestation')->getValue(); // PAr defaut
         $remb_plafond = $repositoryParametre->findOneByNom('percent_rembourse_prestation_plafond')->getValue(); // Si on a sauter le plafond
@@ -286,7 +281,7 @@ class PrestationController extends AbstractController
     /**
      * @Route("/prestation/decider", name="prestation_decider_json")
      */
-    public function ajaxUpadatePrestation(PrestationRepository $repoPre, Request $request, DetailRepository $repoDetail, EntityManagerInterface $manager, ComptaService $comptaService)
+    public function ajaxUpdatePrestation(PrestationRepository $repoPre, Request $request, DetailRepository $repoDetail, EntityManagerInterface $manager, ComptaService $comptaService)
     {
         $data = json_decode( $request->getContent(), true);
         $prestation = $repoPre->find($data['id']);
@@ -306,7 +301,7 @@ class PrestationController extends AbstractController
 
         // Suvegarde des dettes
         $comptaService->updateDetteRemb();
-
+        dump('Affter update');
         return new JsonResponse([
             'hasError' => false,
             'message' => "Mis à jour avec success",

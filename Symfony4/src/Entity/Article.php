@@ -219,8 +219,9 @@ class Article
 
     public function setBudget(?Budget $budget): self
     {
+        $realise = $budget->getRealise();
+        $budget->setRealise($realise + $this->montant);
         $this->budget = $budget;
-
         return $this;
     }
 }

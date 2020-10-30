@@ -7,18 +7,22 @@ use App\Entity\Compte;
 use App\Form\UserType;
 use App\Entity\Exercice;
 use App\Entity\Parametre;
+use App\Entity\Analytique;
 use App\Form\ExerciceType;
 use App\Form\ParametersType;
 use App\Service\ExerciceService;
 use App\Service\ParametreService;
 use App\Repository\UserRepository;
+use App\Repository\BudgetRepository;
 use App\Repository\CompteRepository;
 use Symfony\Component\Form\FormError;
 use App\Repository\ExerciceRepository;
 use App\Repository\ParametreRepository;
+use App\Repository\AnalytiqueRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -68,9 +72,31 @@ class ParametreController extends AbstractController
     }
 
     /**
+     * @Route("/parametre/mutuelle/service", name="parametre_mutuelle_service")
+     */
+    public function serviceSante(Request $request, AnalytiqueRepository $repo,EntityManagerInterface $manager)
+    {
+        if ($request->isMethod('post')) {
+            $ana = new Analytique($request->request->get('code'),$request->request->get('libelle'));
+            $ana->setIsServiceSante(true);
+            $manager->persist($ana);
+            $manager->flush();
+            return new JsonResponse([
+                'hasError' => false,
+                'message' => "Service de santé ajouter avec success",
+                'analytique' => ['id'=>$ana->getId(),'code'=>$ana->getCode(),'libelle'=>$ana->getLibelle()]
+            ]);
+        }
+
+        return $this->render('parametre/service.html.twig', [
+            'analytics' => json_encode($repo->findServiceSante()),
+        ]);
+    }
+
+    /**
      * @Route("/parametre/mutuelle/fonctions", name="parametre_mutuelle_fonctions")
      */
-    public function parametreCotisationPrestation(ParametreRepository $repository,CompteRepository $repositoryCompte, ParametreService $paramService, Request $request, EntityManagerInterface $manager)
+    public function parametreCotisationPrestation(ParametreRepository $repository,BudgetRepository $repoBudget,CompteRepository $repositoryCompte, ParametreService $paramService, Request $request, EntityManagerInterface $manager)
     {
         $allParameters = $repository->getParameters();
         if (!$allParameters) {
@@ -81,20 +107,27 @@ class ParametreController extends AbstractController
         $pCotisation = $allParameters['compte_cotisation'];
         $pLabelCotisation = $allParameters['label_cotisation'];
         $pPeriodeCotisation = $allParameters['periode_cotisation_mois'];
+        $pBudgetCotisation = $allParameters['budget_cotisation'];
         $pPrestation = $allParameters['compte_prestation'];
         $pLabelPrestation = $allParameters['label_prestation'];
         $pSoins = $allParameters['soins_prestation'];
         $pPercent = $allParameters['percent_prestation'];
         $pPercentRemb = $allParameters['percent_rembourse_prestation'];
         $pCompteRembPrestation = $allParameters['compte_dette_prestation'];
+        $pBudgetPrestation = $allParameters['budget_prestation'];
         $pPlafond = $allParameters['plafond_prestation'];
 
         /* Pour bien afficher le formulaire avec les données */
-        $compteCot = $repositoryCompte->findOneByPoste($pCotisation->getValue());        
-        $comptePre = $repositoryCompte->findOneByPoste($pPrestation->getValue());        
-        $compteRembPre = $repositoryCompte->findOneByPoste($pCompteRembPrestation->getValue());        
+        if ($pCotisation->getValue())
+            $compteCot = $repositoryCompte->findOneByPoste($pCotisation->getValue());        
+        if ($pPrestation->getValue())
+            $comptePre = $repositoryCompte->findOneByPoste($pPrestation->getValue());        
+        if ($pCompteRembPrestation->getValue())
+            $compteRembPre = $repositoryCompte->findOneByPoste($pCompteRembPrestation->getValue()); 
         $data['compte_cotisation'] = $compteCot;
         $data['label_cotisation'] = $pLabelCotisation->getValue();
+        if ($pBudgetCotisation->getValue())
+            $data['budget_cotisation'] = $repoBudget->find($pBudgetCotisation->getValue());
         $data['periode_cotisation_mois'] = $pPeriodeCotisation->getValue();
         $data['compte_prestation'] = $comptePre;
         $data['label_prestation'] = $pLabelPrestation->getValue();
@@ -102,6 +135,8 @@ class ParametreController extends AbstractController
         $data['percent_rembourse_prestation'] = $pPercentRemb->getValue();
         $data['compte_dette_prestation'] = $pCompteRembPrestation->getValue();
         $data['plafond_prestation'] = $pPlafond->getValue();
+        if ($pBudgetPrestation->getValue())
+            $data['budget_prestation'] = $repoBudget->find($pBudgetPrestation->getValue());
         $data['soins_prestation'] = json_encode($pSoins->getList());
         /* Le data est uniquement pour afficher le données dans le formulaire */
 
@@ -109,19 +144,28 @@ class ParametreController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             /* Enregistrer tous les parametres données */
-            $pCotisation->setValue($form->get('compte_cotisation')->getData()->getPoste());
-            $pLabelCotisation->setValue($form->get('label_cotisation')->getData());
-            $pPeriodeCotisation->setValue($form->get('periode_cotisation_mois')->getData());
+            $budget_cotisation = $form->get('budget_cotisation')->getData();
+            $budget_prestation = $form->get('budget_prestation')->getData();
+            if ($budget_cotisation->getExercice()->getIsCurrent()) {
+                if ($budget_prestation->getExercice()->getIsCurrent()) {
+                    $pCotisation->setValue($form->get('compte_cotisation')->getData()->getPoste());
+                    $pLabelCotisation->setValue($form->get('label_cotisation')->getData());
+                    $pPeriodeCotisation->setValue($form->get('periode_cotisation_mois')->getData());             
+                    $pBudgetCotisation->setValue($form->get('budget_cotisation')->getData()->getId());
+                    $pPrestation->setValue($form->get('compte_prestation')->getData()->getPoste());
+                    $pLabelPrestation->setValue($form->get('label_prestation')->getData());
+                    $pPercent->setValue($form->get('percent_prestation')->getData());
+                    $pPercentRemb->setValue($form->get('percent_rembourse_prestation')->getData());
+                    $pPlafond->setValue($form->get('plafond_prestation')->getData());
+                    $pCompteRembPrestation->setValue($form->get('compte_dette_prestation')->getData()->getPoste());
+                    $pBudgetPrestation->setValue($form->get('budget_prestation')->getData()->getId());
+                    $pSoins->setList(json_decode($form->get('soins_prestation')->getData(), true));
 
-            $pPrestation->setValue($form->get('compte_prestation')->getData()->getPoste());
-            $pLabelPrestation->setValue($form->get('label_prestation')->getData());
-            $pPercent->setValue($form->get('percent_prestation')->getData());
-            $pPercentRemb->setValue($form->get('percent_rembourse_prestation')->getData());
-            $pPlafond->setValue($form->get('plafond_prestation')->getData());
-            $pCompteRembPrestation->setValue($form->get('compte_dette_prestation')->getData()->getPoste());
-            $pSoins->setList(json_decode($form->get('soins_prestation')->getData(), true));
-
-            $manager->flush(); // flush suffit
+                    $manager->flush(); // flush suffit
+                } else 
+                    $form->get('budget_prestation')->addError(new FormError("Ce budget n'apprtient pas à l'exercice courant"));
+            } else 
+                $form->get('budget_cotisation')->addError(new FormError("Ce budget n'apprtient pas à l'exercice courant"));
         }
 
         return $this->render('parametre/index.html.twig', [

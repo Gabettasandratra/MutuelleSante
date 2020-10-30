@@ -29,6 +29,8 @@ class ParametreService
         $parametres[] = new Parametre('compte_cotisation');
         $parametres[] = new Parametre('label_cotisation', 'Cot {a} | {c}');
         $parametres[] = new Parametre('periode_cotisation_mois', 6);
+        $parametres[] = new Parametre('budget_cotisation');
+        $parametres[] = new Parametre('code_analytique_cong', 'CONG{n}');
         $parametres[] = new Parametre('compte_prestation');
         $parametres[] = new Parametre('label_prestation', 'Remb {a} | {c}');
         $parametres[] = new Parametre('percent_prestation', 1);
@@ -36,6 +38,7 @@ class ParametreService
         $parametres[] = new Parametre('percent_rembourse_prestation', 0.6);
         $parametres[] = new Parametre('percent_rembourse_prestation_plafond', 0.25);
         $parametres[] = new Parametre('compte_dette_prestation');    
+        $parametres[] = new Parametre('budget_prestation');
         $parametres[] = new Parametre('soins_prestation');
         $parametres[] = new Parametre('nom_mutuelle', 'Mutuelle Santé');
         $parametres[] = new Parametre('adresse_mutuelle', 'adresse');

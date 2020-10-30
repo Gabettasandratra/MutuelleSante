@@ -22,12 +22,13 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Plan Budgetaire</h4>
+                    <h4 class="card-title">Etat budgetaire de l'année {{app.session.get('exercice').annee}}</h4>
                     <hr>
                     <div class="row">                       
-                        <table class="table table-hover table-striped border" id="budgets">
+                        <table class="table table-hover table-striped no-padding border" id="budgets">
                             <thead class="thead-light">
                                 <tr>
+                                    <th scope="col">Sens</th>
                                     <th scope="col">Code</th>
                                     <th scope="col">Budget</th>
                                     <th scope="col">Prévision</th>
@@ -36,12 +37,12 @@
                                 </tr>
                             </thead>
                             <tbody></tbody>
-                            <tfoot></tfoot>
+                            <tfoot class="bg-light font-weight-bold"></tfoot>
                         </table>                            
                     </div>
                    
                     <div class="row">
-                        <button class="btn btn-success" data-toggle="modal" data-target="#form-dialog"><i class="fa fa-plus-circle" aria-hidden="true"></i> Creer un nouveau budget</button>
+                        <button class="btn btn-sm btn-info" data-toggle="modal" data-target="#form-dialog"><i class="fa fa-plus-circle" aria-hidden="true"></i> Creer un nouveau budget</button>
                     </div>
                 </div>
             </div>
@@ -59,6 +60,21 @@
                 </div>
                 <div class="modal-body">
                     <form method="post" action="{{path('add_budget')}}" id="form">
+                        <div class="form-group row">
+                            <label class="col-form-label col-sm-5 required">Type de budget</label>
+                            <fieldset class="col-sm-7">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" type="radio" name="input" id="" value="1"> Entrée
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" type="radio" name="input" id="" value="0"> Sortie
+                                    </label>
+                                </div>
+                            </fieldset>
+                        </div>
                         <div class="form-group row">
                             <label for="code" class="col-form-label col-sm-5 required">Code budgetaire</label>
                             <div class="col-sm-7">
@@ -93,8 +109,6 @@
 {% block javascripts %}
 <script>
     var budgets = {{budgets|raw}};
-    console.log(budgets);
-
     const refreshTable = function() {
         $('#budgets tbody').empty();
         $('#budgets tfoot').empty();
@@ -104,36 +118,26 @@
         for (let index = 0; index < budgets.length; index++) {
             var budget = budgets[index];
             var markup = "<tr>";
+            if (budget.input == true)
+                markup += "<td><span class='label label-success label-rounded'><i class='mdi mdi-arrow-right-bold'></i></span></td>";
+            else 
+                markup += "<td><span class='label label-danger label-rounded'><i class='mdi mdi-arrow-left-bold'></i></span></td>";
             markup += "<td>" + budget.code + "</td>";
             markup += "<td>" + budget.libelle + "</td>";
-            markup += "<td>" + budget.montant.toLocaleString("fr-FR") + "</td>";
-            markup += "<td>" + budget.realise.toLocaleString("fr-FR")+ "</td>";
-            markup += "<td>" + (budget.montant - budget.realise).toLocaleString("fr-FR")+ "</td>";
+            markup += "<td>" + printLocaleAmount(budget.montant) + "</td>";
+            markup += "<td>" + printLocaleAmount(budget.realise)+ "</td>";
+            markup += "<td>" + printLocaleAmount(budget.montant - budget.realise)+ "</td>";
             markup += "</tr>";
             totB += budget.montant;  
             totR += budget.realise;
             $('#budgets tbody').append(markup);                   
         }
-
-        if (budgets.length != 0) {
-            var totMarkup = "<tr><th scope='row' colspan=2>Total</th>";
-            totMarkup += "<td>" + totB.toLocaleString("fr-FR") + "</td>";
-            totMarkup += "<td>" + totR.toLocaleString("fr-FR") + "</td>";
-            console.log(totR);
-            totMarkup += "<td>" + (totB-totR).toLocaleString("fr-FR") + "</td>";
-            totMarkup += "</tr>";
-            $('#budgets tfoot').append(totMarkup);  
-        } 
     }
     refreshTable();
-
     $("#form").submit(function(event){
         event.preventDefault(); 
         var post_url = $(this).attr("action");
-        var form_data = $(this).serialize();
-
-        console.log(form_data);
-        
+        var form_data = $(this).serialize();        
         $.post( post_url, form_data, function(response) {
             if (response.hasError == false) {
                 console.log('success');

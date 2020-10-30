@@ -132,6 +132,11 @@
                                     <a href="{{ path('prestation_adherent_show', {'id': adherent.id}) }}"class="btn btn-sm btn-info"><i class="mdi mdi-home-map-marker"></i> Voir fiche de prestation</a>
                                 </div>
                             </ul>
+                            {% if not ouvert %}
+                            <div class="alert alert-primary my-2" role="alert">
+                                La période de paiement de cotisation est fermé
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
 

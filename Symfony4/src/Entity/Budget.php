@@ -50,12 +50,18 @@ class Budget
      */
     private $articles;
 
-    public function __construct($code, $lib, $montant)
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $input;
+
+    public function __construct($code, $lib, $montant,$in)
     {
         $this->code = $code;
         $this->libelle = $lib;
         $this->montant = $montant;
         $this->realise = 0;
+        $this->input = boolval($in);
         $this->articles = new ArrayCollection();
     }
 
@@ -126,7 +132,7 @@ class Budget
     
     public function getAsArray()
     {
-        return ['id'=>$this->id,'code'=>$this->code,'libelle'=>$this->libelle,'montant'=>(float)$this->montant,'realise'=>(float)$this->realise];
+        return ['id'=>$this->id,'input'=>$this->input,'code'=>$this->code,'libelle'=>$this->libelle,'montant'=>(float)$this->montant,'realise'=>(float)$this->realise];
     }
 
     /**
@@ -156,6 +162,18 @@ class Budget
                 $article->setBudget(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getInput(): ?bool
+    {
+        return $this->input;
+    }
+
+    public function setInput(bool $input): self
+    {
+        $this->input = $input;
 
         return $this;
     }

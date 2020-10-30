@@ -43,10 +43,9 @@
                                     <th scope="col" style="width: 2%">N°</th>
                                     <th scope="col" style="width: 5%">Débité</th>
                                     <th scope="col" style="width: 5%">Crédité</th>
-                                    <th scope="col" style="width: 35%">Libellé écriture</th>
+                                    <th scope="col" style="width: 40%">Libellé écriture</th>
                                     <th scope="col" style="width: 15%">Montant</th>
-                                    <th scope="col" style="width: 15%">Réference</th>
-                                    <th scope="col" style="width: 15%">Tier</th>
+                                    <th scope="col" style="width: 20%">Réference</th>
                                     {% if  not app.session.get('exercice').isCloture %}
                                     <th scope="col" style="width: 1%">Act</th>
                                     {% endif %}
@@ -62,7 +61,6 @@
                                         <td>{{ article.libelle }}</td>
                                         <td>{{ article.montant|number_format(2,',',' ') }}</td>
                                         <td>{{ article.piece }}</td>
-                                        <td>{% if article.tier %}{{ article.tier.code }}{% endif %}</td>
                                         {% if not app.session.get('exercice').isCloture %}
                                         <td>{% if not article.isFerme %}<a href="{{ path('comptabilite_saisie_edit',{'id': article.id}) }}" class="label btn-primary label-primary"><i class="mdi mdi-grease-pencil"></i></a>
                                             {% else %}<span class="label label-warning"><i class="mdi mdi-lock"></i></span>{% endif %}

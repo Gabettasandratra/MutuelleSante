@@ -25,19 +25,44 @@
                 <div class="card-body">
                     <h4 class="card-title">Paramètres de la gestion de la mutuelle</h4>
                     <hr>
-                    <div class="row">
-                        <div class="col-md-6">
-                            {{ form_start(form) }}
-                                {{ form_row(form.compte_cotisation, { 'label' : 'Compte associé au cotisation'}) }}
-                                {{ form_row(form.label_cotisation, { 'label' : 'Libellé d\'article de cotisation'}) }}
-                                {{ form_row(form.periode_cotisation_mois, { 'label' : 'Période de paiement de cotisation (mois)'}) }}
-                                <div class="m-4"><hr></div>
-                                {{ form_row(form.compte_prestation, { 'label' : 'Compte associé au remboursement'}) }}
-                                {{ form_row(form.label_prestation, { 'label' : 'Libellé d\'article de remboursement'}) }}
-                                {{ form_row(form.percent_prestation, { 'label' : 'Pourcentage de cotisation versé pour avoir accès au prestation'}) }}
-                                {{ form_row(form.plafond_prestation, { 'label' : 'Plafond de prestation (ex: 2 x cotisation)'}) }}
-                                {{ form_row(form.percent_rembourse_prestation, { 'label' : 'Pourcentage de remboursement par defaut'}) }}
-                                {{ form_row(form.compte_dette_prestation, { 'label' : 'Compte associé au préstation non payé'}) }}
+                    
+                    <div class="row ">
+                        <div class="col-12">
+                        {{ form_start(form) }}
+                            <div class="card border shadow">
+                                <div class="card-header">
+                                    <a href="#cot" class="font-weight-bold" data-toggle="collapse" role="button">Cotisation</a>
+                                </div>
+                                <div class="collapse card-body" id="cot">
+                                    {{ form_row(form.compte_cotisation, { 'label' : 'Compte associé au cotisation'}) }}
+                                    {{ form_row(form.label_cotisation, { 'label' : 'Libellé d\'article de cotisation'}) }}
+                                    {{ form_row(form.periode_cotisation_mois, { 'label' : 'Période de paiement de cotisation (mois)'}) }}
+                                    {{ form_row(form.budget_cotisation, { 'label' : 'Poste budgetaire associé'}) }}
+                                </div>
+                                <div class="card-footer text-muted">
+                                    Paramètre de l'enregistrement de cotisation
+                                </div>
+                            </div>
+                            <div class="card border shadow">
+                                <div class="card-header">
+                                    <a href="#pre" class="font-weight-bold" data-toggle="collapse" role="button">Prestation</a>
+                                </div>
+                                <div class="collapse card-body" id="pre">
+                                    {{ form_row(form.compte_prestation, { 'label' : 'Compte associé au remboursement'}) }}
+                                    {{ form_row(form.label_prestation, { 'label' : 'Libellé d\'article de remboursement'}) }}
+                                    {{ form_row(form.percent_prestation, { 'label' : 'Pourcentage de cotisation versé pour avoir accès au prestation'}) }}
+                                    {{ form_row(form.plafond_prestation, { 'label' : 'Plafond de prestation (ex: 2 x cotisation)'}) }}
+                                    {{ form_row(form.percent_rembourse_prestation, { 'label' : 'Pourcentage de remboursement par defaut'}) }}
+                                    {{ form_row(form.compte_dette_prestation, { 'label' : 'Compte associé au préstation non payé'}) }}
+                                    {{ form_row(form.budget_prestation, { 'label' : 'Poste budgetaire associé'}) }}
+                                </div>
+                                <div class="card-footer text-muted">
+                                    Paramètre de l'enregistrement de prestation
+                                </div>
+                            </div>
+                                    
+                            
+                                
                                 {{ form_row(form.soins_prestation, { 'label' : ' '}) }}
                                 <hr>
                                 <div class="form-row">

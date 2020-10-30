@@ -375,12 +375,16 @@ $('#prestation').submit(function(e) {
     e.preventDefault();
     var index = $('#prestation_index').val();
     var prestation = prestations[index];
+    prestation.frais = parseFloat($('#prestation_frais').val().replace(/\s/g, ""));
+    prestation.rembourse = parseFloat($('#prestation_rembourse').val().replace(/\s/g, ""));
+    prestations[index] = prestation;
     var data = {
         id : prestation.id,
         frais : prestation.frais,
         rembourse : prestation.rembourse,
         details: prestation.details
     };
+
 
     var posting = $.post('{{ path('prestation_decider_json') }}', JSON.stringify(data));
     posting.done(function(data) {
@@ -411,9 +415,11 @@ function refreshTable(prestations) {
         markup += "<td>" + prestation.decompte + "</td>";
         markup += "<td class='text-center'>" + prestation.frais.toLocaleString("fr-FR", {maximumSignifiantDigits:2}) + "</td>"; 
 
-        if (prestation.status != 0) 
+        if (prestation.status == 1) 
            markup += "<td class='text-center'>" + prestation.rembourse.toLocaleString("fr-FR", {maximumSignifiantDigits:2})  + "</td>"; 
-         else 
+        else if (prestation.status == -1)
+            markup += "<td class='text-center'><span class='label label-rounded label-danger'>Refusé</span></td>";
+        else
             markup += "<td class='remb'><span class='label label-rounded label-info'>En attente</span><span class='float-right actions'><a data-index='"+index+"' class='act mr-1'><i class='ti-pencil-alt'></i></a></span></td>";
        
         markup += "<td class='text-center'>" + Math.round((prestation.rembourse/prestation.frais)*100) + " %</td>";

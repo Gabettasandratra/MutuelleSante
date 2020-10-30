@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Entity\Budget;
 use App\Entity\Compte;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
@@ -31,6 +32,17 @@ class ParametersType extends AbstractType
             ])
             ->add('label_cotisation')
             ->add('periode_cotisation_mois',NumberType::class)
+            ->add('budget_cotisation', EntityType::class, [
+                'class' => Budget::class,
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('b')
+                            ->andWhere('b.input = true')
+                            ->orderBy('b.exercice', 'ASC');
+                },
+                'choice_label' => function ($b) {
+                    return $b->getLibelle().' ('.$b->getCode().')';
+                },
+            ])
             ->add('compte_prestation', EntityType::class, [
                 'class' => Compte::class,
                 'query_builder' => function (EntityRepository $er) {
@@ -57,6 +69,17 @@ class ParametersType extends AbstractType
                 },
                 'choice_label' => function ($c) {
                     return $c->getPoste().' | '.$c->getTitre();
+                },
+            ])
+            ->add('budget_prestation', EntityType::class, [
+                'class' => Budget::class,
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('b')
+                            ->andWhere('b.input = false')
+                            ->orderBy('b.exercice', 'ASC');
+                },
+                'choice_label' => function ($b) {
+                    return $b->getLibelle().' ('.$b->getCode().')';
                 },
             ])
             ->add('soins_prestation', TextareaType::class, [

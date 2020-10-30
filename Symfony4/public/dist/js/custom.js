@@ -17,7 +17,7 @@ $(function() {
     // ============================================================== 
     $("body, .page-wrapper").trigger("resize");
     $(".page-wrapper").delay(20).show();
-    
+
     //****************************
     /* This is for the mini-sidebar if width is less then 1170*/
     //**************************** 
@@ -31,5 +31,10 @@ $(function() {
     };
     $(window).ready(setsidebartype);
     $(window).on("resize", setsidebartype);
-
 });
+
+function printLocaleAmount(amount) {
+    if (amount != 0)
+        return amount.toLocaleString("fr");
+    return '-';
+}

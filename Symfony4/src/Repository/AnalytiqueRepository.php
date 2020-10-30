@@ -2,9 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\Exercice;
 use App\Entity\Analytique;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Repository\AnalytiqueRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method Analytique|null find($id, $lockMode = null, $lockVersion = null)
@@ -19,9 +21,31 @@ class AnalytiqueRepository extends ServiceEntityRepository
         parent::__construct($registry, Analytique::class);
     }
 
-    public function findAnalytics()
+    /**
+     * DESCRIPTION
+     * - un compte analytique est toujours la destination 
+     * - les comptes possibles avec un analytique est 2 (Immobilisation), 3 (Stock), 6 (Charge) 
+     * - on parle toujours de dépense pas de recette
+     */
+    public function findAnalytics(Exercice $exercice)
     {
-        return $this->_em->createQuery('select t.id, t.code, t.libelle from App\Entity\Analytique t')
+        $ans = $this->_em->createQuery('select t from App\Entity\Analytique t')
+                    ->getResult(); 
+        foreach ($ans as $an) {
+            $cout = (float)$this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.analytic = :an and a.date between :dateDebut and :dateFin')
+                            ->setParameter('an',$an)   
+                            ->setParameter('dateDebut', $exercice->getDateDebut())
+                            ->setParameter('dateFin', $exercice->getDateFin())        
+                            ->getSingleScalarResult(); 
+            $out[] = ['id'=>$an->getId(),'code'=>$an->getCode(),'libelle'=>$an->getLibelle(),'cout'=>$cout];
+        }
+
+        return $out;
+    }
+
+    public function findServiceSante()
+    {
+        return $this->_em->createQuery('select t.id, t.code, t.libelle from App\Entity\Analytique t where t.isServiceSante = true')
                     ->getArrayResult(); 
     }
 }

@@ -107,11 +107,11 @@
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="prestation_designation" class=" col-form-label col-sm-3 required">Service *</label>
+                                        <label for="prestation_designation" class=" col-form-label col-sm-3 required">Service de santé *</label>
                                         <div class="col-sm-9">
                                             <select name="prestation[designation]" id="prestation_designation" required="required" class="form-control">
-                                                {% for code, designation in soins %}
-                                                    <option value="{{ code }}">{{ designation }}</option>
+                                                {% for soin in soins %}
+                                                    <option value="{{ soin.code }}">{{ soin.libelle }}</option>
                                                 {% endfor %}
                                             </select>
                                         </div>
@@ -162,171 +162,168 @@
 {% endblock %}
 
 {% block javascripts %}  
-    <script>
-        $(document).ready(function() {            
-            var prestations = new Array();
-            
-            $('#prestation').submit(function(e) {
-                e.preventDefault();
-                var index = $('#prestation_index').val();
-                var prestation = {
-                    'date'            :   $('#prestation_date').val(),
-                    'designation'     :   $('#prestation_designation').val(),
-                    'frais'           :   $('#prestation_frais').val(),
-                    'prestataire'     :   $('#prestation_prestataire').val(),
-                    'facture'         :   $('#prestation_facture').val()
-                };
-                
-                // Enregistre les details
-                var details = new Array();
-                $('.sous_form').each(function(){
-                    var x = parseFloat($(this).find('.sous_value').val());
-                    var desc = $(this).find('.sous_desc').val();  
-                    details.push({'montant': x, 'detail': desc});
-                });
-                prestation.details = details;
+<script>
+const soins = {{soins|json_encode()|raw}};
+var prestations = new Array();
+$('#prestation').submit(function(e) {
+    e.preventDefault();
+    var index = $('#prestation_index').val();
+    var prestation = {
+        'date'            :   $('#prestation_date').val(),
+        'designation'     :   $('#prestation_designation').val(),
+        'frais'           :   $('#prestation_frais').val(),
+        'prestataire'     :   $('#prestation_prestataire').val(),
+        'facture'         :   $('#prestation_facture').val()
+    };
+    
+    // Enregistre les details
+    var details = new Array();
+    $('.sous_form').each(function(){
+        var x = parseFloat($(this).find('.sous_value').val());
+        var desc = $(this).find('.sous_desc').val();  
+        details.push({'montant': x, 'detail': desc});
+    });
+    prestation.details = details;
 
-                if (index) {
-                    prestations[index] = prestation;
-                } else {                   
-                    prestations.push(prestation);
+    if (index) {
+        prestations[index] = prestation;
+    } else {                   
+        prestations.push(prestation);
+    }
+    refreshTable(prestations);
+    $('#prestation_index').val(null);
+    $('#sous').empty();
+    $('#prestation').trigger("reset");
+}); 
+
+$('#del').click(function(e) {
+    e.preventDefault();
+    var index = $('#index_del').val();
+    prestations.splice(index, 1);  
+    refreshTable(prestations);
+});   
+
+$('#fermer').click(function(e) {
+    e.preventDefault();
+    $('#sous').empty();
+    $('#prestation').trigger("reset");
+    $('#modal').modal('hide');
+});  
+
+$('#soustract').click(function(e) {
+    e.preventDefault();
+    $('#sous').append(
+        `<tr class="sous_form"><td><input type="text" placeholder="Soin" class="sous_desc form-control form-control-md"></td>
+        <td><input type="number" class="sous_value form-control form-control-md"></td>
+        <td><a href="#" class="rem text-danger text-center">X</a></td></tr>`
+    );
+});
+
+// A chaque fois qu'un sous-value chqnge
+$(document).on("change", ".sous_value" ,function(e) {
+    calculateFrais();
+})
+
+// On enleve le champ
+$(document).on("click", ".rem" ,function(e) { 
+    e.preventDefault();
+    $(this).parent().parent().remove();
+    
+    calculateFrais();
+})            
+
+$("#formDecompte").submit(function(event){
+    event.preventDefault(); 
+    var post_url = $(this).attr("action");
+    var form_data = { 
+        'prestations': prestations,
+        'numero': {{ numero }}
+    }; 
+    $.post( post_url, JSON.stringify(form_data), function(response) {
+        if (response.hasError == false) {
+            window.location.href = "{{ path('prestation_beneficiaire', {'id' : pac.id}) }}";
+        } else {
+            const errors = response.ErrorMessages;
+            $("#alert").empty();
+            for (let index = 0; index < errors.length; index++) {
+                const message = errors[index];
+                if (index == 0) {
+                    $('#alert').append('<h4>'+ message +'</h4>');                   
+                } else {
+                    $('#alert').append('<p>'+ message +'</p>');                   
                 }
-                refreshTable(prestations);
-                $('#prestation_index').val(null);
-                $('#sous').empty();
-                $('#prestation').trigger("reset");
-            }); 
-
-            $('#del').click(function(e) {
-                e.preventDefault();
-                var index = $('#index_del').val();
-                prestations.splice(index, 1);  
-                refreshTable(prestations);
-            });   
-
-            $('#fermer').click(function(e) {
-                e.preventDefault();
-                $('#sous').empty();
-                $('#prestation').trigger("reset");
-                $('#modal').modal('hide');
-            });  
- 
-            $('#soustract').click(function(e) {
-                e.preventDefault();
-                $('#sous').append(
-                    `<tr class="sous_form"><td><input type="text" placeholder="Soin" class="sous_desc form-control form-control-md"></td>
-                    <td><input type="number" class="sous_value form-control form-control-md"></td>
-                    <td><a href="#" class="rem text-danger text-center">X</a></td></tr>`
-                );
-            });
-
-            // A chaque fois qu'un sous-value chqnge
-            $(document).on("change", ".sous_value" ,function(e) {
-                calculateFrais();
-            })
-
-            // On enleve le champ
-            $(document).on("click", ".rem" ,function(e) { 
-                e.preventDefault();
-                $(this).parent().parent().remove();
-                
-                calculateFrais();
-            })            
-
-            $("#formDecompte").submit(function(event){
-                event.preventDefault(); 
-                var post_url = $(this).attr("action");
-                var form_data = { 
-                    'prestations': prestations,
-                    'numero': {{ numero }}
-                }; 
-
-                console.log(form_data);
-
-                $.post( post_url, JSON.stringify(form_data), function(response) {
-                    if (response.hasError == false) {
-                        window.location.href = "{{ path('prestation_beneficiaire', {'id' : pac.id}) }}";
-                    } else {
-                        const errors = response.ErrorMessages;
-                        $("#alert").empty();
-                        for (let index = 0; index < errors.length; index++) {
-                            const message = errors[index];
-                            if (index == 0) {
-                                $('#alert').append('<h4>'+ message +'</h4>');                   
-                            } else {
-                                $('#alert').append('<p>'+ message +'</p>');                   
-                            }
-                        }
-                        $("#alert").show("slow");
-                    }                   
-                });
-            });            
-        });
-
-        function refreshTable(prestations) {
-            $('#decompte tbody').empty();
-            $('#decompte tfoot').empty();
-
-            var totFrais = 0, totRembourse = 0;
-            
-            for (let index = 0; index < prestations.length; index++) {
-                var prestation = prestations[index];
-                var markup = "<tr><th scope='row'>"+ (index + 1) +"</th>";
-                markup += "<td>" + prestation.date + "</td>";
-                markup += "<td>" + prestation.designation + "</td>";
-                markup += "<td>" + parseFloat(prestation.frais).toLocaleString("fr") + "</td>";               
-                markup += "<td>" + prestation.prestataire + "</td>";
-                markup += "<td>" + prestation.facture + "</td>";
-                markup += "<td>" + "<span class='action-icons'><a href='javascript:edit("+index+','+ JSON.stringify(prestation)+")'><i class='ti-pencil-alt'></i></a><a href='javascript:del("+index+")' style='padding-left:7px;color:#f62d51;'><i class='ti-trash'></i></a></span>" + "</td>";      
-                markup += "</tr>";
-
-                totFrais += parseFloat(prestation.frais); 
-
-                $('#decompte tbody').append(markup);                   
             }
-            if (prestations.length != 0) {
-                var totMarkup = "<tr><th scope='row' colspan=3>Total</th>";
-                totMarkup += "<td>" + parseFloat(totFrais).toLocaleString("fr") + "</td><td colspan=3></td></tr>";
-                $('#decompte tfoot').append(totMarkup);  
-                $('#save').removeClass('disabled');
-            } else {
-                $('#save').addClass('disabled');
-            }        
+            $("#alert").show("slow");
+        }                   
+    });
+});            
+
+function refreshTable(prestations) {
+    $('#decompte tbody').empty();
+    $('#decompte tfoot').empty();
+
+    var totFrais = 0, totRembourse = 0;
+    
+    for (let index = 0; index < prestations.length; index++) {
+        var prestation = prestations[index];
+        var markup = "<tr><th scope='row'>"+ (index + 1) +"</th>";
+        markup += "<td>" + prestation.date + "</td>";
+        // Label designation
+        var labelSoin = soins.find( soin => soin.code === prestation.designation);
+        markup += "<td>" + labelSoin.libelle + "</td>";
+        markup += "<td>" + parseFloat(prestation.frais).toLocaleString("fr") + "</td>";               
+        markup += "<td>" + prestation.prestataire + "</td>";
+        markup += "<td>" + prestation.facture + "</td>";
+        markup += "<td>" + "<span class='action-icons'><a href='javascript:edit("+index+','+ JSON.stringify(prestation)+")'><i class='ti-pencil-alt'></i></a><a href='javascript:del("+index+")' style='padding-left:7px;color:#f62d51;'><i class='ti-trash'></i></a></span>" + "</td>";      
+        markup += "</tr>";
+
+        totFrais += parseFloat(prestation.frais); 
+
+        $('#decompte tbody').append(markup);                   
+    }
+    if (prestations.length != 0) {
+        var totMarkup = "<tr><th scope='row' colspan=3>Total</th>";
+        totMarkup += "<td>" + parseFloat(totFrais).toLocaleString("fr") + "</td><td colspan=3></td></tr>";
+        $('#decompte tfoot').append(totMarkup);  
+        $('#save').removeClass('disabled');
+    } else {
+        $('#save').addClass('disabled');
+    }        
+}
+
+function edit(index, prestation) {
+    $('#prestation_index').val(index);
+    $('#prestation_date').val(prestation.date);
+    $('#prestation_designation').val(prestation.designation);
+    $('#prestation_frais').val(prestation.frais);
+    $('#prestation_prestataire').val(prestation.prestataire);
+    $('#prestation_facture').val(prestation.facture);
+
+    prestation.details.forEach(detail => {
+        $('#sous').append(
+            `<tr class="sous_form"><td><input type="text" placeholder="Soin" value="`+ detail.detail +`" class="sous_desc form-control form-control-md"></td>
+            <td><input type="number" value="`+ detail.montant +`" class="sous_value form-control form-control-md"></td>
+            <td><a href="#" class="rem text-danger text-center">X</a></td></tr>`
+        );
+    });
+    $('#modal').modal('show');
+}
+
+function del(index) {
+    $('#index_del').val(index);
+    $('#del').click();
+} 
+
+function calculateFrais() {
+    var sous = 0;
+    $('.sous_value').each(function(){
+        var x = parseFloat(this.value);
+        if (!isNaN(x)) {
+            sous += x;
         }
-
-        function edit(index, prestation) {
-            $('#prestation_index').val(index);
-            $('#prestation_date').val(prestation.date);
-            $('#prestation_designation').val(prestation.designation);
-            $('#prestation_frais').val(prestation.frais);
-            $('#prestation_prestataire').val(prestation.prestataire);
-            $('#prestation_facture').val(prestation.facture);
-
-            prestation.details.forEach(detail => {
-                $('#sous').append(
-                    `<tr class="sous_form"><td><input type="text" placeholder="Soin" value="`+ detail.detail +`" class="sous_desc form-control form-control-md"></td>
-                    <td><input type="number" value="`+ detail.montant +`" class="sous_value form-control form-control-md"></td>
-                    <td><a href="#" class="rem text-danger text-center">X</a></td></tr>`
-                );
-            });
-            $('#modal').modal('show');
-        }
-
-        function del(index) {
-            $('#index_del').val(index);
-            $('#del').click();
-        } 
-
-        function calculateFrais() {
-            var sous = 0;
-            $('.sous_value').each(function(){
-                var x = parseFloat(this.value);
-                if (!isNaN(x)) {
-                    sous += x;
-                }
-            });
-            $('#prestation_frais').val(sous);
-            $('#prestation_frais').trigger("change");
-        }
-    </script>
+    });
+    $('#prestation_frais').val(sous);
+    $('#prestation_frais').trigger("change");
+}
+</script>
 {% endblock %}

@@ -34,6 +34,11 @@ class Analytique
      */
     private $articles;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isServiceSante;
+
 
     public function __construct($code, $int)
     {
@@ -98,6 +103,18 @@ class Analytique
                 $article->setAnalytic(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getIsServiceSante(): ?bool
+    {
+        return $this->isServiceSante;
+    }
+
+    public function setIsServiceSante(bool $isServiceSante): self
+    {
+        $this->isServiceSante = $isServiceSante;
 
         return $this;
     }

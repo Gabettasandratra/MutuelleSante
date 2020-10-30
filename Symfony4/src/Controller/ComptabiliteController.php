@@ -140,6 +140,10 @@ class ComptabiliteController extends AbstractController
                     ->add('analytic', EntityType::class, [
                         'class' => Analytique::class,
                         'required' => false,
+                        'query_builder' => function (EntityRepository $er) {
+                            return $er->createQueryBuilder('a')
+                                    ->andWhere('a.isServiceSante = false');
+                        },
                         'choice_label' => function ($a) {
                             return $a->getLibelle().' ('.$a->getCode().')';
                         }
@@ -528,7 +532,7 @@ class ComptabiliteController extends AbstractController
     {
         $idE = $session->get('exercice')->getId(); 
         $exercice = $repoExercice->find($idE);
-        $budget = new Budget($request->request->get('code'),$request->request->get('libelle'),$request->request->get('prevision'));
+        $budget = new Budget($request->request->get('code'),$request->request->get('libelle'),$request->request->get('prevision'),$request->request->get('input'));
         $budget->setExercice($exercice);
         $manager->persist($budget);
         $manager->flush();
@@ -577,7 +581,7 @@ class ComptabiliteController extends AbstractController
     /**
      * @Route("/comptabilite/plan/analytics", name="comptabilite_plan_analytics")
      */
-    public function planAnalytics(Request $request, AnalytiqueRepository $repo,EntityManagerInterface $manager)
+    public function planAnalytics(Request $request, AnalytiqueRepository $repo,EntityManagerInterface $manager,SessionInterface $session)
     {
         if ($request->isMethod('post')) {
             $ana = new Analytique($request->request->get('code'),$request->request->get('libelle'));
@@ -591,7 +595,7 @@ class ComptabiliteController extends AbstractController
         }
 
         return $this->render('comptabilite/ana.html.twig', [
-            'analytics' => json_encode($repo->findAnalytics()),
+            'analytics' => json_encode($repo->findAnalytics($session->get('exercice'))),
         ]);
     }
 

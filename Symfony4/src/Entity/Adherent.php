@@ -97,10 +97,10 @@ class Adherent
     private $remboursements;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\ManyToOne(targetEntity=Tier::class, cascade={"persist"})
+     * @ORM\JoinColumn(nullable=false)
      */
-    private $codeAnalytique;
-
+    private $tier;
 
     public function __construct()
     {   
@@ -402,22 +402,22 @@ class Adherent
 
         return $this;
     }
-
-    public function getCodeAnalytique(): ?string
-    {
-        return $this->codeAnalytique;
-    }
-
-    public function setCodeAnalytique(?string $codeAnalytique): self
-    {
-        $this->codeAnalytique = $codeAnalytique;
-
-        return $this;
-    } 
-
+    
     public function getNbBeneficiaires()
     {
         $compteCot = $this->getCurrentCompteCotisation();
         return ($compteCot->getAncien() + $compteCot->getNouveau());
+    }
+
+    public function getTier(): ?Tier
+    {
+        return $this->tier;
+    }
+
+    public function setTier(?Tier $tier): self
+    {
+        $this->tier = $tier;
+
+        return $this;
     }
 }
