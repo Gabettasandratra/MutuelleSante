@@ -44,6 +44,7 @@ class Analytique
     {
         $this->code = $code;
         $this->libelle = $int;
+        $this->isServiceSante = false;
         $this->articles = new ArrayCollection();
     }
 

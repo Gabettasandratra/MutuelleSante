@@ -25,7 +25,6 @@ class AdherentType extends AbstractType
             ->add('telephone2')
             ->add('email', EmailType::class)
             ->add('dateInscription', DateType::class, [
-                'data' => new \DateTime(),
                 'widget' => 'single_text',
                 'format' => 'dd/MM/yyyy',
                 'attr' => ['class' => 'datepicker-simple','autocomplete' => 'off'],

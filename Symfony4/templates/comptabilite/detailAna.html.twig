@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Detail de opération{% endblock %}
+
+{% block header %}
+    <div class="page-breadcrumb">
+        <div class="d-flex align-items-center">
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Détail des transactions par comptes analytiques</h4>
+            <div class="ml-auto">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0 p-0">
+                        <li class="breadcrumb-item text-muted" aria-current="page">Comptabilité</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Analytique</li>
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Détail</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-8">
+                        <h4 class="card-title">{{compte.libelle}}</h4>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">  
+                        <div class="col-12">                   
+                            <table class="table table-hover no-padding border" id="budgets">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col">Date</th>
+                                        <th scope="col">N°id</th>
+                                        <th scope="col">C.j</th>
+                                        <th scope="col">Libellé d'ecriture</th>
+                                        <th scope="col">Compte G</th>
+                                        <th scope="col">Montant</th>
+                                        <th scope="col">Référence</th>                                     
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% set t = 0 %}
+                                    {% for article in compte.articles %}
+                                        <tr>
+                                            <td>{{article.date|date('d/m/y')}}</td>
+                                            <td>{{article.id}}</td>
+                                            <td>{{article.categorie}}</td>
+                                            <td>{{article.libelle}}</td>
+                                            <td>{{article.posteGeneraleAnalytique}}</td>
+                                            <td>{{article.montant}}</td>{% set t = t + article.montant %}
+                                            <td>{{article.piece}}</td>
+                                        </tr>                             
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr class="font-weight-bold">
+                                        <td colspan=5>Total</td>
+                                        <td>{{t}}</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>                            
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

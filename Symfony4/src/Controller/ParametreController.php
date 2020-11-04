@@ -44,7 +44,7 @@ class ParametreController extends AbstractController
         $parameters = $repository->getParameters();
         if (!$parameters) {
             $paramService->initialize();
-            $arameters = $repository->getParameters();
+            $parameters = $repository->getParameters();
         }
 
         $nom_mutuelle = $parameters['nom_mutuelle'];
@@ -110,34 +110,41 @@ class ParametreController extends AbstractController
         $pBudgetCotisation = $allParameters['budget_cotisation'];
         $pPrestation = $allParameters['compte_prestation'];
         $pLabelPrestation = $allParameters['label_prestation'];
-        $pSoins = $allParameters['soins_prestation'];
         $pPercent = $allParameters['percent_prestation'];
         $pPercentRemb = $allParameters['percent_rembourse_prestation'];
+        $pPercentRembPlafond = $allParameters['percent_rembourse_prestation_plafond'];
         $pCompteRembPrestation = $allParameters['compte_dette_prestation'];
         $pBudgetPrestation = $allParameters['budget_prestation'];
         $pPlafond = $allParameters['plafond_prestation'];
 
         /* Pour bien afficher le formulaire avec les données */
-        if ($pCotisation->getValue())
-            $compteCot = $repositoryCompte->findOneByPoste($pCotisation->getValue());        
-        if ($pPrestation->getValue())
-            $comptePre = $repositoryCompte->findOneByPoste($pPrestation->getValue());        
-        if ($pCompteRembPrestation->getValue())
+        if ($pCotisation->getValue()) {
+          $compteCot = $repositoryCompte->findOneByPoste($pCotisation->getValue()); 
+          $data['compte_cotisation'] = $compteCot;
+        }       
+        if ($pPrestation->getValue()) {
+            $comptePre = $repositoryCompte->findOneByPoste($pPrestation->getValue()); 
+            $data['compte_prestation'] = $comptePre;
+        }       
+        if ($pCompteRembPrestation->getValue()) {
             $compteRembPre = $repositoryCompte->findOneByPoste($pCompteRembPrestation->getValue()); 
-        $data['compte_cotisation'] = $compteCot;
-        $data['label_cotisation'] = $pLabelCotisation->getValue();
-        if ($pBudgetCotisation->getValue())
+            $data['compte_dette_prestation'] = $compteRembPre;
+        }
+        
+        if ($pBudgetCotisation->getValue()) {
             $data['budget_cotisation'] = $repoBudget->find($pBudgetCotisation->getValue());
+        }
+        $data['label_cotisation'] = $pLabelCotisation->getValue();
         $data['periode_cotisation_mois'] = $pPeriodeCotisation->getValue();
-        $data['compte_prestation'] = $comptePre;
+        
         $data['label_prestation'] = $pLabelPrestation->getValue();
         $data['percent_prestation'] = $pPercent->getValue();
         $data['percent_rembourse_prestation'] = $pPercentRemb->getValue();
-        $data['compte_dette_prestation'] = $pCompteRembPrestation->getValue();
+        $data['percent_rembourse_prestation_plafond'] = $pPercentRembPlafond->getValue();
+        
         $data['plafond_prestation'] = $pPlafond->getValue();
         if ($pBudgetPrestation->getValue())
-            $data['budget_prestation'] = $repoBudget->find($pBudgetPrestation->getValue());
-        $data['soins_prestation'] = json_encode($pSoins->getList());
+          $data['budget_prestation'] = $repoBudget->find($pBudgetPrestation->getValue());
         /* Le data est uniquement pour afficher le données dans le formulaire */
 
         $form = $this->createForm(ParametersType::class, $data);        
@@ -159,7 +166,6 @@ class ParametreController extends AbstractController
                     $pPlafond->setValue($form->get('plafond_prestation')->getData());
                     $pCompteRembPrestation->setValue($form->get('compte_dette_prestation')->getData()->getPoste());
                     $pBudgetPrestation->setValue($form->get('budget_prestation')->getData()->getId());
-                    $pSoins->setList(json_decode($form->get('soins_prestation')->getData(), true));
 
                     $manager->flush(); // flush suffit
                 } else 

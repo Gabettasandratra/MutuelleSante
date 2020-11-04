@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Fiche d'adhésion N°{{ adherent.id }}{% endblock %}
+{% block title %}Fiche d'adhésion {{ adherent.nom }}{% endblock %}
 
 {% block header %}
     <div class="page-breadcrumb">
         <div class="d-flex align-items-center">
-            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Fiche d'adhésion N°{{ adherent.id }}</h4>
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Fiche d'adhésion N°{{ adherent.numero }}</h4>
             <div class="ml-auto">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb m-0 p-0">
@@ -89,7 +89,7 @@
                             
                         </div>
                         <div class="col-md-6">
-                            <h4 class="card-title">Détails du compte pour l'année {{ exercice.annee }}</h4>
+                            <h4 class="card-title">Informations pour l'année {{ exercice.annee }}</h4>
                             <div class="row">
                                 <div class="col-md-4">
                                     <ul class="list-style-none border-bottom-white">                
@@ -178,7 +178,7 @@
                                 {% for pac in adherent.pacs %}
                                     {% if not pac.isSortie %}
                                         <tr>
-                                            <th scope="row">{{ adherent.numero }} / {{ pac.codeMutuelle }}</th>
+                                            <th scope="row">{{ adherent.numero }}/{{ pac.codeMutuelle }}</th>
                                             <td>{{ pac.dateEntrer | date('d/m/Y') }}</td>
                                             <td>{{ pac.nom }} {{ pac.prenom }}</td>
                                             <td>{{ pac.dateNaissance | date('d/m/Y') }}</td>

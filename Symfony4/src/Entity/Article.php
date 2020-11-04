@@ -224,4 +224,28 @@ class Article
         $this->budget = $budget;
         return $this;
     }
+
+    /**
+     * - recupere le poste du compte destination (Charge, Produits, Immo)
+     */
+    public function getPosteGeneraleAnalytique()
+    {
+        $classes = ["2-COMPTES D'IMMOBILISATIONS","6-COMPTES DE CHARGES","7-COMPTES DE PRODUITS"];
+        if (in_array($this->compteDebit->getClasse(), $classes))
+            return $this->compteDebit->getPoste();
+        return null; 
+    }
+    
+
+    /**
+     * - recupere si le montant est débit ou au crédit du Tier
+     */
+    public function getArticleTier()
+    {
+      if($this->compteDebit->getClasse() == "4-COMPTES DE TIERS") 
+        return ['debit'=>$this->montant,'credit'=>0];
+      if($this->compteCredit->getClasse() == "4-COMPTES DE TIERS") 
+        return ['credit'=>$this->montant,'debit'=>0];
+      return null;
+    }
 }

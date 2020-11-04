@@ -94,8 +94,9 @@ class AdhesionController extends AbstractController
                 }
                 $adherent->setPhoto($this->getParameter('users_img_directory').'/'.$fileName);
             } else {
-                $adherent->setPhoto('http://placehold.it/100x100');
+                $adherent->setPhoto('/assets/images/home.png');
             }
+
             $adherent->setCreatedAt(new \DateTime());
 
             // create the current compteCotisation

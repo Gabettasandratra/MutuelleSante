@@ -59,25 +59,39 @@ class ExcelReader
         $g = $this->pacRepo->generateCode($adherent);
 
         foreach ($donnees as $row => $donnee) {
+            /* Si le numero d'adhérent ne correspond pas */
+            if ($adherent->getNumero() != $donnee[0]) {
+                $retour['hasError'] = true;
+                $retour['ErrorMessages'][] = "Les informations de la ligne N° $row est invalide";            
+                $retour['ErrorMessages'][] = "Le numéro de congrégation $donnee[0] ne correspond pas, ou n'existe pas";
+                return $retour;
+            }
+
             $pac = new Pac();
-            if ($donnee[0]) {
-                $pac->setCodeMutuelle($donnee[0]);
+            if ($donnee[1]) {
+                $pac->setCodeMutuelle($donnee[1]);
             } else {          
                 $pac->setCodeMutuelle($g);
                 $g++;
             }
-            $pac->setNom($donnee[1]);
-            $pac->setPrenom($donnee[2]);
-            if ($donnee[3][0] == 'M')
+            $pac->setNom($donnee[2]);
+            if ($donnee[3]) 
+              $pac->setPrenom($donnee[3]);
+            $pac->setDateNaissance($this->getDateTimeFromExcel( $donnee[4]));
+            
+            if ($donnee[5][0] == 'M')
                 $pac->setSexe('Masculin');
             else
                 $pac->setSexe('Feminin');
-
-            $pac->setDateNaissance($this->getDateTimeFromExcel( $donnee[4]));
-            $pac->setCin($donnee[5]);
-            if($donnee[6] !== null) $pac->setParente($donnee[6]);
-            $pac->setDateEntrer($this->getDateTimeFromExcel( $donnee[7]));
-
+            
+            if($donnee[6] !== null) $pac->setCin($donnee[5]);
+            if($donnee[7] !== null) $pac->setParente($donnee[7]);
+            if($donnee[8] !== null) 
+              $pac->setDateEntrer($this->getDateTimeFromExcel( $donnee[8]));
+            else if ($donnee[1]) 
+              $pac->setDateEntrer($adherent->getDateInscription());
+            else
+            $pac->setDateEntrer(new \DateTime());
             $pac->setCreatedAt(new \DateTime());
             $pac->setIsSortie(false);
             $pac->setPhoto("assets/images/users/profile.png");

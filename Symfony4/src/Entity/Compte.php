@@ -25,7 +25,7 @@ class Compte
 
     /**
      * @ORM\Column(type="string", length=10, unique=true)
-     * @Assert\Regex("/^[1-7][0-9]{0,5}$/")
+     * @Assert\Regex("/^[1-8][0-9]{0,5}$/")
      */
     private $poste;
 

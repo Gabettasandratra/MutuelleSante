@@ -39,7 +39,6 @@ class ParametreService
         $parametres[] = new Parametre('percent_rembourse_prestation_plafond', 0.25);
         $parametres[] = new Parametre('compte_dette_prestation');    
         $parametres[] = new Parametre('budget_prestation');
-        $parametres[] = new Parametre('soins_prestation');
         $parametres[] = new Parametre('nom_mutuelle', 'Mutuelle Santé');
         $parametres[] = new Parametre('adresse_mutuelle', 'adresse');
         $parametres[] = new Parametre('contact_mutuelle', 'telephone');
@@ -49,8 +48,6 @@ class ParametreService
             $this->manager->persist($parametre);  
         }
         $this->manager->flush();
-
-        $this->initializeCompte();
     }
 
     public function getParametre($nom)

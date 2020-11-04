@@ -122,6 +122,7 @@ class Pac
     {
         $this->dateEntrer = new \DateTime();
         $this->parente = 'Membre';
+        $this->prenom = '';
         $this->prestations = new ArrayCollection();
     }
 

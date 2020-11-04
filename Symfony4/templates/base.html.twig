@@ -506,7 +506,9 @@
 			<!-- ============================================================== -->
 			<!-- End Left Sidebar - style you can find in sidebar.scss  -->
 			<!-- ============================================================== -->
-			{{ render(controller('App\\Controller\\ComptabiliteController::renderModalJournal')) }}
+      {% if app.session.get('exercice') %}
+			  {{ render(controller('App\\Controller\\ComptabiliteController::renderModalJournal')) }}
+      {% endif %}
 			<!-- ============================================================== -->
 			<!-- Page wrapper  -->
 				<!-- ============================================================== --> <div class="page-wrapper">{% block header %}
@@ -584,6 +586,7 @@
 		<script src="{{ asset('dist/js/bootstrap-datepicker.min.js') }}"></script>
 		<script src="{{ asset('dist/js/datepicker.js') }}"></script>
 		<script>
+    {% if app.session.get('exercice') %}
 			$('.datepicker').datepicker({
                 language: 'fr',
                 orientation: "bottom",
@@ -601,7 +604,7 @@
                 endDate: new Date('{{ app.session.get('exercice').dateFin|date('m/d/Y') }}')
             });
 			// For handling model saisie
-
+    {% endif %}
 			$("#form-model").submit(function(event){
                 event.preventDefault();     
                 window.location.href = "/comptabilite/saisie/model/"+$("#id-model").val();

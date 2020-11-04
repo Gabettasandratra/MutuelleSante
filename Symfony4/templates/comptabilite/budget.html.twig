@@ -22,7 +22,14 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Etat budgetaire de l'année {{app.session.get('exercice').annee}}</h4>
+                  <div class="row">
+                    <div class="col-8">
+                      <h4 class="card-title">Etat budgetaire de l'année {{app.session.get('exercice').annee}}</h4>
+                    </div>
+                    <div class="col-4">
+                      <button class="btn btn-sm btn-info float-right" data-toggle="modal" data-target="#form-dialog"><i class="fa fa-plus-circle" aria-hidden="true"></i> Ajouter un nouveau poste budgetaire</button>
+                    </div>
+                </div>
                     <hr>
                     <div class="row">                       
                         <table class="table table-hover table-striped no-padding border" id="budgets">
@@ -34,15 +41,12 @@
                                     <th scope="col">Prévision</th>
                                     <th scope="col">Réalisé</th>
                                     <th scope="col">Ecart</th>
+                                    <th scope="col">Action</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
                             <tfoot class="bg-light font-weight-bold"></tfoot>
                         </table>                            
-                    </div>
-                   
-                    <div class="row">
-                        <button class="btn btn-sm btn-info" data-toggle="modal" data-target="#form-dialog"><i class="fa fa-plus-circle" aria-hidden="true"></i> Creer un nouveau budget</button>
                     </div>
                 </div>
             </div>
@@ -127,6 +131,11 @@
             markup += "<td>" + printLocaleAmount(budget.montant) + "</td>";
             markup += "<td>" + printLocaleAmount(budget.realise)+ "</td>";
             markup += "<td>" + printLocaleAmount(budget.montant - budget.realise)+ "</td>";
+            if (budget.realise != 0) {
+                markup += "<td><a class='btn' href='/comptabilite/budget/"+ budget.id +"'><i class='fa fa-eye' aria-hidden='true'></i></a></td>";
+            } else {
+                markup += "<td><a href='#' class='btn disabled'><i class='fa fa-eye' aria-hidden='true'></i></a></td>";
+            }
             markup += "</tr>";
             totB += budget.montant;  
             totR += budget.realise;

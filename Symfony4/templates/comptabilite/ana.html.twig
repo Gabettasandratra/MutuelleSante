@@ -39,6 +39,7 @@
                                         <th scope="col">Code</th>
                                         <th scope="col">Intitulé</th>
                                         <th scope="col">Total des coûts</th>
+                                        <th scope="col">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -91,8 +92,8 @@
 
 {% block javascripts %}
 <script>
-    var budgets = {{analytics|raw}};
-    const refreshTable = function() {
+    var budgets_lists = {{analytics|raw}};
+    const refreshTable = function(budgets) {
         $('#budgets tbody').empty();
         $('#budgets tfoot').empty();        
         for (let index = 0; index < budgets.length; index++) {
@@ -101,11 +102,17 @@
             markup += "<td>" + budget.code + "</td>";
             markup += "<td>" + budget.libelle + "</td>";
             markup += "<td>" + printLocaleAmount(budget.cout) + "</td>";
+            if (budget.cout != 0 && budget.cout != null) {
+                markup += "<td><a class='btn' href='/comptabilite/analytique/"+ budget.id +"'><i class='fa fa-eye' aria-hidden='true'></i></a></td>";
+            } else {
+                markup += "<td><a href='#' class='btn disabled'><i class='fa fa-eye' aria-hidden='true'></i></a></td>";
+            }
+            
             markup += "</tr>";
             $('#budgets tbody').append(markup);                   
         }
     }
-    refreshTable();
+    refreshTable(budgets_lists);
 
     $("#form").submit(function(event){
         event.preventDefault(); 
@@ -115,8 +122,8 @@
         $.post( post_url, form_data, function(response) {
             if (response.hasError == false) {
                 console.log('success');
-                budgets.push(response.analytique);
-                refreshTable();
+                budgets_lists.push(response.analytique);
+                refreshTable(budgets_lists);
                 $('#form-dialog').modal('hide');
             } else {
                 console.log('error');

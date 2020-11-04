@@ -58,6 +58,7 @@ class ParametersType extends AbstractType
             ->add('label_prestation')
             ->add('percent_prestation', PercentType::class)
             ->add('percent_rembourse_prestation', PercentType::class)
+            ->add('percent_rembourse_prestation_plafond', PercentType::class)
             ->add('plafond_prestation', NumberType::class)
             ->add('compte_dette_prestation', EntityType::class, [
                 'class' => Compte::class,
@@ -81,11 +82,6 @@ class ParametersType extends AbstractType
                 'choice_label' => function ($b) {
                     return $b->getLibelle().' ('.$b->getCode().')';
                 },
-            ])
-            ->add('soins_prestation', TextareaType::class, [
-                'attr' => [
-                    'style' => 'display:none;'
-                ]
             ])
         ;
     }

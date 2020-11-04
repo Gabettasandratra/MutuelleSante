@@ -544,6 +544,16 @@ class ComptabiliteController extends AbstractController
     }
 
     /**
+     * @Route("/comptabilite/budget/{id}", name="comptabilite_detail_budget")
+     */
+    public function detailBudgets(Budget $compte,SessionInterface $session)
+    {
+        return $this->render('comptabilite/detailBudget.html.twig', [
+            'compte' => $compte
+        ]);
+    }
+
+    /**
      * @Route("/comptabilite/plan/tiers", name="comptabilite_plan_tiers")
      */
     public function planTiers(Request $request, TierRepository $repo, CompteRepository $compteRepo,EntityManagerInterface $manager)
@@ -579,6 +589,16 @@ class ComptabiliteController extends AbstractController
     }
 
     /**
+     * @Route("/comptabilite/tier/{id}", name="comptabilite_detail_tier")
+     */
+    public function detailTiers(Tier $compte,SessionInterface $session)
+    {
+        return $this->render('comptabilite/detailTiers.html.twig', [
+            'compte' => $compte
+        ]);
+    }
+
+    /**
      * @Route("/comptabilite/plan/analytics", name="comptabilite_plan_analytics")
      */
     public function planAnalytics(Request $request, AnalytiqueRepository $repo,EntityManagerInterface $manager,SessionInterface $session)
@@ -596,6 +616,16 @@ class ComptabiliteController extends AbstractController
 
         return $this->render('comptabilite/ana.html.twig', [
             'analytics' => json_encode($repo->findAnalytics($session->get('exercice'))),
+        ]);
+    }
+
+    /**
+     * @Route("/comptabilite/analytique/{id}", name="comptabilite_detail_analytique")
+     */
+    public function detailAnalytiques(Analytique $compte,SessionInterface $session)
+    {
+        return $this->render('comptabilite/detailAna.html.twig', [
+            'compte' => $compte
         ]);
     }
 

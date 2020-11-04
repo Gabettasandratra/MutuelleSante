@@ -98,20 +98,20 @@ class PrestationRepository extends ServiceEntityRepository
                                 ->setParameter('dateDebut', $exercice->getDateDebut())
                                 ->setParameter('dateFin', $exercice->getDateFin())
                                 ->getSingleScalarResult();
-        $listDesSoins = $this->_em->createQuery('select p.list from App\Entity\Parametre p where p.nom = \'soins_prestation\'')
-                                ->getOneOrNullResult();
+        $serviceSoins = $this->_em->createQuery('select s from App\Entity\Analytique s where s.isServiceSante = true')
+                                ->getResult();
         # A chaque soins
         $retour = [];
         
-        foreach ($listDesSoins['list'] as $code => $description) {
+        foreach ($serviceSoins as $soin) {
             $nb = $this->_em->createQuery('select count(p) from App\Entity\Prestation p where p.date between :dateDebut and :dateFin and p.designation = :code')
                                 ->setParameter('dateDebut', $exercice->getDateDebut())
                                 ->setParameter('dateFin', $exercice->getDateFin())
-                                ->setParameter('code', $code)
+                                ->setParameter('code', $soin->getCode())
                                 ->getSingleScalarResult();
             
             $value = ($total == 0)? 0: round($nb / $total, 4);
-            $retour[] = ['code'=>$code,'description'=>$description,'value'=>$value];
+            $retour[] = ['code'=>$soin->getCode(),'description'=>$soin->getLibelle(),'value'=>$value];
         }
         return $retour;
     }

@@ -64,7 +64,8 @@ class ImportExcel
     public function saveIntoDatabase($data = [])
     {
         $retour['hasError'] = false;
-        $donnees = $data['Feuil1']['columnValues'];
+        $sheets = array_keys($data);
+        $donnees = $data[$sheets[0]]['columnValues'];
 
         foreach ($donnees as $row => $donnee) {
             $compte = new Compte();
