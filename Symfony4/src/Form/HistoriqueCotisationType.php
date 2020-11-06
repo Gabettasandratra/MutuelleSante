@@ -27,7 +27,7 @@ class HistoriqueCotisationType extends AbstractType
                 'mapped' => false,
             ])
             ->add('datePaiement', DateType::class, [
-                'label' => 'Date de paiement',
+                'label' => 'Date de versement',
             ])
             ->add('montant')
             ->add('tresorerie', EntityType::class, [
@@ -43,7 +43,8 @@ class HistoriqueCotisationType extends AbstractType
             ])
             ->add('reference')
             ->add('remarque', TextareaType::class, [
-                'required' => false
+              'label' => 'Observation',
+              'required' => false
             ])
         ;
     }

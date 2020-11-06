@@ -212,7 +212,7 @@ class ExportController extends AbstractController
     /**
      * @Route("/pdf/journal/{code}/{debut}/{fin}", name="pdf_journal")
      */
-    public function pdfJournal($code, $debut, $fin, ParametreRepository $parametreRepo,ArticleRepository $repo, CompteRepository $repoCompte)
+    public function pdfJournal($code, $debut, $fin, ParametreRepository $parametreRepo,ArticleRepository $repo,JournalRepository $repoJ, CompteRepository $repoCompte)
     {
         $dateDebut = \DateTime::createFromFormat('dmY', $debut);
         $dateFin = \DateTime::createFromFormat('dmY', $fin);

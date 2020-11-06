@@ -25,25 +25,19 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Ajouter nouveau compte de trésorerie</h4>
+                    <h4 class="card-title">Créer nouveau compte de trésorerie</h4>
                     <hr>
                     <div class="row">
                         <div class="col-6">
                             {{ form_start(form) }}
-                            {% if editMode %}
-                                {{ form_row(form.poste, { 'label': 'N° du compte ', 'attr' : { 'placeholder' : '5...', readonly:'readonly' } }) }} 
-                            {% else %}
-                                {{ form_row(form.poste, { 'label': 'N° du compte ', 'attr' : { placeholder : '5...'} }) }} 
-                            {% endif %}
-                                
-                                {{ form_row(form.titre, { 'label': 'Intitulé du compte ' }) }}
+                                {{ form_row(form.compte, { label: 'Compte générale rattaché ', attr:{dis: editMode} }) }}
+                                {{ form_row(form.codeJournal, { 'label': 'Code Journal', attr:{dis: editMode} }) }}
                                 {{ form_row(form.acceptIn, { 'label': 'Accepte les paiements de cotisation' }) }}
                                 {{ form_row(form.acceptOut, { 'label': 'Accepte les reglements de remboursement ' }) }}
-                                {{ form_row(form.codeJournal, { 'label': 'Code de journal tresorerie ' }) }}
-                                {{ form_row(form.note, { 'label': 'Notes ' }) }}
+                                {{ form_row(form.note, { 'label': 'Informations ' }) }}
                                 <div class="form-row">
                                     <div class="col-12 text-right">
-                                        <button type="submit" class="btn btn-success">{% if editMode %}Enregitrer les modifications{% else %}Ajouter nouveau trésorerie{% endif %} <i class="mdi mdi-keyboard-return"></i></button>
+                                        <button type="submit" class="btn btn-success">{% if editMode %}Enregitrer les modifications{% else %}Créer trésorerie{% endif %} <i class="mdi mdi-keyboard-return"></i></button>
                                     </div>
                                 </div>                                                     
                             {{ form_end(form) }}
@@ -53,4 +47,12 @@
             </div>
         </div>
     </div>
+{% endblock %}
+{% block javascripts %}
+<script>
+    $('#success-alert').modal();
+    $("select[dis] option:not(:selected)").prop("disabled", true);
+    $('select[dis]').css('pointer-events','none');
+    $('select[dis]').css('background-color','#DDD');
+</script>
 {% endblock %}

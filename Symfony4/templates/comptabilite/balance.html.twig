@@ -66,11 +66,11 @@
                                     {% endfor %}
                                     <tr>
                                         <th colspan=2 class="text-right">TOTAL : {{ classe }}</th>
-                                        <td class="text-center">{% if debit != 0 %}{{ debit|number_format(2,',',' ') }}{% endif %}</td> {% set Tdebit = Tdebit + debit %}
-                                        <td class="text-center">{% if credit != 0 %}{{ credit|number_format(2,',',' ') }}{% endif %}</td> {% set Tcredit = Tcredit + credit %}
+                                        <td class="text-center font-italic">{% if debit != 0 %}{{ debit|number_format(2,',',' ') }}{% endif %}</td> {% set Tdebit = Tdebit + debit %}
+                                        <td class="text-center font-italic">{% if credit != 0 %}{{ credit|number_format(2,',',' ') }}{% endif %}</td> {% set Tcredit = Tcredit + credit %}
 
-                                        <td class="text-center">{% if soldeD != 0 %}{{ soldeD|number_format(2,',',' ') }}{% endif %}</td> {% set TsoldeD = TsoldeD + soldeD %}
-                                        <td class="text-center">{% if soldeC != 0 %}{{ soldeC|number_format(2,',',' ') }}{% endif %}</td> {% set TsoldeC = TsoldeD + soldeC %}
+                                        <td class="text-center font-italic">{% if soldeD != 0 %}{{ soldeD|number_format(2,',',' ') }}{% endif %}</td> {% set TsoldeD = TsoldeD + soldeD %}
+                                        <td class="text-center font-italic">{% if soldeC != 0 %}{{ soldeC|number_format(2,',',' ') }}{% endif %}</td> {% set TsoldeC = TsoldeC + soldeC %}
                                          
                                     </tr>
                                 {% endfor %}

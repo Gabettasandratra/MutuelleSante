@@ -4,17 +4,22 @@ namespace App\Controller;
 
 use App\Entity\Compte;
 use App\Entity\Article;
+use App\Entity\Journal;
 use App\Form\CompteType;
 use App\Service\ComptaService;
 use Doctrine\ORM\EntityRepository;
 use App\Repository\CompteRepository;
 use App\Repository\ArticleRepository;
+use App\Repository\JournalRepository;
+use Symfony\Component\Form\FormError;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -37,29 +42,69 @@ class TresorerieController extends AbstractController
      */
     public function add(Compte $compteTresorerie = null, Request $request, EntityManagerInterface $manager)
     {
-        if ($compteTresorerie === null) {
-            $compteTresorerie = new Compte();
-            $compteTresorerie->setIsTresor(true);
+        $data = [];
+        if ($compteTresorerie != null) {
+            $data['compte'] = $compteTresorerie;
+            $data['acceptIn'] = $compteTresorerie->getAcceptIn();
+            $data['acceptOut'] = $compteTresorerie->getAcceptOut();
+            $data['codeJournal'] = $compteTresorerie->getCodeJournal();
+            $data['note'] = $compteTresorerie->getNote();
         }
-        $form = $this->createFormBuilder($compteTresorerie)
-                     ->add('poste')
-                     ->add('titre')
-                     ->add('acceptIn')
-                     ->add('acceptOut')
-                     ->add('codeJournal')
-                     ->add('note')
-                     ->getForm();       
+        $form = $this->createFormBuilder($data)
+                      ->add('compte', EntityType::class, [
+                        'class' => Compte::class,
+                        'query_builder' => function (EntityRepository $er) {
+                            return $er->createQueryBuilder('c')
+                                    ->andWhere('c.classe = \'5-COMPTES FINANCIERS\'')
+                                    ->andWhere('length(c.poste)=6')
+                                    ->orderBy('c.poste', 'ASC');
+                        },
+                        'choice_label' => function ($c) {
+                          return $c->getTitre().' ('.$c->getPoste().')';
+                      }
+                      ])
+                      ->add('codeJournal')
+                      ->add('acceptIn', ChoiceType::class, [
+                        'choices'  => ['Oui'=> true,'Non'=> false]
+                      ])
+                      ->add('acceptOut', ChoiceType::class, [
+                        'choices'  => ['Oui'=> true,'Non'=> false]
+                      ])     
+                      ->add('note', TextareaType::class)
+                      ->getForm();       
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+          $alreadyTresor = false;
+          if ($compteTresorerie == null) { // On est en mode création
+            $compteTresorerie = $form->get('compte')->getData();
+            
+            if ($compteTresorerie->getIsTresor())
+              $alreadyTresor = true;
+            else {
+              $createdJournal = new Journal("Trésorerie",$form->get('codeJournal')->getData(),$compteTresorerie->getTitre());
+              $manager->persist($createdJournal);
+              $compteTresorerie->setIsTresor(true);
+            }
+          }
+          if (!$alreadyTresor) {
+            $compteTresorerie->setCodeJournal($form->get('codeJournal')->getData());
+            $compteTresorerie->setAcceptIn($form->get('acceptIn')->getData());
+            $compteTresorerie->setAcceptOut($form->get('acceptOut')->getData());
+            $compteTresorerie->setNote($form->get('note')->getData());
+
             $manager->persist($compteTresorerie);
             $manager->flush();
             return $this->redirectToRoute('tresorerie');
+          } else {
+            $form->get('compte')->addError(new FormError("Ce compte financier est déja rattaché à un autre tresorerie"));
+            $compteTresorerie = null;
+          }
         }
 
         return $this->render('tresorerie/form.html.twig', [
             'form' => $form->createView(),
-            'editMode' => $compteTresorerie->getId() !== null
+            'editMode' => $compteTresorerie !== null
         ]);
     }
 
@@ -112,5 +157,24 @@ class TresorerieController extends AbstractController
             'cheque' => $articleCheque,
             'form' => $form->createView()
         ]);
+    }
+
+    /**
+     * @Route("/comptabilite/codes_journaux", name="tresorerie_codes_journaux")
+     */
+    public function codesJournaux(Request $request,JournalRepository $repo, EntityManagerInterface $manager )
+    {
+      if ($request->getMethod() == "POST") {
+        $type = $request->request->get('j_type','Achats');
+        $code = $request->request->get('j_code');
+        $intitule = $request->request->get('j_intitule');
+        $j = new Journal($type,$code,$intitule);
+        $manager->persist($j);
+        $manager->flush();
+      }
+
+      return $this->render('tresorerie/journaux.html.twig',[
+        'journaux'=>$repo->findCodes()
+      ]);
     }
 }

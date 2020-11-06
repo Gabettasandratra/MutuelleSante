@@ -22,7 +22,7 @@ class CompteRepository extends ServiceEntityRepository
 
     public function findComptes()
     {       
-        return $this->_em->createQuery('select c from App\Entity\Compte c order by c.poste')
+        return $this->_em->createQuery('select c from App\Entity\Compte c where length(c.poste)=6 order by c.poste')
                                     ->getResult();
     }
 
@@ -49,7 +49,7 @@ class CompteRepository extends ServiceEntityRepository
             $credit = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a where a.compteCredit = :cp')
                             ->setParameter('cp', $compte)                      
                             ->getSingleScalarResult();
-            $retour[] = ['id' => $compte->getId(), 'poste' => $compte->getPoste(), 'titre' => $compte->getTitre(), 'solde' => ($debit - $credit), 'codeJournal' => $compte->getCodeJournal(), 'isCheque' => $compte->isTresorerieCheque() ];
+            $retour[] = ['id' => $compte->getId(), 'poste' => $compte->getPoste(), 'titre' => $compte->getTitre(),'note' => $compte->getNote(), 'solde' => ($debit - $credit), 'codeJournal' => $compte->getCodeJournal(), 'isCheque' => $compte->isTresorerieCheque() ];
         }
 
         return $retour;
@@ -82,26 +82,6 @@ class CompteRepository extends ServiceEntityRepository
                             ->setParameter('date', $date)                                          
                             ->getSingleScalarResult();
         return ($debit - $credit);
-    }
-
-    public function findCodeJournaux($in = null)
-    {
-        $codes =  $this->_em->createQuery('select c.titre, c.codeJournal from App\Entity\Compte c where c.isTresor =  true order by c.codeJournal')
-                            ->getResult();
-        foreach ($codes as $code) {
-            $code['type'] = 'trésorerie';
-            $retour[] = $code;
-        }
-        $retour[] = [ 'titre' => 'Opération divers', 'codeJournal' => 'OD','type' => 'standard'];
-        $retour[] = [ 'titre' => 'Prestations', 'codeJournal' => 'PRE' ,'type' => 'sortie'];
-        if ($in) {
-            foreach ($retour as $code) {
-                if ($code['codeJournal'] == $in) {
-                    return [$code];
-                }
-            }
-        }
-        return $retour;
     }
 
     /**

@@ -64,7 +64,7 @@ class ExerciceService
                 $article = new Article();
                 $article->setCategorie('OD')
                         ->setAnalytique('-')
-                        ->setLibelle('Solde des comptes de gestion - '. $exercice->getAnnee())
+                        ->setLibelle("Ecriture de fin d'exercice ". $exercice->getAnnee())
                         ->setPiece($exercice->getAnnee() .' '. date('dmY'))
                         ->setDate($exercice->getDateFin())
                         ->setMontant(abs($solde))

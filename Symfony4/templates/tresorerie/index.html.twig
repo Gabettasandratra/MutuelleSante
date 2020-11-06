@@ -40,7 +40,7 @@
                                 </thead>
                                 <tbody>
                                     {% for compte in comptes %}
-                                        <tr>
+                                        <tr title="{{compte.note}}" data-toggle="tooltip">
                                             <th scope="row">{{ loop.index }}</th>
                                             <td>{{ compte.poste }}</td>
                                             <td>{{ compte.titre }}</td>

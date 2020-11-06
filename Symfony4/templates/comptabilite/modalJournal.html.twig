@@ -13,7 +13,7 @@
                         <label for="recipient-name" class="col-form-label">Journal</label>
                         <select class="form-control" name="code">
                             {% for code in codes %}
-                                <option value="{{code.codeJournal}}" class="pre-space">{{code.titre}} ({{code.codeJournal}})</span></option>
+                                <option value="{{code.code}}" class="pre-space">{{code.code}} - {{code.intitule}} </span></option>
                             {% endfor %}
                         </select>
                     </div>

@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Journal {{code.titre|capitalize}}
+    Journal {{code.intitule|capitalize}}
 {% endblock %}
 
 {% block stylesheets %}
@@ -31,7 +31,7 @@
                 <div class="card-body">
                     {% include "comptabilite/reportHeader.html.twig" with {
                         title: "Journal", 
-                        subtitle: code.codeJournal|upper ~" "~ code.titre|capitalize,
+                        subtitle: code.code|upper ~" "~ code.intitule|capitalize,
                         periode: periode,
                     } %}
                     <hr>                           
@@ -74,7 +74,7 @@
 
                     <div class="row mt-2 btn-group">
                         <a href="{{ path('export_rapport_journal') }}" class="btn btn-sm btn-success"><i class="mdi mdi-printer"></i> Excel</a>
-                        <a href="{{ path('pdf_journal', { code: code.codeJournal, debut: periode['debut']|date('dmY'), fin: periode['fin']|date('dmY')}) }}" class="btn btn-sm btn-secondary"><i class="mdi mdi-printer"></i> PDF</a>
+                        <a href="{{ path('pdf_journal', { code: code.code, debut: periode['debut']|date('dmY'), fin: periode['fin']|date('dmY')}) }}" class="btn btn-sm btn-secondary"><i class="mdi mdi-printer"></i> PDF</a>
                     </div>
                 </div>
             </div>

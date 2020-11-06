@@ -18,6 +18,7 @@ use Doctrine\ORM\EntityRepository;
 use App\Repository\BudgetRepository;
 use App\Repository\CompteRepository;
 use App\Repository\ArticleRepository;
+use App\Repository\JournalRepository;
 use Symfony\Component\Form\FormError;
 use App\Repository\ExerciceRepository;
 use App\Repository\ParametreRepository;
@@ -47,7 +48,7 @@ class ComptabiliteController extends AbstractController
     /**
      * @Route("/comptabilite/journal", name="comptabilite_view_journal")
      */
-    public function viewJournal(Request $request, ParametreRepository $parametreRepo, CompteRepository $repositoryCompte, ArticleRepository $repositoryArticle, SessionInterface $session)
+    public function viewJournal(Request $request, ParametreRepository $parametreRepo, JournalRepository $repoJ,CompteRepository $repositoryCompte, ArticleRepository $repositoryArticle, SessionInterface $session)
     {
         $exercice = $session->get('exercice');
 
@@ -72,7 +73,7 @@ class ComptabiliteController extends AbstractController
         $articles = $repositoryArticle->findJournal($code, $dateDebut, $dateFin);
         return $this->render('comptabilite/journal.html.twig', [
             'articles' => $articles,
-            'code' => $repositoryCompte->findCodeJournaux($code)[0],
+            'code' => $repoJ->findOneBy(['code'=>$code]),
             'periode' => ['debut' => $dateDebut, 'fin' => $dateFin],
             'mutuelle' => $parametreRepo->findDonneesMutuelle()
         ]);
@@ -83,18 +84,17 @@ class ComptabiliteController extends AbstractController
      * @Route("/comptabilite/saisie", name="comptabilite_saisie_standard")
      * @Route("/comptabilite/saisie/edit/{id}", name="comptabilite_saisie_edit")
      */
-    public function saisieStandard(Article $article = null, Request $request, CompteRepository $repositoryCompte, EntityManagerInterface $manager, SessionInterface $session)
+    public function saisieStandard(Article $article = null, Request $request, CompteRepository $repositoryCompte, JournalRepository $repoJ,EntityManagerInterface $manager, SessionInterface $session)
     {
         // Les codes journaux
-        $codes = $repositoryCompte->findCodeJournaux();
+        $codes = $repoJ->findCodes();
         foreach ($codes as $code)
-            $cCodes[$code['titre'].' ('.$code['codeJournal'].')'] = $code['codeJournal'];
+            $cCodes[$code->getCode().' - '.$code->getIntitule()] = $code->getCode();
         
         $edit = true;
         // Article 
         if ($article === null) {
             $article = new Article();
-            $article->setCategorie('OD');
             $edit = false;
         }
 
@@ -205,12 +205,12 @@ class ComptabiliteController extends AbstractController
     /**
      * @Route("/comptabilite/saisie/model/{id}", name="comptabilite_saisie_model")
      */
-    public function saisieModel(ModelSaisie $model,Request $request, CompteRepository $repositoryCompte, EntityManagerInterface $manager, SessionInterface $session)
+    public function saisieModel(ModelSaisie $model,Request $request, CompteRepository $repositoryCompte,JournalRepository $repoJ, EntityManagerInterface $manager, SessionInterface $session)
     {
         // Les codes journaux
-        $codes = $repositoryCompte->findCodeJournaux();
+        $codes = $repoJ->findCodes();
         foreach ($codes as $code)
-            $cCodes[$code['titre'].' ('.$code['codeJournal'].')'] = $code['codeJournal'];
+            $cCodes[$code->getCode().' - '.$code->getIntitule()] = $code->getCode();
         
         // Article 
         $article = new Article();
@@ -219,7 +219,7 @@ class ComptabiliteController extends AbstractController
         $article->setCompteCredit($model->getCredit());
         $article->setAnalytic($model->getAnalytic());
         $article->setTier($model->getTier());
-        $article->setBudget($model->getBudget());
+        if($model->getBudget()) $article->setBudget($model->getBudget());
 
         $form = $this->createFormBuilder($article)
                     ->add('categorie', ChoiceType::class, [
@@ -323,18 +323,15 @@ class ComptabiliteController extends AbstractController
     /**
      * @Route("/comptabilite/model/saisie", name="comptabilite_model_saisie")
      */
-    public function modelSaisie(Request $request, CompteRepository $repositoryCompte,EntityManagerInterface $manager, ModelSaisieRepository $repo)
+    public function modelSaisie(Request $request, CompteRepository $repositoryCompte,JournalRepository $repoJ,EntityManagerInterface $manager, ModelSaisieRepository $repo)
     {
-        $journaux = $repositoryCompte->findCodeJournaux();
-        foreach ($journaux as $code) {
-            $codes[$code['titre'].' ('.$code['codeJournal'].')'] = $code['codeJournal'];
-        }
+        $codeJ = $repoJ->findCodes();
+        foreach ($codeJ as $code)
+            $codes[$code->getCode().' - '.$code->getIntitule()] = $code->getCode();
+
         $model = new ModelSaisie();
         $form = $this->createFormBuilder($model)
                 ->add('nom')
-                ->add('type', ChoiceType::class, [
-                    'choices' => ['Entré'=>'E', 'Sortie'=>'S','Entré / Sortie'=>'ES', 'Trésorerie'=>'T']
-                ])  
                 ->add('journal', ChoiceType::class, [
                     'choices' => $codes
                 ])                    
@@ -753,7 +750,7 @@ class ComptabiliteController extends AbstractController
         ]);
     }
 
-    public function renderModalJournal(ModelSaisieRepository $modelRepo, CompteRepository $repositoryCompte, SessionInterface $session)
+    public function renderModalJournal(ModelSaisieRepository $modelRepo,JournalRepository $repoJ, CompteRepository $repositoryCompte, SessionInterface $session)
     {
         $exercice = $session->get('exercice');
 
@@ -764,7 +761,7 @@ class ComptabiliteController extends AbstractController
         $periods   = new \DatePeriod($start, $interval, $end);
 
         return $this->render('comptabilite/modalJournal.html.twig', [
-            'codes' => $repositoryCompte->findCodeJournaux(),
+            'codes' => $repoJ->findCodes(),
             'models' => $modelRepo->findAll(),
             'periodes' => $periods,
             'labelComptes' => $repositoryCompte->findPosteTitre()

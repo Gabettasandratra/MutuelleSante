@@ -213,7 +213,7 @@ class ComptaService
         $article = new Article();
         $article->setCompteDebit($compteBanque);        
         $article->setCompteCredit($articleCheque->getCompteDebit());        
-        $article->setLibelle("Versement chèque: ". $articleCheque->getPiece());
+        $article->setLibelle("Remise chèque ". $articleCheque->getPiece());
         $article->setCategorie($compteBanque->getCodeJournal()); // journal de la banque
         $article->setMontant($articleCheque->getMontant());
         $article->setDate($date);
