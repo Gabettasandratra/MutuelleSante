@@ -11,6 +11,7 @@ use App\Service\ConfigEtatFi;
 use App\Repository\PacRepository;
 use App\Repository\CompteRepository;
 use App\Repository\ArticleRepository;
+use App\Repository\JournalRepository;
 use App\Repository\AdherentRepository;
 use App\Repository\ParametreRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -151,31 +152,18 @@ class ExportController extends AbstractController
     }
 
     /**
-     * @Route("/pdf/adhesion/beneficiaires", name="pdf_beneficiaires")
+     * @Route("/pdf/adhesion/beneficiaires/{id}", name="pdf_beneficiaires")
      */
-    public function pdfBeneficiaires(SessionInterface $session, AdherentRepository $repoAdh, PacRepository $repoPac, Request $request)
+    public function pdfBeneficiaires(Adherent $adherent, SessionInterface $session, AdherentRepository $repoAdh, PacRepository $repoPac, Request $request)
     {
         $exercice = $session->get('exercice');
-        $fin = $request->query->get('fin');
-        $deb = $request->query->get('deb');
-        $type = $request->query->get('type');
-
-        $idAdherent = $request->query->get('adherent');
-        $adherent = null;
-        if ($idAdherent !== "all") {
-            $adherent = $repoAdh->find((int)$idAdherent);
-        }
-
-        $periode['fin'] = \DateTime::createFromFormat('d/m/Y', $fin);
-        $periode['debut'] = \DateTime::createFromFormat('d/m/Y', $deb);
-        $benefs = $repoPac->findByDateEnter($periode, $adherent);
-
-        $pdf = new PDFMutuelle($periode, "Liste de bénéficiaire");
+        
+        
+        $pdf = new PDFMutuelle('liste benef', "Liste de bénéficiaire");
         $pdf->AliasNbPages();
         $pdf->AddPage('P', 'A4');
         
-        $pdf->beneficiaireTable($benefs);
-
+        $pdf->beneficiaireTable($adherent->getPacs());
         return new Response(
             $pdf->Output('file.pdf', 'I'),
             Response::HTTP_OK,
@@ -223,9 +211,9 @@ class ExportController extends AbstractController
         $donnees = $repo->findJournal($code, $dateDebut, $dateFin);
 
         // Le subtitle
-        $codeJour = $repoCompte->findCodeJournaux($code);
+        $j= $repoJ->findOneBy(['code'=>$code]);
 
-        $pdf = new Pdf($periode, $parametreRepo->findDonneesMutuelle(),'Journal', $codeJour[0]['codeJournal'].'  '.$codeJour[0]['titre']);
+        $pdf = new Pdf($periode, $parametreRepo->findDonneesMutuelle(),'Journal', $j->getCode().'  '.$j->getIntitule());
         $pdf->AliasNbPages();
         $pdf->AddPage('P', 'A4');
 

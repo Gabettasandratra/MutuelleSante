@@ -165,7 +165,7 @@ class ComptaService
     * - charge de compte 606 (charge remboursement) - compte Analytique de la SOIN
     * - compte budgetaire des prestations associé 
     */
-    public function updateDetteRemb($journal ='PRE')
+    public function updateDetteRemb($journal ='REMB')
     {
         $posteRemboursement = $this->paramService->getParametre('compte_prestation'); // Charge
         $compteRemboursement = $this->comptaRepo->findOneByPoste($posteRemboursement); 

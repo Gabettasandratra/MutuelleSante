@@ -84,7 +84,7 @@ class ExcelReader
             else
                 $pac->setSexe('Feminin');
             
-            if($donnee[6] !== null) $pac->setCin($donnee[5]);
+            if($donnee[6] !== null) $pac->setCin($donnee[6]);
             if($donnee[7] !== null) $pac->setParente($donnee[7]);
             if($donnee[8] !== null) 
               $pac->setDateEntrer($this->getDateTimeFromExcel( $donnee[8]));
@@ -220,7 +220,7 @@ class ExcelReader
     {
         if(strpos($data, "/"))
         {
-            return \DateTime::createFromFormat('d/m/Y', $data);
+          return \DateTime::createFromFormat('d/m/Y', str_ireplace("'","",$data));
         } else {
             return Date::excelToDateTimeObject($data);
         }

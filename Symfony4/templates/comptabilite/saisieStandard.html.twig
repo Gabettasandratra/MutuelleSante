@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Saisie standard{% endblock %}
+{% block title %}Saisie écriture comptable{% endblock %}
 
 {% block header %}
     <div class="page-breadcrumb">
         <div class="d-flex align-items-center">
-            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Saisie standard</h4>
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Saisie écriture comptable</h4>
             <div class="ml-auto">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb m-0 p-0">
@@ -37,30 +37,55 @@
                     <div class="row"> 
                         <div class="col-md-3">{{ form_row(form.categorie, { label: 'Journal'}) }}</div>
                         <div class="col-md-3">{{ form_row(form.date) }}</div>
-                        <div class="offset-md-2 col-md-4">{{ form_row(form.piece, { label: 'N° de pièce',attr:{placeholder:"Réference"}}) }}</div>
+                        <div class="offset-md-2 col-md-4">{{ form_row(form.piece, { label: 'Reference de pièce'}) }}</div>
                     </div>
                     <div class="row">
                         <div class="col-md-3">{{ form_row(form.montant) }}</div>
                         <div class="col-md-9">{{ form_row(form.libelle, { label: 'Libellé',attr:{placeholder:"Description de l'opération"}}) }}</div>
                     </div>
-                    <div class="row mt-3">
-                        <div class="col-md-6">{{ form_row(form.compteDebit,{ label: 'N° compte générale débité'}) }}</div>
+                    <div class="row mt-2">
+                        <div class="col-md-5">{{ form_row(form.compteDebit,{ label: 'Compte débité'}) }}</div>
+                        <div class="offset-md-2 col-md-5">{{ form_row(form.compteCredit,{ label: 'Compte crédité'}) }}</div>
                     </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">{{ form_row(form.compteCredit,{ label: 'N° compte générale crédité'}) }}</div>
+
+                    <div class="row my-2">
+                      <div class="col-md-3">
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" value="" id="checkAna">
+                          <label class="form-check-label" for="checkAna">
+                            Sasie analytique
+                          </label>
+                        </div>
+                      </div>
+                      
+                      <div class="form-check col-md-3">
+                        <input class="form-check-input" type="checkbox" value="" id="checkTier">
+                        <label class="form-check-label" for="checkTier">
+                          Saisie tier
+                        </label>
+                      </div>
+                      <div class="form-check col-md-3">
+                        <input class="form-check-input" type="checkbox" value="" id="checkBud">
+                        <label class="form-check-label" for="checkBud">
+                          Saisie budget
+                        </label>
+                      </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6">{{ form_row(form.analytic,{ label: 'N° compte analytique'}) }}</div>
+
+                    <div>
+                      <div class="row" id="ana">
+                          <div class="col-md-6">{{ form_row(form.analytic,{ label: 'Compte analytique'}) }}</div>
+                      </div>
+                      <div class="row" id="tier">
+                          <div class="col-md-6">{{ form_row(form.tier,{ label: 'Compte tier'}) }}</div>
+                      </div>
+                      <div class="row" id="bud">
+                          <div class="col-md-6">{{ form_row(form.budget,{ label: 'Poste budgetaire'}) }}</div>
+                      </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6">{{ form_row(form.tier,{ label: 'N° compte tier'}) }}</div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">{{ form_row(form.budget,{ label: 'Poste budgetaire'}) }}</div>
-                    </div>
-                    <div class="form-row">
-                        <div class="col-5">
-                            <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-check-circle" aria-hidden="true"></i> Valider</button>
+                    <div class="row my-2">
+                        <div class="col-12 text-right">
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-check-circle" aria-hidden="true"></i> Valider</button>
                         </div>
                     </div>
 
@@ -95,6 +120,29 @@
 
 {% block javascripts %}
 <script>
-    $('#success-alert').modal();
+  $('#success-alert').modal();
+  $('#ana').hide();
+  $('#bud').hide();
+  $('#tier').hide();
+  $('#checkAna').change(function(e) {
+    if ($(this).prop('checked')) 
+      $('#ana').show('slow');
+    else 
+      $('#ana').hide('slow');
+  });
+
+  $('#checkBud').change(function(e) {
+    if ($(this).prop('checked')) 
+      $('#bud').show('slow');
+    else 
+      $('#bud').hide('slow');
+  });
+
+  $('#checkTier').change(function(e) {
+    if ($(this).prop('checked')) 
+      $('#tier').show('slow');
+    else 
+      $('#tier').hide('slow');
+  });
 </script>
 {% endblock %}

@@ -75,7 +75,7 @@ class SecurityController extends AbstractController
                 }
                 $user->setPhoto($this->getParameter('users_img_directory').'/'.$fileName);
             } else {
-                $user->setPhoto('/assets/images/profile.png');
+                $user->setPhoto('assets/images/profile.png');
             }
             $user->setRoles(['ROLE_ADMIN']);
 

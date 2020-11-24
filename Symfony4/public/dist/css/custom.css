@@ -164,3 +164,27 @@ ul.border-bottom-white li {
     border: 5px solid transparent;
     border-top-color: #2d3242!important;
 }
+
+.pal-1 {
+    padding-left: 0px!important;
+}
+
+.pal-2 {
+    padding-left: 10px!important;
+}
+
+.pal-3 {
+    padding-left: 20px!important;
+}
+
+.pal-4 {
+    padding-left: 30px!important;
+}
+
+.pal-5 {
+    padding-left: 40px!important;
+}
+
+.pal-6 {
+    padding-left: 50px!important;
+}

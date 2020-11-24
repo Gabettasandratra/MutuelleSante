@@ -98,13 +98,6 @@ class Pac
 
     /**
      * @ORM\Column(type="string", length=15, nullable=true, unique=true)
-     * @Assert\Length(
-     *      min = 12,
-     *      max = 12,
-     *      minMessage = "Le CIN doit representé {{ limit }} chiffre",
-     *      maxMessage = "Le CIN doit representé {{ limit }} chiffre",
-     *      allowEmptyString = true
-     * )
      */
     private $cin;
 
@@ -166,11 +159,11 @@ class Pac
         return $this->prenom;
     }
 
-    public function setPrenom(string $prenom): self
+    public function setPrenom($prenom): self
     {
+      if ($prenom)
         $this->prenom = $prenom;
-
-        return $this;
+      return $this;
     }
 
     public function getNomComplet(): ?string

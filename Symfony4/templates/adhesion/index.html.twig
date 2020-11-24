@@ -32,7 +32,6 @@
                         <table id="zero_config" class="table border">
                             <thead class="thead-light">
                                 <tr>
-                                    <th scope="col">#</th>
                                     <th scope="col">Code</th>
                                     <th scope="col">Nom de la congrégation</th>
                                     <th scope="col">Adresse</th>
@@ -43,8 +42,7 @@
                             <tbody>
                                 {% for adherent in adherents %}
                                     <tr>
-                                        <th scope="row">{{ adherent.id }}</th>
-                                        <td>{{ adherent.numero }}</td>
+                                        <th scope="row">{{ adherent.numero }}</th>
                                         <td>{{ adherent.nom }}</td>
                                         <td>{{ adherent.adresse }}</td>
                                         <td>{{ adherent.nbBeneficiaires }}</td>

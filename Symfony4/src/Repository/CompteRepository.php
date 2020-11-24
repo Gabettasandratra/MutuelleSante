@@ -22,7 +22,7 @@ class CompteRepository extends ServiceEntityRepository
 
     public function findComptes()
     {       
-        return $this->_em->createQuery('select c from App\Entity\Compte c where length(c.poste)=6 order by c.poste')
+        return $this->_em->createQuery('select c from App\Entity\Compte c order by c.poste')
                                     ->getResult();
     }
 

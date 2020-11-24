@@ -37,7 +37,6 @@ class Adherent
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\Regex("/^(\+261|0)3[2,3,4,9][0-9]{7}$/")
      * @Assert\NotBlank
      */
     private $telephone1;

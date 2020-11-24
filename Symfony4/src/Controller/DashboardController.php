@@ -222,7 +222,7 @@ class DashboardController extends AbstractController
     public function printPdfCotisation(SessionInterface $session, CompteCotisationRepository $repo)
     {
         $exercice = $session->get('exercice');
-        $header = ['N°', 'Congrégation', 'Anciens', 'Nouveaux', 'Montant due', 'Montant percue', 'Reste à payé'];   
+        $header = ['N°', 'Congrégation', 'Anc', 'Nouv', 'Montant due', 'Montant percue', 'Reste à payé'];   
         
         $pdf = new Fpdf();
         $pdf->AliasNbPages();                     
@@ -239,13 +239,13 @@ class DashboardController extends AbstractController
         $pdf->Cell(260,7,'Nouveau membre: '.number_format($exercice->getCotNouveau(),0, ","," ").' Ar',0,0,'R');
         $pdf->Ln(); 
         // Colonne des tables
-        $w = [10, 80, 25, 25, 40, 40, 40];
+        $w = [10, 100, 15, 15, 40, 40, 40];
         $pdf->SetFont('Arial','B',12);
         for($i=0;$i<count($header);$i++)
             $pdf->Cell($w[$i],7,$header[$i],1,0,'C');
         $pdf->Ln();
         // Data
-        $lines = $repo->findByExercice($exercice);
+        $lines = $repo->findOrderByNum($exercice);
         // Line
         $pdf->SetFont('Arial','',11);
         // Totaux
@@ -275,7 +275,7 @@ class DashboardController extends AbstractController
         $pdf->Cell(160,8,'Anneé '.$exercice->getAnnee(),0,0,'R');
         $pdf->Ln();
         // Colonne des tables
-        $w = [10, 80, 30, 40, 40, 80];
+        $w = [10, 100, 25, 35, 35, 75];
         $header = ['N°', 'Congrégation', 'Date Vers', 'Montant Vers', 'Référence', 'Remarque']; 
         $pdf->SetFont('Arial','B',12);
         for($i=0;$i<count($header);$i++)

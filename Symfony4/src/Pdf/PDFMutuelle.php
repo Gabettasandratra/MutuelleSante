@@ -6,9 +6,8 @@ use Fpdf\Fpdf;
 
 class PDFMutuelle extends Fpdf {
 
-    public function __construct($periode,$title,$subtitle=null) {
+    public function __construct($title,$subtitle=null) {
         parent::__construct();
-        $this->periode = $periode;
         $this->title = $title;
         $this->subtitle = $subtitle;
     }
@@ -141,11 +140,10 @@ class PDFMutuelle extends Fpdf {
         $this->SetX(5);
         $this->SetFont('Arial','B',10);
 
-        $this->Cell(17,8,'N°Matri', 1,0, 'C');
-        $this->Cell(70,8,'Nom & prénom', 'TBR',0, 'C');
+        $this->Cell(22,8,'N°matr', 1,0, 'C');
+        $this->Cell(95,8,'Nom et prénoms', 'TBR',0, 'C');
         $this->Cell(8,8,'G', 'TBR',0, 'C');
-        $this->Cell(20,8,'Date Nais', 'TBR',0, 'C');
-        $this->Cell(30,8,'Tél', 'TBR',0, 'C');
+        $this->Cell(20,8,'Date nais', 'TBR',0, 'C');
         $this->Cell(35,8,'CIN', 'TBR',0, 'C');
         $this->Cell(20,8,'Date entré', 'TBR',1, 'C');
         
@@ -153,11 +151,10 @@ class PDFMutuelle extends Fpdf {
         $this->SetFont('Arial','',9);
         foreach ($beneficiaires as $ben) {
             $this->SetX(5);
-            $this->Cell(17,7, $ben->getMatricule(), 'LR',0, 'C');
-            $this->Cell(70,7, $ben->getNomComplet(), 'R',0, 'L');
+            $this->Cell(22,7, $ben->getMatricule(), 'LR',0, 'C');
+            $this->Cell(95,7, $ben->getNomComplet(), 'R',0, 'L');
             $this->Cell(8,7, $ben->getSexe()[0], 'R',0, 'C');
             $this->Cell(20,7, $ben->getDateNaissance()->format('d/m/Y'), 'R',0, 'C');
-            $this->Cell(30,7, $ben->getTel(), 'R',0, 'L');
             $this->Cell(35,7, $ben->getCin(), 'R',0, 'L');
             $this->Cell(20,7, $ben->getDateEntrer()->format('d/m/Y'), 'R',1, 'C');
         }

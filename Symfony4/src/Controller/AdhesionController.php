@@ -94,7 +94,7 @@ class AdhesionController extends AbstractController
                 }
                 $adherent->setPhoto($this->getParameter('users_img_directory').'/'.$fileName);
             } else {
-                $adherent->setPhoto('/assets/images/home.png');
+                $adherent->setPhoto('assets/images/home.png');
             }
 
             $adherent->setCreatedAt(new \DateTime());
@@ -105,8 +105,8 @@ class AdhesionController extends AbstractController
                                     ->findCurrent();
             $newCompteCotisation = new CompteCotisation($currentExercice, $adherent);          
             // Create analytic account           
-            $codeAnalytique = $paramRepo->findOneByNom('code_analytique_cong')->getValue(); // Le modele code analytique
-            $code = str_ireplace('{n}', $adherent->getNumero(), $codeAnalytique);
+            $codeTier = $paramRepo->findOneByNom('code_analytique_cong')->getValue(); // Le modele code analytique
+            $code = str_ireplace('{n}', $adherent->getNumero(), $codeTier);
 
             $compteAssocie = $paramRepo->findOneByNom('compte_dette_prestation')->getValue(); 
             $compteCollectif = $repoCompte->findOneBy(['poste'=>$compteAssocie]);

@@ -62,8 +62,7 @@ class ExerciceService
             $solde = $this->compteRepo->findSolde($compte);
             if ($solde != 0) {
                 $article = new Article();
-                $article->setCategorie('OD')
-                        ->setAnalytique('-')
+                $article->setCategorie('CLO')
                         ->setLibelle("Ecriture de fin d'exercice ". $exercice->getAnnee())
                         ->setPiece($exercice->getAnnee() .' '. date('dmY'))
                         ->setDate($exercice->getDateFin())

@@ -38,8 +38,8 @@
                                 <thead class="thead-light">
                                     <tr>
                                         <th>Type</th>
-                                        <th>Poste</th>
-                                        <th>Intitulé</th>
+                                        <th>Compte</th>
+                                        
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -52,8 +52,8 @@
                                                     <i class="mdi mdi-checkbox-multiple-blank" title="Rubrique" data-toggle="tooltip"></i>    
                                                 {% endif %}
                                             </td>
-                                            <td>{{ compte.poste }}</td>
-                                            <td>{{ compte.titre }}</td>
+                                            <td class="pal-{{compte.poste|length}}">{{ compte.poste }} - {{ compte.titre }}</td>
+                          
                                         </tr>
                                     {% endfor %} 
                             </tbody>

@@ -173,10 +173,9 @@ class Pdf extends Fpdf {
         $this->Cell(8,8,'N°', 'TBR',0, 'C');
         $this->Cell(16,8,'Débité', 'TBR',0, 'C');
         $this->Cell(16,8,'Crédité', 'TBR',0, 'C');
-        $this->Cell(63,8,'Libellé écriture', 'TBR',0, 'C');
+        $this->Cell(73,8,'Libellé écriture', 'TBR',0, 'C');
         $this->Cell(31,8,'Montant', 'TBR',0, 'C');
-        $this->Cell(39,8,'Réference', 'TBR',0, 'C');
-        $this->Cell(10,8,'Dest', 'TBR',1, 'C');
+        $this->Cell(39,8,'Réference', 'TBR',1, 'C');
         
         // Donnees
         $this->SetFont('Arial','',9);
@@ -186,10 +185,9 @@ class Pdf extends Fpdf {
             $this->Cell(8,6,$article->getId(), 'R',0, 'C');
             $this->Cell(16,6,$article->getCompteDebit()->getPoste(), 'R',0, 'C');
             $this->Cell(16,6,$article->getCompteCredit()->getPoste(), 'R',0, 'C');
-            $this->Cell(63,6,$article->getLibelle(), 'R',0, 'L');
+            $this->Cell(73,6,$article->getLibelle(), 'R',0, 'L');
             $this->Cell(31,6,$this->number_format($article->getMontant()), 'R',0, 'C');
-            $this->Cell(39,6,$article->getPiece(), 'R',0, 'L');
-            $this->Cell(10,6,$article->getAnalytique(), 'R',1, 'C');
+            $this->Cell(39,6,$article->getPiece(), 'R',1, 'C');
         }
         $this->SetX(5);
         $this->Cell(200,1,'','T',1);

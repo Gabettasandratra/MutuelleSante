@@ -19,7 +19,9 @@ class PacType extends AbstractType
         $builder
             ->add('codeMutuelle', TextType::class)
             ->add('nom')
-            ->add('prenom')
+            ->add('prenom', TextType::class, [
+              'required' => false
+            ])
             ->add('sexe', ChoiceType::class, [
                 'choices'  => [
                     'Masculin' => 'Masculin',

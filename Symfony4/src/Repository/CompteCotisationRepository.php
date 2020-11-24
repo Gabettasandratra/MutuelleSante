@@ -31,4 +31,11 @@ class CompteCotisationRepository extends ServiceEntityRepository
                             ->setParameter('e', $exercice)
                             ->getOneOrNullResult();
     }
+
+    public function findOrderByNum(Exercice $exercice)
+    {
+        return $this->_em->createQuery('select c from App\Entity\CompteCotisation c join App\Entity\Adherent a with c.adherent = a where c.exercice = :e order by a.numero asc')
+                            ->setParameter('e', $exercice)
+                            ->getResult();
+    }
 }
