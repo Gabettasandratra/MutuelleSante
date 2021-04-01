@@ -104,6 +104,10 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator implements P
             return new RedirectResponse($this->urlGenerator->generate('parametre_mutuelle'));
         }
 
+        if (!$exercice->getIsCurrent()) {
+            return new RedirectResponse($this->urlGenerator->generate('parametre_exercice'));
+        }
+
         if ($targetPath = $this->getTargetPath($session, $providerKey)) {
             return new RedirectResponse($targetPath);
         }

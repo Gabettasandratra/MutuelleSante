@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Compte;
 use App\Entity\Parametre;
 use App\Repository\ParametreRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -52,13 +53,58 @@ class ParametreService
         foreach ($parametres as $parametre) {
             $this->manager->persist($parametre);  
         }
-
         $this->manager->flush();
 
+        $this->initializeCompte();
     }
 
     public function getParametre($nom)
     {
         return $this->parametreRepo->findOneByNom($nom)->getValue();
+    }
+
+    /* Initialize all account utils */
+    private function initializeCompte()
+    {
+        // Les report à nouveau
+        $ran110 = new Compte();
+        $ran110->setIsTresor(false) // Pas de trésorerie
+                ->setCategorie('COMPTES DE BILAN') // Categorie
+                ->setType(false) // Passif
+                ->setClasse('1-COMPTES DE CAPITAUX') // Classe
+                ->setPoste('110000')
+                ->setTitre('Report à nouveau (solde créditeur)')
+                ->setNote('Les bénéfices de l\'exercice précedent');
+        $ran119 = new Compte();
+        $ran119->setIsTresor(false) // Pas de trésorerie
+                ->setCategorie('COMPTES DE BILAN') // Categorie
+                ->setType(false) // Passif
+                ->setClasse('1-COMPTES DE CAPITAUX') // Classe
+                ->setPoste('119000')
+                ->setTitre('Report à nouveau (solde débiteur)')
+                ->setNote('Les pertes de l\'exercice précedent');
+        
+        // Résultat de l'exercice
+        $res120 = new Compte();
+        $res120->setIsTresor(false) // Pas de trésorerie
+                ->setCategorie('COMPTES DE BILAN') // Categorie
+                ->setType(false) // Passif
+                ->setClasse('1-COMPTES DE CAPITAUX') // Classe
+                ->setPoste('120000')
+                ->setTitre('Résultat de l\'exercice (bénéfice)')
+                ->setNote('Les bénéfices de l\'exercice à la clôture');
+        $res129 = new Compte();
+        $res129->setIsTresor(false) // Pas de trésorerie
+                ->setCategorie('COMPTES DE BILAN') // Categorie
+                ->setType(false) // Passif
+                ->setClasse('1-COMPTES DE CAPITAUX') // Classe
+                ->setPoste('129000')
+                ->setTitre('Résultat de l\'exercice (perte)')
+                ->setNote('Les pertes de l\'exercice à la clôture');
+        $this->manager->persist($ran110);  
+        $this->manager->persist($ran119);  
+        $this->manager->persist($res120);  
+        $this->manager->persist($res129);  
+        $this->manager->flush();
     }
 }

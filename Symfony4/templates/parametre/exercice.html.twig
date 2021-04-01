@@ -51,10 +51,11 @@
                                         </td>
                                         <td>
                                             {% if exercice.id != app.session.get('exercice').id %}
-                                            <a href="{{ path('parametre_exercice_select', {'id': exercice.id}) }}" class="label btn-primary label-info">Selectionner</a>
+                                            <a href="{{ path('parametre_exercice_select', {'id': exercice.id}) }}" class="label btn-info label-info">Selectionner</a>
                                             {% else %}
                                             <span class="label label-success"><i class="mdi mdi-check"></i></span>   
                                             {% endif %}
+                                            {% if not exercice.isCloture and not exercice.isCurrent %}<a href="{{ path('parametre_exercice_cloture', {'id': exercice.id}) }}" class="label btn-danger label-danger"><i class="mdi mdi-lock"></i> Clôturer</a>{% endif %}
                                         </td>
                                     </tr>                                        
                                 {% endfor %}        

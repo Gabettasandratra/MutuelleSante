@@ -139,6 +139,7 @@
                                     {% endif %}
                                     <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('adhesion') }}" class="sidebar-link"><i class="mdi mdi-account-search"></i><span class="hide-menu"> Liste des congrégations </span></a></li>
                                     <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('adhesion_beneficiaires') }}" class="sidebar-link"><i class="mdi mdi-format-list-bulleted"></i><span class="hide-menu"> Liste béneficiaires </span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('export_rapport_adhesions') }}" class="sidebar-link"><i class="mdi mdi-newspaper"></i><span class="hide-menu"> Rapport d'adhésion </span></a></li>
                                 </ul>
                             </li>
                         
@@ -146,6 +147,7 @@
                                 <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-calculator"></i><span class="hide-menu"> Cotisation </span></a>
                                 <ul aria-expanded="false" class="collapse first-level">
                                     <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('cotisation') }}" class="sidebar-link"><i class="mdi mdi-calendar-check"></i><span class="hide-menu"> Fiche de cotistation </span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('export_rapport_cotisations') }}" class="sidebar-link"><i class="mdi mdi-newspaper"></i><span class="hide-menu"> Rapport de cotisation </span></a></li>
                                 </ul>
                             </li>
                             <li class="sidebar-item"> 
@@ -153,6 +155,7 @@
                                 <ul aria-expanded="false" class="collapse first-level">
                                     <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('prestation') }}" class="sidebar-link"><i class="mdi mdi-verified"></i><span class="hide-menu"> Prestation béneficiaire </span></a></li>
                                     <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('prestation_adherent') }}" class="sidebar-link"><i class="mdi mdi-clipboard-outline"></i><span class="hide-menu"> Prestation congrégation</span></a></li>
+                                    <li class="sidebar-item waves-effect waves-dark"><a href="{{ path('export_rapport_prestations') }}" class="sidebar-link"><i class="mdi mdi-newspaper"></i><span class="hide-menu"> Rapport de prestation </span></a></li>
                                 </ul>
                             </li>
                         {% endif %}

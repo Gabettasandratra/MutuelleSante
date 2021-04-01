@@ -148,6 +148,15 @@ class ParametreController extends AbstractController
     }
 
     /**
+     * @Route("/parametre/exercice/cloturer/{id}", name="parametre_exercice_cloture")
+     */
+    public function cloturerExercice(Exercice $exercice, ExerciceService $exerciceService)
+    {      
+        $exerciceService->cloturerExercice($exercice);
+        return $this->redirectToRoute('parametre_exercice');
+    }
+
+    /**
      * @Route("/parametre/user/all", name="user_all")
      */
     public function allUser(UserRepository $repository, Request $request, UserPasswordEncoderInterface $passwordEncoder, EntityManagerInterface $manager)

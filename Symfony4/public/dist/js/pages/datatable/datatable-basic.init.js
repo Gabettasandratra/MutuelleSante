@@ -59,7 +59,7 @@ $('#scroll_ver').DataTable({
 
 $('.scroll_no_order').DataTable({
     "dom": "t",
-    "scrollY": "50vh",
+    "scrollY": "60vh",
     "scrollX": true,
     "scrollCollapse": true,
     "paging": false,

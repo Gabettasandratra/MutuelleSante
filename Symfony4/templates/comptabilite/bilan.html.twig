@@ -36,10 +36,12 @@
                                 <tbody>
                                     {% set totalA = 0 %}
                                     {% for compte in donnees.actif %}
+                                        {% if compte.solde != 0 %}
                                         <tr>
                                             <td title="{{ compte.poste }}" data-toggle="tooltip">{{ compte.titre }}</td>
                                             <td>{{ compte.solde|number_format(2,',',' ') }}</td> {% set totalA = totalA + compte.solde %}
                                         </tr>
+                                        {% endif %}
                                     {% endfor %}
                                     
                                 </tbody>
@@ -61,10 +63,12 @@
                                 <tbody>
                                     {% set totalP = 0 %}
                                     {% for compte in donnees.passif %}
+                                        {% if compte.solde != 0 %}
                                         <tr>
                                             <td title="{{ compte.poste }}" data-toggle="tooltip">{{ compte.titre }}</td>
                                             <td>{{ compte.solde|number_format(2,',',' ') }}</td> {% set totalP = totalP + compte.solde %}
                                         </tr>
+                                        {% endif %}
                                     {% endfor %}
                                     {% set resultat = totalA - totalP %}
                                     <tr>

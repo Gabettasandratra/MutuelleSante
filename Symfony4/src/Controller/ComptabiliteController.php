@@ -7,6 +7,7 @@ use App\Entity\Article;
 use App\Entity\Exercice;
 use App\Form\CompteType;
 use App\Form\ArticleType;
+use Doctrine\ORM\EntityRepository;
 use App\Repository\CompteRepository;
 use App\Repository\ArticleRepository;
 use Symfony\Component\Form\FormError;
@@ -89,12 +90,22 @@ class ComptabiliteController extends AbstractController
                     ])            
                     ->add('compteDebit', EntityType::class, [
                         'class' => Compte::class,
+                        'query_builder' => function (EntityRepository $er) {
+                            return $er->createQueryBuilder('c')
+                                    ->andWhere('c.classe != \'7-COMPTES DE PRODUITS\'')
+                                    ->orderBy('c.poste', 'ASC');
+                        },
                         'choice_label' => function ($c) {
                             return $c->getPoste().' | '.$c->getTitre();
                         },
                     ])
                     ->add('compteCredit', EntityType::class, [
                         'class' => Compte::class,
+                        'query_builder' => function (EntityRepository $er) {
+                            return $er->createQueryBuilder('c')
+                                    ->andWhere('c.classe != \'6-COMPTES DE CHARGES\'')
+                                    ->orderBy('c.poste', 'ASC');
+                        },
                         'choice_label' => function ($c) {
                             return $c->getPoste().' | '.$c->getTitre();
                         },
@@ -299,8 +310,7 @@ class ComptabiliteController extends AbstractController
      */
     public function bilan(CompteRepository $repositoryCompte, SessionInterface $session)
     {
-        $exercice = $session->get('exercice');
-
+        $exercice = $session->get('exercice');      
         $donnees['actif'] = $repositoryCompte->findBilanActif($exercice);
         $donnees['passif'] = $repositoryCompte->findBilanPassif($exercice);
         return $this->render('comptabilite/bilan.html.twig', [

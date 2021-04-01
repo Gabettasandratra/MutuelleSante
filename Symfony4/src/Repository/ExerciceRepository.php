@@ -23,6 +23,11 @@ class ExerciceRepository extends ServiceEntityRepository
     {
         $exercice = $this->_em->createQuery('select e from App\Entity\Exercice e where CURRENT_DATE() between e.dateDebut and e.dateFin')  
                         ->getOneOrNullResult();
+        if (!$exercice) {
+            return $this->_em->createQuery('select e from App\Entity\Exercice e order by e.dateFin DESC')  
+                        ->getOneOrNullResult();
+        }
+
         return $exercice;
     }
 
@@ -54,4 +59,16 @@ class ExerciceRepository extends ServiceEntityRepository
                     ->getOneOrNullResult();   
     }
 
+    public function findResult(Exercice $exercice)
+    {
+        $charges = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a join App\Entity\Compte c with a.compteDebit = c and c.classe = \'6-COMPTES DE CHARGES\' where a.date between :dateDebut and :dateFin')
+                                ->setParameter('dateDebut', $exercice->getDateDebut())                      
+                                ->setParameter('dateFin', $exercice->getDateFin())                      
+                                ->getSingleScalarResult();
+        $produits = (float) $this->_em->createQuery('select sum(a.montant) from App\Entity\Article a join App\Entity\Compte c with a.compteCredit = c and c.classe = \'7-COMPTES DE PRODUITS\' where a.date between :dateDebut and :dateFin')
+                                ->setParameter('dateDebut', $exercice->getDateDebut())                      
+                                ->setParameter('dateFin', $exercice->getDateFin())                      
+                                ->getSingleScalarResult();
+        return ($produits - $charges);
+    }
 }

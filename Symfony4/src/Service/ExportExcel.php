@@ -223,7 +223,7 @@ class ExportExcel
         $spreadsheet = new Spreadsheet();
         // Feuille 1
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('Remboursements '. $exercice->getAnnee());
+        $sheet->setTitle('Détail remboursements '. $remboursement->getDate()->format('d_m_Y'));
   
         $prestations = $remboursement->getPrestations();
 

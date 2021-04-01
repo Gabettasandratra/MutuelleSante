@@ -34,7 +34,7 @@
                     <hr>                           
                     <div class="row">
                         <div class="col-md-12 table-responsive">
-                            <table class="table" id="scroll_ver">
+                            <table class="table" id="scroll_no_order">
                                 <thead class="thead-light">
                                     <tr>
                                         <th scope="col">Date</th>
@@ -45,8 +45,9 @@
                                         <th scope="col">Compte débité</th>
                                         <th scope="col">Compte crédité</th>
                                         <th scope="col">Analytique</th>
-                                        <th scope="col">Journal</th>
+                                        {% if not app.session.get('exercice').isCloture %}
                                         <th scope="col">Action</th>
+                                        {% endif %}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -60,8 +61,9 @@
                                             <td title="{{ article.compteDebit.titre }}" data-toggle="tooltip">{{ article.compteDebit.poste }}</td>
                                             <td title="{{ article.compteCredit.titre }}" data-toggle="tooltip">{{ article.compteCredit.poste }}</td>
                                             <td>{{ article.analytique }}</td>
-                                            <td>{{ article.categorie }}</td>
-                                            <td>{% if article.isFerme or app.session.get('exercice').isCloture %}<span class="label label-rounded btn-secondary label-secondary disabled">Modifier</span>{% else %}<a href="{{ path('comptabilite_modifier_article', {'id': article.id, 'journal': article.categorie}) }}" class="label label-rounded btn-primary label-primary">Modifier</a>{% endif %}</td>
+                                            {% if not app.session.get('exercice').isCloture %}
+                                            <td>{% if article.isFerme %}<span class="label label-rounded btn-secondary label-secondary disabled">Modifier</span>{% else %}<a href="{{ path('comptabilite_modifier_article', {'id': article.id, 'journal': article.categorie}) }}" class="label label-rounded btn-primary label-primary">Modifier</a>{% endif %}</td>
+                                            {% endif %}
                                         </tr>
                                     {% endfor %}
                                 </tbody>
@@ -71,7 +73,7 @@
                     {% if journal.codeJournal %}           
                         <div class="row mt-4">
                             <div class="col-md-12 text-right">
-                                <a href="{{ path('comptabilite_saisie', { 'journal': journal.codeJournal }) }}" class="btn btn-success"><i class="mdi mdi-receipt"></i> Saisie écriture comptable</a>
+                                {% if not app.session.get('exercice').isCloture %}<a href="{{ path('comptabilite_saisie', { 'journal': journal.codeJournal }) }}" class="btn btn-success"><i class="mdi mdi-receipt"></i> Saisie écriture comptable</a>{% endif %}
                                 <a href="{{ path('comptabilite_select_journal') }}" class="btn btn-secondary"><i class="mdi mdi-close-circle-outline"></i> Fermer</a>
                             </div>
                         </div>

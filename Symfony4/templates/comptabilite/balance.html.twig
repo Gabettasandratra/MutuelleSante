@@ -33,16 +33,21 @@
                         <table class="table table-bordered">
                             <thead class="thead-light">
                                 <tr>
-                                    <th scope="col">Poste</th>
-                                    <th scope="col">Intitulé de compte</th>
+                                    <th scope="col" rowspan=2 class="text-center align-middle">Poste</th>
+                                    <th scope="col" rowspan=2 class="text-center align-middle">Intitulé de compte</th>
+                                    <th scope="col" colspan=2 class="text-center">Mouvement</th>
+                                    <th scope="col" colspan=2 class="text-center">Solde</th>
+                                </tr>
+                                <tr>
                                     <th scope="col">Débit</th>
-                                    <th scope="col">Credit</th>
-                                    <th scope="col">Solde</th>
+                                    <th scope="col">Crédit</th>
+                                    <th scope="col">Débiteur</th>
+                                    <th scope="col">Créditeur</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for classe, comptes in donnees %}
-                                    <tr><th colspan=4 class="table-active">{{ classe }}</th></tr>
+                                    <tr><th colspan=6 class="table-active">{{ classe }}</th></tr>
                                     {% set debit = 0 %} {% set credit = 0 %} {% set solde = 0 %}
                                     {% for compte in comptes %}
                                         <tr>
@@ -50,14 +55,28 @@
                                             <td>{{ compte.titre }}</td>
                                             <td>{{ compte.debit|number_format(2,',',' ') }}</td> {% set debit = debit + compte.debit %}
                                             <td>{{ compte.credit|number_format(2,',',' ') }}</td> {% set credit = credit + compte.credit %}
-                                            <td>{{ compte.solde|number_format(2,',',' ') }}</td> {% set solde = solde + compte.solde %}
+                                            {% if compte.solde >= 0 %}
+                                                <td>{{ compte.solde|abs|number_format(2,',',' ') }}</td> {% set solde = solde + compte.solde %}
+                                                <td>0,00</td>
+                                            {% else %}
+                                                <td>0,00</td>
+                                                <td>{{ compte.solde|abs|number_format(2,',',' ') }}</td> {% set solde = solde + compte.solde %}             
+                                            {% endif %}
+                                            
                                         </tr>                                        
                                     {% endfor %}
                                     <tr>
                                         <th colspan=2 class="text-right">TOTAL : {{ classe }}</th>
                                         <td>{{ debit|number_format(2,',',' ') }}</td>
                                         <td>{{ credit|number_format(2,',',' ') }}</td>
-                                        <td>{{ solde|number_format(2,',',' ') }}</td>
+                                        {% if solde >= 0 %}
+                                            <td>{{ solde|abs|number_format(2,',',' ') }}</td>
+                                            <td>0,00</td>
+                                        {% else %}
+                                            <td>0,00</td>
+                                            <td>{{ solde|abs|number_format(2,',',' ') }}</td>
+                                        {% endif %}
+                                        
                                     </tr>
                                 {% endfor %}        
                             </tbody>
