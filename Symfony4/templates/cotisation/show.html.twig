@@ -72,22 +72,22 @@
                                 <div class="col-md-4">
                                     <ul class="list-style-none border-bottom-white">                
                                         <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Droit d'ahésion payé:</span>
+                                            <span class="font-weight-medium text-dark"> Droit d'ahésion payé</span>
                                         </li>
                                         <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Cotisation ancien :</span>
+                                            <span class="font-weight-medium text-dark"> Cotisation ancien</span>
                                         </li>
                                         <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Cotisation nouveau :</span>
+                                            <span class="font-weight-medium text-dark"> Cotisation nouveau</span>
                                         </li>
                                         <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Ancien béneficiaire :</span>
+                                            <span class="font-weight-medium text-dark"> Ancien béneficiaire</span>
                                         </li>
                                         <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Nouveau béneficiaire :</span>
+                                            <span class="font-weight-medium text-dark"> Nouveau béneficiaire </span>
                                         </li>
                                         <li class="my-3 ">
-                                            <span class="font-weight-medium text-dark"> Cotisation annuelle:</span>
+                                            <span class="font-weight-medium text-dark"> Cotisation annuelle</span>
                                         </li>
                                     </ul>
                                 </div>
@@ -192,18 +192,17 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for compteCotisation in adherent.compteCotisations %}
-                                    {% for historiqueCotisation in compteCotisation.historiqueCotisations %}                                                               
-                                        <tr>
-                                            <th scope="row">{{ historiqueCotisation.datePaiement |date('d/m/Y') }}</th>
-                                            <td>{{ compteCotisation.exercice.annee }}</td>
-                                            <td>{{ historiqueCotisation.montant }}</td>
-                                            <td>{{ historiqueCotisation.tresorerie.libelle }}</td>
-                                            <td>{{ historiqueCotisation.reference }}</td>
-                                            <td>{{ historiqueCotisation.remarque }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                {% endfor %}                  
+                                {% set compteCotisation = adherent.compteCotisation(exercice) %}
+                                {% for historiqueCotisation in compteCotisation.historiqueCotisations %}                                                               
+                                    <tr>
+                                        <th scope="row">{{ historiqueCotisation.datePaiement |date('d/m/Y') }}</th>
+                                        <td>{{ compteCotisation.exercice.annee }}</td>
+                                        <td>{{ historiqueCotisation.montant }}</td>
+                                        <td>{{ historiqueCotisation.tresorerie.libelle }}</td>
+                                        <td>{{ historiqueCotisation.reference }}</td>
+                                        <td>{{ historiqueCotisation.remarque }}</td>
+                                    </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>

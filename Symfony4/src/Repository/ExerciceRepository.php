@@ -28,9 +28,30 @@ class ExerciceRepository extends ServiceEntityRepository
 
     public function findExerciceFromInscription(Adherent $adherent)
     {
-        return $this->_em->createQuery('select e from App\Entity\Exercice e where :dateInscription < e.dateFin')  
+        return $this->_em->createQuery('select e from App\Entity\Exercice e where :dateInscription <= e.dateFin')  
                                         ->setParameter('dateInscription', $adherent->getDateInscription())
                                         ->getResult();   
+    }
+
+    public function findFinExercice()
+    {
+        $result =  $this->_em->createQuery('select max(e.dateFin) from App\Entity\Exercice e')  
+                                ->getOneOrNullResult(); 
+        if ($result) {
+            return new \DateTimeImmutable($result[1]);
+        } 
+
+        return null;
+        
+    }
+
+    public function findDernierExercice()
+    {
+        $dernierDate = $this->_em->createQuery('select max(e.dateFin) from App\Entity\Exercice e')  
+                    ->getOneOrNullResult(); 
+        return $this->_em->createQuery('select e from App\Entity\Exercice e where e.dateFin = :der')
+                    ->setParameter('der', $dernierDate)  
+                    ->getOneOrNullResult();   
     }
 
 }

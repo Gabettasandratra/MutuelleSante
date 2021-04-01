@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Bilan{% endblock %}
+{% block title %}Bilan comptable{% endblock %}
 
 {% block header %}
     <div class="page-breadcrumb">
         <div class="d-flex align-items-center">
-            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Bilan des comptes</h4>
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Bilan comptable</h4>
             <div class="ml-auto">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb m-0 p-0">
@@ -23,135 +23,63 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Bilan actif</h4>
+                    <h4 class="card-title">Bilan comptable</h4>
                     <hr>
                     <div class="row">
-                        <div class="col-md-10">
-                            <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <thead>
+                        <div class="col-md-6 col-sm-12 border-right">
+                            <table class="table table-bordered">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th class="text-center" colspan=2>ACTIFS</th>
+                                    </tr>                
+                                </thead>
+                                <tbody>
+                                    {% set totalA = 0 %}
+                                    {% for compte in donnees.actif %}
                                         <tr>
-                                            <th class="text-center">ACTIF</th>
-                                            <th class="text-right">2019</th>
-                                            <th class="text-right">2020</th>
+                                            <td title="{{ compte.poste }}" data-toggle="tooltip">{{ compte.titre }}</td>
+                                            <td>{{ compte.solde }}</td> {% set totalA = totalA + compte.solde %}
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>ACTIFS NON COURANTS</td><td></td><td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Immobilisations incorporelles</td><td></td><td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Immobilisations corporelles</td><td></td><td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Immobilisations fincancières</td><td></td><td></td>
-                                        </tr>
-                                        <tr class="bordered">
-                                            <td class="text-right">TOTAL ACTIFS NON COURANTS</td><td></td><td></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>ACTIFS COURANTS</td><td></td><td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Stock et en-cours</td><td></td><td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Créances et emplois assimilés</td><td></td><td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Trésorerie et équivalents de trésorerie</td><td></td><td></td>
-                                        </tr>
-                                        <tr class="bordered">
-                                            <td class="text-right">TOTAL ACTIFS NON COURANTS</td><td></td><td></td>
-                                        </tr>
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <td class="text-right">TOTAL ACTIFS</td><td></td><td></td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
+                                    {% endfor %}
+                                    
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-active">
+                                        <th>TOTAL ACTIF</th>
+                                        <td>{{ totalA }}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
                         </div>
-                    </div>
-                    <h4 class="card-title mt-4">Bilan passif</h4>
-                    <hr>
-                    <div class="row">
-                        <div class="col-md-10">
-                            <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <thead>
+                        <div class="col-md-6 col-sm-12">
+                            <table class="table table-bordered">
+                                <thead  class="thead-light">
+                                    <tr>
+                                        <th class="text-center" colspan=2>CAPITAUX PROPRES ET PASSIFS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% set totalP = 0 %}
+                                    {% for compte in donnees.passif %}
                                         <tr>
-                                            <th class="text-center">CAPITAUX PROPRES ET PASSIF</th>
-                                            <th class="text-right">2019</th>
-                                            <th class="text-right">2020</th>
+                                            <td title="{{ compte.poste }}" data-toggle="tooltip">{{ compte.titre }}</td>
+                                            <td>{{ compte.solde }}</td> {% set totalP = totalP + compte.solde %}
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>CAPITAUX PROPRES</td><td></td><td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Capital émis</td><td></td><td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Primes et réserves consolidés</td><td></td><td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Resultat net - part du groupe</td><td></td><td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Autres capitaux propres - report à nouveau</td><td></td><td></td>
-                                        </tr>
-                                        <tr class="bordered">
-                                            <td class="text-right">TOTAL CAPITAUX PROPRES</td><td></td><td></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>PASSIFS NON-COURANTS</td><td></td><td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Produits différés : subventions d'investissement</td><td></td><td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Impôts differés</td><td></td><td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Emprunts et dettes financières</td><td></td><td></td>
-                                        </tr>
-                                        <tr class="bordered">
-                                            <td class="text-right">TOTAL PASSIFS NON-COURANTS</td><td></td><td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>PASSIFS COURANTS</td><td></td><td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Dettes à court terme</td><td></td><td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Fournisseurs et comptes rattachés</td><td></td><td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Provisions et produits constatés d'avance</td><td></td><td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Autres dettes</td><td></td><td></td>
-                                        </tr>
-                                        <tr class="bordered">
-                                            <td class="text-right">TOTAL NON-COURANTS</td><td></td><td></td>
-                                        </tr>
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <td class="text-right">TOTAL PASSIF ET CAPITAUX PROPRES</td><td></td><td></td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
+                                    {% endfor %}
+                                    {% set resultat = totalA - totalP %}
+                                    <tr>
+                                        <td><strong>Résultat de l'exercice {% if resultat >= 0 %}(Bénéfice){% else %}(Perte){% endif %}</strong></td>
+                                        <td></strong>{{ resultat }}</strong></td>
+                                    </tr>
+                                    
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-active">
+                                        <th>TOTAL CAPITAUX PROPRES ET PASSIFS</th>
+                                        <td>{{ totalP + resultat }}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
                         </div>
                     </div>
                 </div>

@@ -13,7 +13,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=AdherentRepository::class)
- * @UniqueEntity(fields={"numero"}, message="Le numéro de congrégation donné existe déja")
+ * @UniqueEntity(fields={"numero"}, message="Le numéro de congrégation {{ value }} existe déja")
  */
 class Adherent
 {
@@ -275,7 +275,7 @@ class Adherent
         $exercice = null;
         foreach ($this->compteCotisations as  $compteCotisation) {
             $exercice = $compteCotisation->getExercice();
-            if ( $exercice->getDateDebut() <= $now && $exercice->getDateFin() > $now) {
+            if ( $exercice->getDateDebut() <= $now && $exercice->getDateFin() >= $now) {
                 return $compteCotisation;
             }
         }

@@ -33,7 +33,7 @@
                                         <th scope="col">#</th>
                                         <th scope="col">Poste</th>
                                         <th scope="col">Intitulé</th>
-                                        <th scope="col">Solde actuelle</th>
+                                        <th scope="col">Solde</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -42,7 +42,7 @@
                                             <th scope="row">{{ loop.index }}</th>
                                             <td>{{ compte.poste }}</td>
                                             <td>{{ compte.titre }}</td>
-                                            <td>0</td>
+                                            <td>{{ compte.solde }}</td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>

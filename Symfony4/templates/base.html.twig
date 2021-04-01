@@ -185,7 +185,7 @@
                             <li class="sidebar-item"> 
                                 <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-cash-multiple"></i><span class="hide-menu"> Etats financiers </span></a>
                                 <ul aria-expanded="false" class="collapse first-level">
-                                    <li class="sidebar-item"><a href="{{ path('comptabilite_bilan') }}" class="sidebar-link"><i class="mdi mdi-chart-arc"></i><span class="hide-menu"> Bilan </span></a></li>
+                                    <li class="sidebar-item"><a href="{{ path('comptabilite_bilan') }}" class="sidebar-link"><i class="mdi mdi-chart-arc"></i><span class="hide-menu"> Bilan comptable</span></a></li>
                                     <li class="sidebar-item"><a href="{{ path('comptabilite_resultat') }}" class="sidebar-link"><i class="mdi mdi-chart-bar"></i><span class="hide-menu"> Compte de résultat </span></a></li>
                                 </ul>
                             </li>
@@ -205,10 +205,11 @@
                                     <li class="sidebar-item"><a href="#" class="sidebar-link"><i class="mdi mdi-format-list-bulleted"></i><span class="hide-menu"> Liste utilisateurs </span></a></li>
                                 </ul>
                             </li>
-                            <li class="sidebar-item"> 
+                            <li class="sidebar-item  mb-5"> 
                                 <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-settings"></i><span class="hide-menu"> Configuration </span></a>
                                 <ul aria-expanded="false" class="collapse first-level">
-                                    <li class="sidebar-item"><a href="{{ path('parametre_compta') }}" class="sidebar-link"><i class="mdi mdi-dots-horizontal"></i><span class="hide-menu"> Configurations comptable</span></a></li>
+                                    <li class="sidebar-item"><a href="{{ path('parametre_mutuelle') }}" class="sidebar-link"><i class="mdi mdi-settings"></i><span class="hide-menu"> Configurations mutuelle</span></a></li>
+                                    <li class="sidebar-item"><a href="{{ path('parametre_exercice') }}" class="sidebar-link"><i class="mdi mdi-settings"></i><span class="hide-menu"> Configurations exercice</span></a></li>
                                 </ul>
                             </li>
                         {% endblock %}

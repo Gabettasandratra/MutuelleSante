@@ -39,8 +39,17 @@ class PrestationController extends AbstractController
      */
     public function show(Pac $pac)
     {
+        $exercice = $this->getDoctrine()
+                         ->getRepository(Exercice::class)
+                         ->findCurrent();
+
+        $prestations = $this->getDoctrine()
+                          ->getRepository(Prestation::class)
+                          ->findPrestation($exercice, $pac);   
+
         return $this->render('prestation/beneficiaire.html.twig', [
             'pac' => $pac,
+            'prestations' => $prestations,
         ]);
     }
 

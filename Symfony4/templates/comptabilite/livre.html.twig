@@ -41,7 +41,7 @@
                                     </select>
                                 </div>
                                 <div class="col-sm-4">
-                                    <a href="/comptabilite/grandlivre" class="btn btn-info">Acceder</a>
+                                    <a href="/comptabilite/grandlivre" id="link" class="btn btn-info">Acceder</a>
                                 </div>
                             </div>
                         </div>                       
@@ -63,7 +63,7 @@
                                     {% for classe, comptes in donnees %}
                                         <tr><th colspan=6>{{ classe }}</th></tr>
                                         {% for compte, articles in comptes %}
-                                            <tr><th colspan=6>{{ compte }}</th></tr> 
+                                            <tr><th colspan=6  class="table-active">{{ compte }}</th></tr> 
                                             {% set debit = 0 %} {% set credit = 0 %}
                                             {% for article in articles %}
                                                 <tr>
@@ -121,4 +121,19 @@
 {% block javascripts %}
     <script src="{{ asset('assets/libs/datatable/dist/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('dist/js/pages/datatable/datatable-basic.init.js') }}"></script>
+    <script>
+        $(document).ready(function() {  
+            var url = window.location + "";
+            var value = url.replace(window.location.protocol + "//" + window.location.host + "{{ path('comptabilite_livre') }}", ""); 
+            var element = $('#compte option').filter(function() {
+                return this.value === value;
+            });
+            element.attr('selected', 'selected');
+
+            $('#link').click(function(e) {
+                e.preventDefault();
+                window.location.href = "{{ path('comptabilite_livre') }}"+ $('#compte').val();
+            });    
+        });
+    </script>
 {% endblock %}

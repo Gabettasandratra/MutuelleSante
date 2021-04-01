@@ -6,9 +6,12 @@ use App\Repository\ExerciceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=ExerciceRepository::class)
+ * @UniqueEntity(fields={"annee"}, message="L'exercice {{ value }} est déja configuré")
  */
 class Exercice
 {
@@ -31,16 +34,19 @@ class Exercice
 
     /**
      * @ORM\Column(type="float")
+     * @Assert\Positive
      */
     private $cotNouveau;
 
     /**
      * @ORM\Column(type="float")
+     * @Assert\Positive
      */
     private $cotAncien;
 
     /**
      * @ORM\Column(type="float")
+     * @Assert\Positive
      */
     private $droitAdhesion;
 
@@ -56,6 +62,7 @@ class Exercice
 
     public function __construct()
     {
+        $this->isCloture = false;   
         $this->historiqueCotisations = new ArrayCollection();
     }
 
@@ -146,5 +153,14 @@ class Exercice
         $this->dateFin = $dateFin;
 
         return $this;
+    }
+
+    public function isCurrent()
+    {       
+        $now = new \DateTime();
+        if ( $this->dateDebut <= $now && $this->dateFin >= $now) {
+            return true;
+        }
+        return null;
     }
 }

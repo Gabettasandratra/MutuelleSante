@@ -2,7 +2,9 @@
 
 namespace App\Repository;
 
+use App\Entity\Pac;
 use App\Entity\Adherent;
+use App\Entity\Exercice;
 use App\Entity\Prestation;
 use App\Entity\Remboursement;
 use Doctrine\Persistence\ManagerRegistry;
@@ -49,6 +51,15 @@ class PrestationRepository extends ServiceEntityRepository
     {
         return $this->_em->createQuery('select sum(p.frais),sum(p.rembourse) from App\Entity\Prestation p where p.adherent = :ad and p.isPaye = false')
                             ->setParameter('ad', $adherent)
+                            ->getResult();                    
+    }
+
+    public function findPrestation(Exercice $exercice, Pac $pac)
+    {
+        return $this->_em->createQuery('select p from App\Entity\Prestation p where p.pac = :pac and p.date between :dateDebut and :dateFin')
+                            ->setParameter('pac', $pac)
+                            ->setParameter('dateDebut', $exercice->getDateDebut())
+                            ->setParameter('dateFin', $exercice->getDateFin())
                             ->getResult();                    
     }
 }

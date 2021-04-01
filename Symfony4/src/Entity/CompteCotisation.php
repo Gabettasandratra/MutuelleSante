@@ -120,7 +120,7 @@ class CompteCotisation
     public function setNouveau(int $nouveau): self
     {
         $this->nouveau = $nouveau;
-
+        $this->updateMontants();
         return $this;
     }
 
@@ -132,7 +132,7 @@ class CompteCotisation
     public function setAncien(int $ancien): self
     {
         $this->ancien = $ancien;
-
+        $this->updateMontants();
         return $this;
     }
 

@@ -17,7 +17,7 @@ class TresorerieController extends AbstractController
     {
         $compteTresoreries = $this->getDoctrine()
                                  ->getRepository(Compte::class)
-                                 ->findByIsTresor(true);
+                                 ->findTresorerie();
 
         return $this->render('tresorerie/index.html.twig', [
             'comptes' => $compteTresoreries,

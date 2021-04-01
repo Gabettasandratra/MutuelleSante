@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Compte;
 use App\Entity\Article;
+use App\Entity\Exercice;
 use App\Form\CompteType;
 use App\Form\ArticleType;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,12 +29,16 @@ class ComptabiliteController extends AbstractController
      */
     public function journal($journal)
     {
+        $exercice = $this->getDoctrine()
+                         ->getRepository(Exercice::class)
+                         ->findCurrent();
+
         if ($journal == 'cotisation') {
-            $articles = $this->getDoctrine()->getRepository(Article::class)->findByCategorie('Cotisation');
+            $articles = $this->getDoctrine()->getRepository(Article::class)->findJournal($exercice, 'Cotisation');
         } else if ($journal == 'remboursement') {
-            $articles = $this->getDoctrine()->getRepository(Article::class)->findByCategorie('Remboursement');
+            $articles = $this->getDoctrine()->getRepository(Article::class)->findJournal($exercice, 'Remboursement');
         } else if ($journal == 'divers') {
-            $articles = $this->getDoctrine()->getRepository(Article::class)->findByCategorie('Divers');
+            $articles = $this->getDoctrine()->getRepository(Article::class)->findJournal($exercice, 'Divers');
         } else {
             throw $this->createNotFoundException('Ce journal comptable n\'existe pas');
         }
@@ -72,20 +77,22 @@ class ComptabiliteController extends AbstractController
      */
     public function livre($poste = null)
     {
+        $exercice = $this->getDoctrine()
+                         ->getRepository(Exercice::class)
+                         ->findCurrent();
+
         if ($poste === null) {
-            $donnees = $this->getDoctrine()->getRepository(Article::class)->findGrandLivre();
+            $donnees = $this->getDoctrine()->getRepository(Article::class)->findGrandLivre($exercice);
         } else {
             $compte = $this->getDoctrine()->getRepository(Compte::class)->findOneByPoste($poste);
             if ($compte) {
-                $articles = $this->getDoctrine()->getRepository(Article::class)->findGrandLivreCompte($compte);
+                $articles = $this->getDoctrine()->getRepository(Article::class)->findGrandLivreCompte($exercice, $compte);
                 $donnees['compte'] = $compte;
                 $donnees['articles'] = $articles;
             } else {
                 throw $this->createNotFoundException("Le compte numéro $poste n'existe pas");
             }
         }
-
-        dump($donnees);
     
         $labelcomptes = $this->getDoctrine()->getRepository(Compte::class)->findPosteTitre();
 
@@ -102,7 +109,10 @@ class ComptabiliteController extends AbstractController
      */
     public function balance()
     {
-        return $this->render('comptabilite/balance.html.twig');
+        $donnees = $this->getDoctrine()->getRepository(Article::class)->findBalance();
+        return $this->render('comptabilite/balance.html.twig', [
+            'donnees' => $donnees,
+        ]);
     }
 
     /**
@@ -202,7 +212,11 @@ class ComptabiliteController extends AbstractController
      */
     public function bilan()
     {
-        return $this->render('comptabilite/bilan.html.twig');
+        $donnees['actif'] = $this->getDoctrine()->getRepository(Compte::class)->findBilanActif();
+        $donnees['passif'] = $this->getDoctrine()->getRepository(Compte::class)->findBilanPassif();
+        return $this->render('comptabilite/bilan.html.twig', [
+            'donnees' => $donnees,
+        ]);
     }
 
     /**
@@ -210,6 +224,10 @@ class ComptabiliteController extends AbstractController
      */
     public function resultat()
     {
-        return $this->render('comptabilite/resultat.html.twig');
+        $donnees['charge'] = $this->getDoctrine()->getRepository(Compte::class)->findGestionCharge();
+        $donnees['produit'] = $this->getDoctrine()->getRepository(Compte::class)->findGestionProduit();
+        return $this->render('comptabilite/resultat.html.twig', [
+            'donnees' => $donnees,
+        ]);
     }
 }

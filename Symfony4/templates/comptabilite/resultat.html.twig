@@ -1,0 +1,93 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Compte de résultat{% endblock %}
+
+{% block header %}
+    <div class="page-breadcrumb">
+        <div class="d-flex align-items-center">
+            <h4 class="page-title text-truncate text-dark font-weight-medium mb-0">Compte de résultat</h4>
+            <div class="ml-auto">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb m-0 p-0">
+                        <li class="breadcrumb-item text-muted active" aria-current="page">Etats financiers</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page">Compte de résultat</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Compte de résultat</h4>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12 border-right">
+                            <table class="table table-bordered">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th class="text-center" colspan=2>CHARGES</th>
+                                    </tr>                
+                                </thead>
+                                <tbody>
+                                    {% set totalC = 0 %}
+                                    {% for compte in donnees.charge %}
+                                        <tr>
+                                            <td title="{{ compte.poste }}" data-toggle="tooltip">{{ compte.titre }}</td>
+                                            <td>{{ compte.solde }}</td> {% set totalC = totalC + compte.solde %}
+                                        </tr>
+                                    {% endfor %}
+                                    
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-active">
+                                        <th>TOTAL DES CHARGES</th>
+                                        <td>{{ totalC }}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <table class="table table-bordered">
+                                <thead  class="thead-light">
+                                    <tr>
+                                        <th class="text-center" colspan=2>PRODUITS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% set totalP = 0 %}
+                                    {% for compte in donnees.produit %}
+                                        <tr>
+                                            <td title="{{ compte.poste }}" data-toggle="tooltip">{{ compte.titre }}</td>
+                                            <td>{{ compte.solde }}</td> {% set totalP = totalP + compte.solde %}
+                                        </tr>
+                                    {% endfor %}
+                                    
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-active">
+                                        <th>TOTAL DES PRODUITS</th>
+                                        <td>{{ totalP }}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            {% set resultat = totalP - totalC %}
+                            <div class="alert {% if resultat >= 0 %}alert-success{% else %}alert-danger{% endif %} " role="alert">
+                                RESULTAT DE L'EXERCICE = {{totalP}} - {{totalC}} = {{ totalP - totalC }}
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
